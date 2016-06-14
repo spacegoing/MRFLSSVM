@@ -1,4 +1,5 @@
-# Defualt: Python 2.7
+# Defualt: Python 3.4
+# You need to modify the following path as well as the PYTHONHOME path in cfile
 #python-config=/usr/bin/python-config
 python-config=/Users/spacegoing/anaconda/bin/python3-config
 ldflags:=$(shell $(python-config) --ldflags)
