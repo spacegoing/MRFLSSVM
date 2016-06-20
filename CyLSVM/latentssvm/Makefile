@@ -1,10 +1,10 @@
 # Makefile for Latent Structural SVM
 
-CC=gcc
+CC=gcc-5
 #CFLAGS= -g -Wall
 CFLAGS= -O3 -fomit-frame-pointer -ffast-math
 #CFLAGS = -O3 -pg
-LD=gcc
+LD=gcc-5
 #LDFLAGS= -g
 LDFLAGS= -O3
 #LDFLAGS = -O3 -pg
