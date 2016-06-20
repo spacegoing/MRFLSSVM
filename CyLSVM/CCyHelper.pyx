@@ -1,3 +1,4 @@
+from PyLSVM import instance
 
 cdef extern from "./latentssvm/svm_struct_latent_api_types.h":
     ctypedef struct PATTERN:
@@ -17,4 +18,6 @@ cdef extern from "./latentssvm/svm_struct_latent_api_types.h":
     ctypedef struct SAMPLE:
         int n
         EXAMPLE *examples
+
+cdef SAMPLE read_struct_examples_helper():
 
