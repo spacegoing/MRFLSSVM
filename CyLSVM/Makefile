@@ -4,36 +4,29 @@
 python-config=/Users/spacegoing/anaconda/bin/python3-config
 ldflags:=$(shell $(python-config) --ldflags)
 cflags:=$(shell $(python-config) --cflags)
+gcc=gcc-5
 
 pyxfile=test
-cfile=testcc.c
+cfile=testcc
 
 default: cysvm.o
 
-cysvm.o: $(pyxfile).o testcc.o
-	gcc $(ldflags) $? $(cfile) -o $@
+cysvm.o: $(pyxfile).o $(cfile).o
+	$(gcc) $(ldflags) $? -o $@ -lm
 
-testcc.o: $(cfile).c
-	gcc $(cflags) $< -o $@
+$(cfile).o: $(cfile).c
+	$(gcc) -c $(cflags) $< -o $@
 
-test.o: $(pyxfile).c
-	gcc $(cflags) $< -o $@
+$(pyxfile).o: $(pyxfile).c
+	$(gcc) -c $(cflags) $< -o $@
+
+run:
+	./cysvm.o
 
 $(pyxfile).c: $(pyxfile).pyx setup.py
 	python setup.py build_ext --inplace
 	cython $<
 
-cysvm.out: test.o testcc.o 
-	gcc-5 $(ldflags) testcc.o test.o -o $@ -lm
-
-testcc.o: $(cfile)
-	gcc-5 -c $(cflags) $< -o $@
-
-$(pyxfile).o: $(pyxfile).c
-	gcc-5 -c $(cflags) $< -o $@
-
-run:
-	./cysvm.o
-
 clean:
-	rm -rf $(pyxfile).c $(pyxfile).h $(pyxfile)c.so build cysvm*
+	rm -rf build cysvm*
+	rm -f *.o *.so $(pyxfile).c $(pyxfile).h

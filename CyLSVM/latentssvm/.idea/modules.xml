@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/latentssvm_v0.12.iml" filepath="$PROJECT_DIR$/.idea/latentssvm_v0.12.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/latentssvm.iml" filepath="$PROJECT_DIR$/.idea/latentssvm.iml" />
     </modules>
   </component>
 </project>
