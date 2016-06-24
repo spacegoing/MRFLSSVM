@@ -16,6 +16,6 @@ set(SOURCE_FILES
     svm_struct_latent_api.h
     svm_struct_latent_api_types.h
     svm_struct_latent_cccp.c
-    svm_struct_latent_classify.c)
+    svm_struct_latent_classify.c CythonWrapper.c CythonWrapper.h ttt.c)
 
 add_executable(latentssvm_v0_12 ${SOURCE_FILES})

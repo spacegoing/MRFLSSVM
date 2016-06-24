@@ -6,26 +6,30 @@ ldflags:=$(shell $(python-config) --ldflags)
 cflags:=$(shell $(python-config) --cflags)
 gcc=gcc-5
 
-pyxfile=test
-cfile=testcc
+pyxfile=CCyHelper
+wrapperFile=CythonWrapper
+mainFile=ttt
 
 default: cysvm.o
 
-cysvm.o: $(pyxfile).o $(cfile).o
+cysvm.o: $(pyxfile).o $(mainFile).o $(wrapperFile).o
 	$(gcc) $(ldflags) $? -o $@ -lm
 
-$(cfile).o: $(cfile).c
+$(wrapperFile).o: $(wrapperFile).c
 	$(gcc) -c $(cflags) $< -o $@
 
 $(pyxfile).o: $(pyxfile).c
 	$(gcc) -c $(cflags) $< -o $@
 
+$(mainFile).o: $(mainFile).c
+	$(gcc) -c $(cflags) $< -o $@
+
+$(pyxfile).c: $(pyxfile).pyx #setup.py
+#python setup.py build_ext --inplace
+	cython $<
+
 run:
 	./cysvm.o
-
-$(pyxfile).c: $(pyxfile).pyx setup.py
-	python setup.py build_ext --inplace
-	cython $<
 
 clean:
 	rm -rf build cysvm*

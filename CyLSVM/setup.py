@@ -4,7 +4,10 @@ from distutils.core import setup, Extension
 from Cython.Build import cythonize
 from numpy import get_include
 
-ext = Extension("testc", sources=["test.pyx"],
+extensionName = "testc"
+sourcesFiles = ["CCyHelper.pyx"]
+
+ext = Extension(extensionName, sources=sourcesFiles,
                 include_dirs=['.', get_include()])
 
-setup(name="testc", ext_modules=cythonize(ext))
+setup(name=extensionName, ext_modules=cythonize(ext))

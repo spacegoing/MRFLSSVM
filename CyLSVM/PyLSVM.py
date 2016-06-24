@@ -10,11 +10,10 @@ from linEnvLearn import linEnvLearn
 # initialize random number generator
 np.random.seed(0)
 
-
 # Generate checkboard data
 def checkboardHelper(H, W):
-    cliques = np.zeros([H, W])  # mapping of variables to cliques
-    y = np.zeros([H, W])  # ground-truth labels
+    cliques = np.zeros([H, W],dtype=np.int32)  # mapping of variables to cliques
+    y = np.zeros([H, W], dtype=np.int32)  # ground-truth labels
 
     # create checkboard data
     _black = True  # indicate _black True or white False
