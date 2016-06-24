@@ -23,6 +23,15 @@ $(pyxfile).c: $(pyxfile).pyx setup.py
 	python setup.py build_ext --inplace
 	cython $<
 
+cysvm.out: test.o testcc.o 
+	gcc-5 $(ldflags) testcc.o test.o -o $@ -lm
+
+testcc.o: $(cfile)
+	gcc-5 -c $(cflags) $< -o $@
+
+$(pyxfile).o: $(pyxfile).c
+	gcc-5 -c $(cflags) $< -o $@
+
 run:
 	./cysvm.o
 
