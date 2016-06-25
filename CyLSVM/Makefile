@@ -33,4 +33,4 @@ run:
 
 clean:
 	rm -rf build cysvm*
-	rm -f *.o *.so $(pyxfile).c $(pyxfile).h
+	rm -f *.o *.so $(pyxfile).c $(pyxfile).h $(pyxfile)_api.h

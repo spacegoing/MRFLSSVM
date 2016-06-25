@@ -4,16 +4,18 @@
 #include "ttt.h"
 int* crazytest(void);
 int main(int argc, char **argv) {
-    Py_SetPythonHome(L"/Users/spacegoing/anaconda");
-    Py_Initialize();
-    PyInit_CCyHelper(); // Python 3.x
+//    Py_SetPythonHome(L"/Users/spacegoing/anaconda");
+//    Py_Initialize();
+//    PyInit_CCyHelper(); // Python 3.x
+    import_CCyHelper();
 
     int* arr = crazytest();
-    for(int j =0; j<20; j++){
+    int row = sizeof arr / sizeof *arr;
+    for(int j =0; j<row; j++){
         printf("int: %d", arr[j]);
     }
 
-    Py_Finalize();
+//    Py_Finalize();
     return 0;
 }
 
