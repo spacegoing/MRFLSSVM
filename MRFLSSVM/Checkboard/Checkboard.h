@@ -18,6 +18,9 @@ struct Options {
     int numCliques = (int) pow(W / gridStep, 2); // number of cliques
     int N = W * H; // number of variables
 
+    int dimUnary = 2;
+    int dimPairwise = 3;
+
     // Learning Configs
     int K = 4;  // number of lower linear functions
     int maxIters = 100;  // maximum learning iterations
@@ -37,10 +40,9 @@ public:
     cube pairwise;
 
     Checkboard();
-    ~Checkboard();
 
 private:
-    
+    void checkboardHelper();
 
 };
 
