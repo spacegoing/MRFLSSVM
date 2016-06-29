@@ -7,6 +7,8 @@
 
 #include <armadillo>
 #include <math.h>
+#include <vector>
+#include <random>
 
 using namespace arma;
 
@@ -39,10 +41,24 @@ public:
     cube unary;
     cube pairwise;
 
+    typedef std::vector<double> stdvec;
+    typedef std::vector< std::vector<double> > stdmat;
+    typedef std::vector<std::vector
+            <std::vector<double> > > stdcube;
+
     Checkboard();
+
+    stdmat mat_to_std_vec(Mat<int> &A);
+    stdcube cube_to_std_vec(cube &A);
+    void printStdVector(const Checkboard::stdmat &vec);
+    void printStdCube(const Checkboard::stdcube &cube);
+
 
 private:
     void checkboardHelper();
+    mat randomMatrix(int rows, int cols);
+
+
 
 };
 
