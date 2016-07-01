@@ -2,20 +2,14 @@ cmake_minimum_required(VERSION 3.5)
 project(latentssvm_v0_12)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+find_package(Armadillo REQUIRED)
+include_directories(${ARMADILLO_INCLUDE_DIRS})
 
 set(SOURCE_FILES
-    svm_light/kernel.h
-    svm_light/svm_classify.c
-    svm_light/svm_common.c
-    svm_light/svm_common.h
-    svm_light/svm_hideo.c
-    svm_light/svm_learn.c
-    svm_light/svm_learn.h
-    svm_light/svm_learn_main.c
-    svm_struct_latent_api.c
-    svm_struct_latent_api.h
-    svm_struct_latent_api_types.h
-    svm_struct_latent_cccp.c
-    svm_struct_latent_classify.c)
+        mrf_helper.cpp
+        mrf_helper.h
+        Checkboard/Checkboard.cpp
+        Checkboard/Checkboard.h)
 
-add_executable(latentssvm_v0_12 ${SOURCE_FILES})
+add_executable(mrflssvm ${SOURCE_FILES})
+target_link_libraries(mrflssvm ${ARMADILLO_LIBRARIES})
