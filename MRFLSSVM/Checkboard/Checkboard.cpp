@@ -38,22 +38,46 @@ void Checkboard::checkboardHelper() {
 
 }
 
-Checkboard::stdmat Checkboard::mat_to_std_vec(Mat<int> &A) {
-    stdmat V(A.n_rows);
+int **Checkboard::mat_to_std_vec(Mat<int> &A) {
+    int **V = (int **) malloc(sizeof(int *) * A.n_rows);
     for (size_t i = 0; i < A.n_rows; i++) {
-        V[i] = conv_to<stdvec>::from(A.row(i));
+        int *temp = (int *) malloc(sizeof(int) * A.n_cols);
+        for (int j = 0; j < A.n_cols; ++j) {
+            temp[j] = A(i, j);
+        }
+        V[i] = temp;
     };
     return V;
 }
 
-Checkboard::stdcube Checkboard::cube_to_std_vec(cube &A) {
-    stdcube VVV(A.n_rows, stdmat(A.n_cols, stdvec(A.n_slices)));
+double **Checkboard::mat_to_std_vec(mat &A) {
+    double **V = (double **) malloc(sizeof(double *) * A.n_rows);
     for (size_t i = 0; i < A.n_rows; i++) {
-        for (size_t j = 0; j < A.n_cols; j++) {
-            for (int k = 0; k < A.n_slices; ++k) {
-                VVV[i][j][k] = A(i, j, k);
-            }
+        double *temp = (double *) malloc(sizeof(double) * A.n_cols);
+        for (int j = 0; j < A.n_cols; ++j) {
+            temp[j] = A(i, j);
         }
+        V[i] = temp;
+    };
+    return V;
+}
+
+double ***Checkboard::cube_to_std_vec(cube &A) {
+    double ***VVV = (double ***) malloc(sizeof(double **) * A.n_rows);
+    for (size_t i = 0; i < A.n_rows; i++) {
+        double **VV = (double **) malloc(sizeof(double *) * A.n_cols);
+
+        for (size_t j = 0; j < A.n_cols; j++) {
+
+            double *V = (double *) malloc(sizeof(double) * A.n_rows);
+            for (int k = 0; k < A.n_slices; ++k) {
+                V[k] = A(i, j, k);
+            }
+
+            VV[j] = V;
+        }
+
+        VVV[i] = VV;
     }
 
     return VVV;
@@ -70,19 +94,28 @@ mat Checkboard::randomMatrix(int rows, int cols) {
     return A;
 }
 
-void Checkboard::printStdVector(const Checkboard::stdmat &vec) {
-    for (int i = 0; i < vec.size(); i++) {
-        for (int j = 0; j < vec[i].size(); j++) {
+void Checkboard::printStdVector(int **vec) {
+    for (int i = 0; i < options.H; i++) {
+        for (int j = 0; j < options.W; j++) {
             std::cout << vec[i][j] << " ";
         }
         std::cout << "\n";
     }
 }
 
-void Checkboard::printStdCube(const Checkboard::stdcube &cube) {
-    for (int i = 0; i < cube.size(); i++) {
-        for (int j = 0; j < cube[i].size(); j++) {
-            for (int k = 0; k < cube[i][j].size(); ++k) {
+void Checkboard::printStdVector(double **vec) {
+    for (int i = 0; i < options.H; i++) {
+        for (int j = 0; j < options.W; j++) {
+            std::cout << vec[i][j] << " ";
+        }
+        std::cout << "\n";
+    }
+}
+
+void Checkboard::printStdCube(double ***cube) {
+    for (int i = 0; i < options.H; i++) {
+        for (int j = 0; j < options.W; j++) {
+            for (int k = 0; k < options.dimUnary; ++k) {
                 std::cout << std::setprecision(2) <<
                 cube[i][j][k] << ";";
             }

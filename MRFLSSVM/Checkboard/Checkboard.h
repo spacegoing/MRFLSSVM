@@ -41,20 +41,19 @@ public:
     cube unary;
     cube pairwise;
 
-    typedef std::vector<double> stdvec;
-    typedef std::vector<std::vector<double> > stdmat;
-    typedef std::vector<std::vector
-            <std::vector<double> > > stdcube;
-
     Checkboard();
 
-    stdmat mat_to_std_vec(Mat<int> &A);
+    int **mat_to_std_vec(Mat<int> &A);
 
-    stdcube cube_to_std_vec(cube &A);
+    double **mat_to_std_vec(mat &A);
 
-    void printStdVector(const Checkboard::stdmat &vec);
+    double ***cube_to_std_vec(cube &A);
 
-    void printStdCube(const Checkboard::stdcube &cube);
+    void printStdVector(int **vec);
+
+    void printStdVector(double **vec);
+
+    void printStdCube(double ***cube);
 
 
 private:

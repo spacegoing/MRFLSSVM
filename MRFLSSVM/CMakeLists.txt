@@ -8,6 +8,7 @@ include_directories(${ARMADILLO_INCLUDE_DIRS})
 set(SOURCE_FILES
         mrf_helper.cpp
         mrf_helper.h
+        svm_struct_latent_api_types.h
         Checkboard/Checkboard.cpp
         Checkboard/Checkboard.h)
 

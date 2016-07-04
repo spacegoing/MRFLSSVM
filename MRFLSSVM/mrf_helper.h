@@ -5,20 +5,28 @@
 #ifndef LATENTSSVM_V0_12_MRF_HELPER_H
 #define LATENTSSVM_V0_12_MRF_HELPER_H
 
-
-#include "Checkboard/Checkboard.h"
-
-class MRF{
-public:
-
-};
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
-class LSSVM{
-    Checkboard checkboard;
-    int unaryWeight = 1;
-    int pairwiseWeight = 0;
-    int featureLength = 2*checkboard.options.K - 1;
-    mat linEnvCoeffs = zeros<mat>(featureLength, featureLength);
+#include "svm_struct_latent_api_types.h"
+
+SAMPLE read_struct_examples_helper(char *filename, STRUCT_LEARN_PARM *sparm);
+
+SVECTOR *psi(PATTERN x, LABEL y, LATENT_VAR h, STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm);
+
+void classify_struct_example_helper(PATTERN x, LABEL *y, LATENT_VAR *h, STRUCTMODEL *sm,
+                                    STRUCT_LEARN_PARM *sparm);
+
+void find_most_violated_constraint_marginrescaling_helper(PATTERN x, LABEL y, LABEL *ybar, LATENT_VAR *hbar,
+                                                          STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm);
+
+LATENT_VAR infer_latent_variables_helper(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm);
+
+
+#ifdef __cplusplus
 }
+#endif
+
 #endif //LATENTSSVM_V0_12_MRF_HELPER_H
