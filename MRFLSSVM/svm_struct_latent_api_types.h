@@ -20,8 +20,8 @@ typedef struct pattern {
     /*
       Type definition for input pattern x
     */
-    int row_no;
-    int col_no;
+    int n_rows;
+    int n_cols;
     double **observed_label;
 } PATTERN;
 
@@ -29,13 +29,17 @@ typedef struct label {
     /*
       Type definition for output label y
     */
-    int *ground_truth_label;
+    int n_rows;
+    int n_cols;
+    int **clique_indexes;
+    int **ground_truth_label;
 } LABEL;
 
 typedef struct latent_var {
     /*
       Type definition for latent variable h
     */
+    int n_rows;
     int *auxiliary_z;
 } LATENT_VAR;
 
@@ -61,6 +65,26 @@ typedef struct structmodel {
        added here, e.g. the grammar rules for NLP parsing */
 } STRUCTMODEL;
 
+struct check_options {
+    // Image Configs
+    int gridStep;  // grid size for defining cliques
+    int W; // image width
+    int H; // image height
+    int numCliques; // number of cliques
+    int N; // number of variables
+
+    int dimUnary;
+    int dimPairwise;
+
+    // Learning Configs
+    int K;  // number of lower linear functions
+    int maxIters;  // maximum learning iterations
+    double eps;  // constraint violation threshold
+
+    // Other Configs
+    int learningQP;  // encoding for learning QP (1, 2, or 3)
+    int figWnd;  // figure for showing results
+};
 
 typedef struct struct_learn_parm {
     double epsilon;
@@ -89,7 +113,10 @@ typedef struct struct_learn_parm {
 				  functions via -l command line
 				  option */
     /* add your own variables */
+    check_options options;
     int length_feature_vector;
     double cost_factor;
 } STRUCT_LEARN_PARM;
+
+
 

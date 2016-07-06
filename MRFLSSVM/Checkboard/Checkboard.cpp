@@ -12,7 +12,7 @@ Checkboard::Checkboard() :
 
 void Checkboard::checkboardHelper() {
     bool _black = true;
-    int cliqueID = 1;
+    int cliqueID = 0;
 
     //generate ground-truth checkboard
     for (int row = 0; row < options.H; row += options.gridStep) {
