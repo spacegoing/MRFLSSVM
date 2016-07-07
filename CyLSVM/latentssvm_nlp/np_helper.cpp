@@ -208,7 +208,6 @@ LATENT_VAR infer_latent_variables_helper(PATTERN x, LABEL y, STRUCTMODEL *sm, ST
 
 /* modified from Tom's function */
 SAMPLE read_struct_examples_helper(char *filename, STRUCT_LEARN_PARM *sparm) {
-
     FILE *fp = fopen(filename, "r");
     if (fp == NULL) {
         printf("Cannot open input file %s!\n", filename);

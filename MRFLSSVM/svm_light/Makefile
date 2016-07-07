@@ -7,8 +7,8 @@
 #
 
 #Use the following to compile under unix or cygwin
-CC = gcc
-LD = gcc
+CC = gcc-5
+LD = gcc-5
 
 #Uncomment the following line to make CYGWIN produce stand-alone Windows executables
 #SFLAGS= -mno-cygwin

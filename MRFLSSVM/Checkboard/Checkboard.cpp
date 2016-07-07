@@ -12,7 +12,7 @@ Checkboard::Checkboard() :
 
 void Checkboard::checkboardHelper() {
     bool _black = true;
-    int cliqueID = 0;
+    int cliqueID = 1;
 
     //generate ground-truth checkboard
     for (int row = 0; row < options.H; row += options.gridStep) {
@@ -50,12 +50,24 @@ int **Checkboard::mat_to_std_vec(Mat<int> &A) {
     return V;
 }
 
-double **Checkboard::mat_to_std_vec(mat &A) {
+double ** Checkboard::mat_to_std_vec(mat &A) {
     double **V = (double **) malloc(sizeof(double *) * A.n_rows);
     for (size_t i = 0; i < A.n_rows; i++) {
         double *temp = (double *) malloc(sizeof(double) * A.n_cols);
         for (int j = 0; j < A.n_cols; ++j) {
             temp[j] = A(i, j);
+        }
+        V[i] = temp;
+    };
+    return V;
+}
+
+float ** Checkboard::mat_to_float_vec(mat &A) {
+    float **V = (float **) malloc(sizeof(float *) * A.n_rows);
+    for (size_t i = 0; i < A.n_rows; i++) {
+        float *temp = (float *) malloc(sizeof(float) * A.n_cols);
+        for (int j = 0; j < A.n_cols; ++j) {
+            temp[j] = (float) A(i, j);
         }
         V[i] = temp;
     };
@@ -94,7 +106,7 @@ mat Checkboard::randomMatrix(int rows, int cols) {
     return A;
 }
 
-void Checkboard::printStdVector(int **vec) {
+void Checkboard::printVector(int **vec) {
     for (int i = 0; i < options.H; i++) {
         for (int j = 0; j < options.W; j++) {
             std::cout << vec[i][j] << " ";
@@ -103,7 +115,7 @@ void Checkboard::printStdVector(int **vec) {
     }
 }
 
-void Checkboard::printStdVector(double **vec) {
+void Checkboard::printVector(double **vec) {
     for (int i = 0; i < options.H; i++) {
         for (int j = 0; j < options.W; j++) {
             std::cout << vec[i][j] << " ";
@@ -112,7 +124,7 @@ void Checkboard::printStdVector(double **vec) {
     }
 }
 
-void Checkboard::printStdCube(double ***cube) {
+void Checkboard::printCube(double ***cube) {
     for (int i = 0; i < options.H; i++) {
         for (int j = 0; j < options.W; j++) {
             for (int k = 0; k < options.dimUnary; ++k) {

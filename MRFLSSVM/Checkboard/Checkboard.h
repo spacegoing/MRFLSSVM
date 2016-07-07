@@ -45,15 +45,17 @@ public:
 
     int **mat_to_std_vec(Mat<int> &A);
 
-    double **mat_to_std_vec(mat &A);
+    float ** mat_to_float_vec(mat &A);
+
+    double ** mat_to_std_vec(mat &A);
 
     double ***cube_to_std_vec(cube &A);
 
-    void printStdVector(int **vec);
+    void printVector(int **vec);
 
-    void printStdVector(double **vec);
+    void printVector(double **vec);
 
-    void printStdCube(double ***cube);
+    void printCube(double ***cube);
 
 
 private:
