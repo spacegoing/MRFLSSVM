@@ -14,10 +14,10 @@ extern "C" {
 
 SAMPLE read_struct_examples_helper(char *filename, STRUCT_LEARN_PARM *sparm);
 
-SVECTOR *psi(PATTERN x, LABEL y, LATENT_VAR h, STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm);
+SVECTOR *psi_helper(PATTERN x, LABEL y, LATENT_VAR h, STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm);
 
-void classify_struct_example_helper(PATTERN x, LABEL *y, LATENT_VAR *h, STRUCTMODEL *sm,
-                                    STRUCT_LEARN_PARM *sparm);
+//void classify_struct_example_helper(PATTERN x, LABEL *y, LATENT_VAR *h, STRUCTMODEL *sm,
+//                                    STRUCT_LEARN_PARM *sparm);
 
 void find_most_violated_constraint_marginrescaling_helper(PATTERN x, LABEL y, LABEL *ybar, LATENT_VAR *hbar,
                                                           STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm);

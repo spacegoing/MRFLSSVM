@@ -3,8 +3,8 @@
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" assignedExecutableTargets="true" buildAllGenerated="true">
     <generated>
       <config projectName="latentnpcoref_v0_12" targetName="np" />
-      <config projectName="latentnpcoref_v0_12" targetName="Np" />
       <config projectName="latentnpcoref_v0_12" targetName="lssvm_learn" />
+      <config projectName="latentnpcoref_v0_12" targetName="Np" />
       <config projectName="latentnpcoref_v0_12" targetName="Nphelper" />
       <config projectName="latentnpcoref_v0_12" targetName="latentnpcoref_v0_12" />
       <config projectName="latentnpcoref_v0_12" targetName="lssvm" />
@@ -45,8 +45,8 @@
       <file leaf-file-name="np_helper.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/np_helper.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="123">
-              <caret line="257" column="0" selection-start-line="257" selection-start-column="0" selection-end-line="257" selection-end-column="0" />
+            <state relative-caret-position="272">
+              <caret line="164" column="12" selection-start-line="164" selection-start-column="12" selection-end-line="164" selection-end-column="12" />
               <folding>
                 <element signature="e#33#53#0" expanded="true" />
               </folding>
@@ -54,11 +54,41 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="svm_common.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/svm_light/svm_common.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="128">
+              <caret line="312" column="16" selection-start-line="312" selection-start-column="16" selection-end-line="312" selection-end-column="16" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="svm_common.c" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/svm_light/svm_common.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1090">
+              <caret line="639" column="1" selection-start-line="639" selection-start-column="1" selection-end-line="639" selection-end-column="1" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="np_helper.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/np_helper.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="190">
+              <caret line="9" column="27" selection-start-line="9" selection-start-column="27" selection-end-line="9" selection-end-column="27" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="svm_struct_latent_api.c" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/svm_struct_latent_api.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="171">
-              <caret line="28" column="0" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
+            <state relative-caret-position="2040">
+              <caret line="208" column="25" selection-start-line="208" selection-start-column="25" selection-end-line="208" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -67,8 +97,8 @@
       <file leaf-file-name="svm_struct_latent_cccp.c" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/svm_struct_latent_cccp.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="411">
-              <caret line="598" column="17" selection-start-line="598" selection-start-column="17" selection-end-line="598" selection-end-column="17" />
+            <state relative-caret-position="152">
+              <caret line="571" column="7" selection-start-line="571" selection-start-column="7" selection-end-line="571" selection-end-column="7" />
               <folding>
                 <element signature="e#1126#1144#0" expanded="true" />
                 <element signature="e#1246#1280#0" expanded="true" />
@@ -95,6 +125,7 @@
         <option value="$PROJECT_DIR$/svm_struct_latent_cccp.c" />
         <option value="$PROJECT_DIR$/np_helper.cpp" />
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/svm_light/svm_common.c" />
       </list>
     </option>
   </component>
@@ -151,6 +182,20 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="latentssvm_nlp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="latentssvm_nlp" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="latentssvm_nlp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="svm_light" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -402,22 +447,22 @@
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20234375" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33653846" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32967034" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32692307" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32692307" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34203297" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.44368133" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33653846" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34203297" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.44368133" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -449,11 +494,6 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#33#53#0" expanded="true" />
-            <element signature="e#2886#2927#0" expanded="false" />
-            <element signature="e#3606#3649#0" expanded="false" />
-            <element signature="e#4058#4080#0" expanded="false" />
-            <element signature="e#4504#4538#0" expanded="false" />
-            <element signature="e#4649#4829#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -464,11 +504,6 @@
           <caret line="90" column="50" selection-start-line="90" selection-start-column="50" selection-end-line="90" selection-end-column="50" />
           <folding>
             <element signature="e#33#53#0" expanded="true" />
-            <element signature="e#2886#2927#0" expanded="false" />
-            <element signature="e#3606#3649#0" expanded="false" />
-            <element signature="e#4058#4080#0" expanded="false" />
-            <element signature="e#4504#4538#0" expanded="false" />
-            <element signature="e#4649#4829#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -477,7 +512,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -485,7 +519,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="18432">
           <caret line="768" column="21" selection-start-line="768" selection-start-column="21" selection-end-line="768" selection-end-column="21" />
-          <folding />
+          <folding>
+            <element signature="e#1126#1144#0" expanded="true" />
+            <element signature="e#1246#1280#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -493,7 +530,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1200">
           <caret line="50" column="24" selection-start-line="50" selection-start-column="24" selection-end-line="50" selection-end-column="24" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -519,11 +555,6 @@
           <caret line="90" column="50" selection-start-line="90" selection-start-column="50" selection-end-line="90" selection-end-column="50" />
           <folding>
             <element signature="e#33#53#0" expanded="true" />
-            <element signature="e#2886#2927#0" expanded="false" />
-            <element signature="e#3606#3649#0" expanded="false" />
-            <element signature="e#4058#4080#0" expanded="false" />
-            <element signature="e#4504#4538#0" expanded="false" />
-            <element signature="e#4649#4829#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -532,7 +563,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -540,7 +570,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="18432">
           <caret line="768" column="21" selection-start-line="768" selection-start-column="21" selection-end-line="768" selection-end-column="21" />
-          <folding />
+          <folding>
+            <element signature="e#1126#1144#0" expanded="true" />
+            <element signature="e#1246#1280#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -548,7 +581,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1200">
           <caret line="50" column="24" selection-start-line="50" selection-start-column="24" selection-end-line="50" selection-end-column="24" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -574,11 +606,6 @@
           <caret line="90" column="50" selection-start-line="90" selection-start-column="50" selection-end-line="90" selection-end-column="50" />
           <folding>
             <element signature="e#33#53#0" expanded="true" />
-            <element signature="e#2886#2927#0" expanded="false" />
-            <element signature="e#3606#3649#0" expanded="false" />
-            <element signature="e#4058#4080#0" expanded="false" />
-            <element signature="e#4504#4538#0" expanded="false" />
-            <element signature="e#4649#4829#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -587,7 +614,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -595,7 +621,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="18432">
           <caret line="768" column="21" selection-start-line="768" selection-start-column="21" selection-end-line="768" selection-end-column="21" />
-          <folding />
+          <folding>
+            <element signature="e#1126#1144#0" expanded="true" />
+            <element signature="e#1246#1280#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -603,7 +632,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1200">
           <caret line="50" column="24" selection-start-line="50" selection-start-column="24" selection-end-line="50" selection-end-column="24" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -629,11 +657,6 @@
           <caret line="90" column="50" selection-start-line="90" selection-start-column="50" selection-end-line="90" selection-end-column="50" />
           <folding>
             <element signature="e#33#53#0" expanded="true" />
-            <element signature="e#2886#2927#0" expanded="false" />
-            <element signature="e#3606#3649#0" expanded="false" />
-            <element signature="e#4058#4080#0" expanded="false" />
-            <element signature="e#4504#4538#0" expanded="false" />
-            <element signature="e#4649#4829#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -642,7 +665,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -650,7 +672,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="18432">
           <caret line="768" column="21" selection-start-line="768" selection-start-column="21" selection-end-line="768" selection-end-column="21" />
-          <folding />
+          <folding>
+            <element signature="e#1126#1144#0" expanded="true" />
+            <element signature="e#1246#1280#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -658,7 +683,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1200">
           <caret line="50" column="24" selection-start-line="50" selection-start-column="24" selection-end-line="50" selection-end-column="24" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -684,11 +708,6 @@
           <caret line="383" column="28" selection-start-line="383" selection-start-column="28" selection-end-line="383" selection-end-column="28" />
           <folding>
             <element signature="e#33#53#0" expanded="true" />
-            <element signature="e#2886#2927#0" expanded="false" />
-            <element signature="e#3606#3649#0" expanded="false" />
-            <element signature="e#4058#4080#0" expanded="false" />
-            <element signature="e#4504#4538#0" expanded="false" />
-            <element signature="e#4649#4829#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -697,7 +716,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="672">
           <caret line="28" column="20" selection-start-line="28" selection-start-column="20" selection-end-line="28" selection-end-column="20" />
-          <folding />
+          <folding>
+            <element signature="e#1126#1144#0" expanded="true" />
+            <element signature="e#1246#1280#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -722,11 +744,6 @@
           <caret line="383" column="28" selection-start-line="383" selection-start-column="28" selection-end-line="383" selection-end-column="28" />
           <folding>
             <element signature="e#33#53#0" expanded="true" />
-            <element signature="e#2886#2927#0" expanded="false" />
-            <element signature="e#3606#3649#0" expanded="false" />
-            <element signature="e#4058#4080#0" expanded="false" />
-            <element signature="e#4504#4538#0" expanded="false" />
-            <element signature="e#4649#4829#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -735,7 +752,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="672">
           <caret line="28" column="20" selection-start-line="28" selection-start-column="20" selection-end-line="28" selection-end-column="20" />
-          <folding />
+          <folding>
+            <element signature="e#1126#1144#0" expanded="true" />
+            <element signature="e#1246#1280#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -775,11 +795,6 @@
           <caret line="383" column="28" selection-start-line="383" selection-start-column="28" selection-end-line="383" selection-end-column="28" />
           <folding>
             <element signature="e#33#53#0" expanded="true" />
-            <element signature="e#2886#2927#0" expanded="false" />
-            <element signature="e#3606#3649#0" expanded="false" />
-            <element signature="e#4058#4080#0" expanded="false" />
-            <element signature="e#4504#4538#0" expanded="false" />
-            <element signature="e#4649#4829#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -802,15 +817,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="624">
           <caret line="26" column="47" selection-start-line="26" selection-start-column="47" selection-end-line="26" selection-end-column="47" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/svm_light/svm_common.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="152">
-          <caret line="89" column="10" selection-start-line="89" selection-start-column="10" selection-end-line="89" selection-end-column="10" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -822,35 +828,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/svm_light/svm_common.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-9">
-          <caret line="112" column="9" selection-start-line="112" selection-start-column="9" selection-end-line="112" selection-end-column="9" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/svm_struct_latent_api_types.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="334">
-          <caret line="120" column="23" selection-start-line="120" selection-start-column="23" selection-end-line="120" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/np_helper.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="382">
-          <caret line="17" column="5" selection-start-line="17" selection-start-column="5" selection-end-line="17" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/DisjointSets.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-811">
           <caret line="16" column="35" selection-start-line="16" selection-start-column="35" selection-end-line="16" selection-end-column="35" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -858,7 +839,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="123">
           <caret line="596" column="0" selection-start-line="596" selection-start-column="0" selection-end-line="596" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -866,28 +846,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="123">
           <caret line="1706" column="0" selection-start-line="1706" selection-start-column="0" selection-end-line="1706" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/np_helper.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="123">
-          <caret line="257" column="0" selection-start-line="257" selection-start-column="0" selection-end-line="257" selection-end-column="0" />
-          <folding>
-            <element signature="e#33#53#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/svm_struct_latent_cccp.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="411">
-          <caret line="598" column="17" selection-start-line="598" selection-start-column="17" selection-end-line="598" selection-end-column="17" />
-          <folding>
-            <element signature="e#1126#1144#0" expanded="true" />
-            <element signature="e#1246#1280#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -899,10 +857,63 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/svm_light/svm_common.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="128">
+          <caret line="312" column="16" selection-start-line="312" selection-start-column="16" selection-end-line="312" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/svm_struct_latent_cccp.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="152">
+          <caret line="571" column="7" selection-start-line="571" selection-start-column="7" selection-end-line="571" selection-end-column="7" />
+          <folding>
+            <element signature="e#1126#1144#0" expanded="true" />
+            <element signature="e#1246#1280#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/svm_light/svm_common.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1090">
+          <caret line="639" column="1" selection-start-line="639" selection-start-column="1" selection-end-line="639" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/np_helper.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="164" column="12" selection-start-line="164" selection-start-column="12" selection-end-line="164" selection-end-column="12" />
+          <folding>
+            <element signature="e#33#53#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/svm_struct_latent_api_types.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="152">
+          <caret line="38" column="2" selection-start-line="38" selection-start-column="2" selection-end-line="38" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/np_helper.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="190">
+          <caret line="9" column="27" selection-start-line="9" selection-start-column="27" selection-end-line="9" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/svm_struct_latent_api.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
-          <caret line="28" column="0" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
+        <state relative-caret-position="2040">
+          <caret line="208" column="25" selection-start-line="208" selection-start-column="25" selection-end-line="208" selection-end-column="25" />
           <folding />
         </state>
       </provider>

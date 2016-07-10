@@ -22,7 +22,7 @@ typedef struct pattern {
     */
     int n_rows;
     int n_cols;
-    double **observed_label;
+    float **observed_unary;
 } PATTERN;
 
 typedef struct label {
