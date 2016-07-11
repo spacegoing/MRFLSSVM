@@ -40,7 +40,8 @@ typedef struct latent_var {
       Type definition for latent variable h
     */
     int n_rows;
-    int *auxiliary_z;
+    int n_cols;
+    int **auxiliary_z;
 } LATENT_VAR;
 
 typedef struct example {

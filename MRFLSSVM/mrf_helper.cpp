@@ -4,12 +4,21 @@
 
 #include "mrf_helper.h"
 #include "Checkboard/Checkboard.h"
+#include "maxflow-v3.03.src/graph.h"
 #include <iostream>
 
 
 void copy_check_options(STRUCT_LEARN_PARM *sparm, Options *options);
 
-inline int argmax_hidden_var(LATENT_VAR h);
+inline int *argmax_hidden_var(LATENT_VAR h);
+
+Infer_Result *infer_graph_cut(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm);
+
+struct Infer_Result {
+    int **y_labels;
+    int **auxiliary;
+    double e;
+};
 
 SAMPLE read_struct_examples_helper(char *filename, STRUCT_LEARN_PARM *sparm) {
     SAMPLE sample;
@@ -26,8 +35,11 @@ SAMPLE read_struct_examples_helper(char *filename, STRUCT_LEARN_PARM *sparm) {
     sample.examples[0].y.clique_indexes = checkboard.mat_to_std_vec(checkboard.cliques);
     sample.examples[0].y.ground_truth_label = checkboard.mat_to_std_vec(checkboard.y);
 
-    sample.examples[0].h.n_rows = checkboard.options.K - 1;
-    sample.examples[0].h.auxiliary_z = (int *) calloc(checkboard.options.K - 1, sizeof(int));
+    sample.examples[0].h.n_rows = checkboard.options.numCliques;
+    sample.examples[0].h.n_cols = checkboard.options.K - 1;
+    sample.examples[0].h.auxiliary_z = (int **) calloc(checkboard.options.numCliques, sizeof(int *));
+    for (int i = 0; i < checkboard.options.numCliques; ++i)
+        sample.examples[0].h.auxiliary_z[i] = (int *) calloc(checkboard.options.K - 1, sizeof(int));
 
     copy_check_options(sparm, &checkboard.options);
 
@@ -35,7 +47,8 @@ SAMPLE read_struct_examples_helper(char *filename, STRUCT_LEARN_PARM *sparm) {
 }
 
 SVECTOR *psi_helper(PATTERN x, LABEL y, LATENT_VAR h, STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm) {
-    int max_h = argmax_hidden_var(h); // max_h = max non zero index + 1
+    int* argmax_z_array = argmax_hidden_var(h); // max_h = max non zero index + 1
+
 
     // 1st higher order feature + number of non-zero higher-order features +
     // unary + pairwise + the terminate word (wnum = 0 & weight = 0 required by package)
@@ -109,6 +122,101 @@ SVECTOR *psi_helper(PATTERN x, LABEL y, LATENT_VAR h, STRUCTMODEL *sm, STRUCT_LE
     return create_svector(words, (char *) "", 1);
 }
 
+Infer_Result *infer_graph_cut(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm) {
+    // The valid index of sm->w starts from 1. Thus the length is sm.sizePsi+1
+    int nVariables = sparm->options.H * sparm->options.W;
+    int K = sparm->options.K;
+    int nMaxCliquesPerVariable = 1;
+    double *w = sm->w;
+
+    float **unaryWeights = x.observed_unary;
+
+    Graph g<double, double, double>(nVariables, 8 * nVariables);
+    g.add_node(nVariables);
+
+    // Add unary edges
+    int counter = 0;
+    for (int i = 0; i < x.n_rows; ++i) {
+        for (int j = 0; j < x.n_cols; ++j) {
+            g.add_tweights(counter, 0, unaryWeights[i][j]);
+            counter++;
+        }
+    }
+
+    // todo:Add pairwise edges
+
+    // Add auxiliary vars z for each clique
+    int z_index[sparm->options.numCliques];
+    for (int k = 0; k < sparm->options.numCliques; ++k) {
+        z_index[k] = g.add_node(K - 1);
+    }
+
+    // compute clique size
+    int clique_size[sparm->options.numCliques]{0};
+    for (int l = 0; l < y.n_rows; ++l) {
+        for (int i = 0; i < y.n_cols; ++i) {
+            // clique_index starts from 1
+            clique_size[y.clique_indexes[l][i] - 1] += 1;
+        }
+    }
+
+    // Add higher-order terms for each clique (w_i = 1/cliqueSize)
+    // Edges between y_i z_k and y_i t
+    // todo: nMaxCliquesPerVariable>1
+    counter = 0;
+    for (int i = 0; i < y.n_rows; ++i) {
+        for (int j = 0; j < y.n_cols; ++j) {
+            int clique_index = y.clique_indexes[i][j] - 1;
+            double w_i = 1.0 / clique_size[clique_index];
+
+            // edge between y_i and t
+            g.add_tweights(counter, 0.0, w[0] * w_i);
+
+            for (int k = 0; k < K - 1; ++k) {
+                // edge between y_i and z_k
+                // in w, w[0] element is a1, the followings are a_k+1 - a_k
+                // to w[K-1]. So the edge should be -w[k+1]
+                g.add_edge(counter, z_index[clique_index] + k,
+                           0.0, w_i * -1.0 * w[k + 1]);
+
+                // edge between z_k and s and t
+                g.add_tweights(z_index[clique_index] + k,
+                               w_i * -1.0 * w[k + 1], w[K + k + 1]);
+            }
+            counter++;
+        }
+    }
+
+
+    Infer_Result *res = (Infer_Result *) malloc(sizeof(Infer_Result));
+    res->y_labels = (int **) malloc(sparm->options.H * sizeof(int *));
+    for (int m = 0; m < sparm->options.H; ++m)
+        res->y_labels[m] = (int *) malloc(sparm->options.W * sizeof(int));
+    res->auxiliary = (int **) malloc(sparm->options.numCliques * sizeof(int *));
+    for (int n = 0; n < sparm->options.numCliques; ++n)
+        res->auxiliary[n] = (int *) malloc((K - 1) * sizeof(int));
+
+    res->e = g.maxflow();
+
+    int row = 0;
+    for (int i1 = 0; i1 < nVariables; ++i1) {
+        if (i1 == y.n_cols - 1) {
+            i1 = 0;
+            row++;
+        }
+        res->y_labels[row][i1] = (g.what_segment(i1) == Graph::SOURCE) ? 1 : 0;
+    }
+
+    for (int l1 = 0; l1 < sparm->options.numCliques; ++l1) {
+        for (int k1 = 0; k1 < K - 1; ++k1) {
+            res->auxiliary[l1][k1] = (g.what_segment(z_index[l1] + k1)) ? 1 : 0;
+        }
+    }
+
+    free(g);
+
+    return res;
+}
 
 void copy_check_options(STRUCT_LEARN_PARM *sparm, Options *options) {
     sparm->options.gridStep = options->gridStep;  // grid size for defining cliques
@@ -129,18 +237,33 @@ void copy_check_options(STRUCT_LEARN_PARM *sparm, Options *options) {
 
 }
 
-inline int argmax_hidden_var(LATENT_VAR h) {
+inline int *argmax_hidden_var(LATENT_VAR h) {
     // return number of non-zero hidden vars
     // notice the non-zero state of h is continuous
     int counter = 0;
-    for (int i = 0; i < h.n_rows; ++i) {
-        if (h.auxiliary_z[i] < 1) break;
-        counter++;
+    int *argmax_z_array = (int *) malloc(h.n_rows * sizeof(int));
+    for (int i = 0; i < h.n_rows; ++i) { // numCliques
+        for (int j = 0; j < h.n_cols; ++j) {
+            if (h.auxiliary_z[i][j] < 1) break;
+            counter++;
+        }
+        argmax_z_array[i] = counter;
+        counter = 0;
     }
 
-    return counter;
+    return argmax_z_array;
 }
 
+void free_infer_res(Infer_Result *res, STRUCT_LEARN_PARM *sparm) {
+    for (int i = 0; i < sparm->options.numCliques; ++i) {
+        free(res->auxiliary[i]);
+    }
+    for (int j = 0; j < sparm->options.H; ++j) {
+        free(res->y_labels[j]);
+    }
+    free(res->auxiliary);
+    free(res->y_labels);
+}
 
 int main(int argc, char **argv) {
 
@@ -172,7 +295,6 @@ int main(int argc, char **argv) {
         cout << "Key: " << index->wnum << ", Value: " << index->weight << "\n";
         index++;
     }
-
 
 
     return 0;
