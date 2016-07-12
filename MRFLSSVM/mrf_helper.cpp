@@ -28,7 +28,10 @@ SAMPLE read_struct_examples_helper(char *filename, STRUCT_LEARN_PARM *sparm) {
 
     sample.examples[0].x.n_rows = checkboard.options.H;
     sample.examples[0].x.n_cols = checkboard.options.W;
+    sample.examples[0].x.dim_unary = checkboard.options.dimUnary;
+    sample.examples[0].x.dim_pairwise = checkboard.options.dimPairwise;
     sample.examples[0].x.observed_unary = checkboard.cube_to_float(checkboard.unary);
+    //todo: pairwise
 
     sample.examples[0].y.n_rows = checkboard.options.H;
     sample.examples[0].y.n_cols = checkboard.options.W;
@@ -99,7 +102,7 @@ SVECTOR *psi_helper(PATTERN x, LABEL y, LATENT_VAR h, STRUCTMODEL *sm, STRUCT_LE
     for (int i = 0; i < y.n_rows; ++i) {
         for (int j = 0; j < y.n_cols; ++j) {
             if (y.ground_truth_label[i][j] == 1)
-                unary_psi += x.observed_unary[i][j][sparm->options.dimUnary - 1];
+                unary_psi += x.observed_unary[i][j][x.dim_unary - 1];
         }
     }
 

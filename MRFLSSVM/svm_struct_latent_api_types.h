@@ -22,6 +22,8 @@ typedef struct pattern {
     */
     int n_rows;
     int n_cols;
+    int dim_unary;
+    int dim_pairwise;
     float ***observed_unary;
 } PATTERN;
 
@@ -115,8 +117,6 @@ typedef struct struct_learn_parm {
 				  option */
     /* add your own variables */
     check_options options;
-    int length_feature_vector;
-    double cost_factor;
 } STRUCT_LEARN_PARM;
 
 

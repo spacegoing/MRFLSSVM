@@ -101,17 +101,46 @@ double loss(LABEL y, LABEL ybar, LATENT_VAR hbar, STRUCT_LEARN_PARM *sparm) {
   Computes the loss of prediction (ybar,hbar) against the
   correct label y. 
 */
-    double ans;
+    double ans = 0;
 
     /* your code here */
+    int *clique_size_vector = (int *) calloc(sparm->options.numCliques, sizeof(int));
+    int clique_id = 0;
+    for (int i = 0; i < y.n_rows; ++i) {
+        for (int j = 0; j < y.n_cols; ++j) {
+            clique_id = y.clique_indexes[i][j] - 1; // clique_indexes start from 1
+            clique_size_vector[clique_id]++;
+        }
+    }
 
-    return (ans);
+    for (int i = 0; i < y.n_rows; ++i) {
+        for (int j = 0; j < y.n_cols; ++j) {
+            if (y.ground_truth_label[i][j] != ybar.ground_truth_label[i][j])
+                ans += 1.0 / clique_size_vector[y.clique_indexes[i][j] - 1];
+        }
+    }
+
+    return ans;
 }
 
 void write_struct_model(char *file, STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm) {
 /*
   Writes the learned weight vector sm->w to file after training. 
 */
+    FILE *modelfl;
+    long i;
+
+    modelfl = fopen(file, "w");
+    if (modelfl == NULL) {
+        printf("Cannot open model file %s for output!", file);
+        exit(1);
+    }
+
+    fprintf(modelfl, "# sizePsi:%ld\n", sm->sizePsi);
+    for (i = 1; i < sm->sizePsi + 1; i++) {
+        fprintf(modelfl, "%ld:%.16g\n", i, sm->w[i]);
+    }
+    fclose(modelfl);
 
 }
 
@@ -123,6 +152,32 @@ STRUCTMODEL read_struct_model(char *file, STRUCT_LEARN_PARM *sparm) {
     STRUCTMODEL sm;
 
     /* your code here */
+    FILE *modelfl;
+    long sizePsi, i, fnum;
+    double fweight;
+
+    modelfl = fopen(file, "r");
+    if (modelfl == NULL) {
+        printf("Cannot open model file %s for input!", file);
+        exit(1);
+    }
+
+    if (fscanf(modelfl, "# sizePsi:%ld", &sizePsi) != 1) {
+        printf("Incorrect model file format for %s!\n", file);
+        fflush(stdout);
+    }
+
+    sm.sizePsi = sizePsi;
+    sm.w = (double *) malloc(sizeof(double) * (sizePsi + 1));
+    for (i = 0; i < sizePsi + 1; i++) {
+        sm.w[i] = 0.0;
+    }
+
+    while (!feof(modelfl)) {
+        fscanf(modelfl, "%ld:%lf", &fnum, &fweight);
+        sm.w[fnum] = fweight;
+    }
+    fclose(modelfl);
 
     return (sm);
 }
@@ -143,6 +198,12 @@ void free_pattern(PATTERN x) {
 */
 
     /* your code here */
+    for (int i = 0; i < x.n_rows; ++i) {
+        for (int j = 0; j < x.n_cols; ++j) {
+            free(x.observed_unary[i][j]);
+        }
+        free(x.observed_unary[i]);
+    }
 
 }
 
@@ -152,6 +213,10 @@ void free_label(LABEL y) {
 */
 
     /* your code here */
+    for (int i = 0; i < y.n_rows; ++i) {
+        free(y.ground_truth_label[i]);
+        free(y.clique_indexes[i]);
+    }
 
 }
 
@@ -161,6 +226,9 @@ void free_latent_var(LATENT_VAR h) {
 */
 
     /* your code here */
+    for (int i = 0; i < h.n_rows; ++i) {
+        free(h.auxiliary_z[i]);
+    }
 
 }
 
