@@ -7,18 +7,9 @@
 #include "maxflow-v3.03.src/graph.h"
 #include <iostream>
 
-struct Infer_Result {
-    int **y_labels;
-    int **auxiliary;
-    double e;
-};
-
 void copy_check_options(STRUCT_LEARN_PARM *sparm, Options *options);
 
 inline int *argmax_hidden_var(LATENT_VAR h);
-
-Infer_Result *infer_graph_cut(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm);
-
 
 SAMPLE read_struct_examples_helper(char *filename, STRUCT_LEARN_PARM *sparm) {
     SAMPLE sample;
@@ -142,19 +133,6 @@ LATENT_VAR infer_latent_variables_helper(PATTERN x, LABEL y, STRUCTMODEL *sm, ST
 
 void find_most_violated_constraint_marginrescaling_helper(PATTERN x, LABEL y, LABEL *ybar, LATENT_VAR *hbar,
                                                           STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm) {
-    Infer_Result *res = infer_graph_cut(x, y, sm, sparm);
-    ybar->ground_truth_label = res->y_labels;
-    ybar->clique_indexes = y.clique_indexes;
-    ybar->n_cols = y.n_cols;
-    ybar->n_rows = y.n_rows;
-
-    hbar->auxiliary_z = res->auxiliary;
-    hbar->n_rows = sparm->options.numCliques;
-    hbar->n_cols = sparm->options.K - 1;
-}
-
-
-Infer_Result *infer_graph_cut(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm) {
     // The valid index of sm->w starts from 1. Thus the length is sm.sizePsi+1
     int nVariables = sparm->options.H * sparm->options.W;
     int K = sparm->options.K;
@@ -225,15 +203,22 @@ Infer_Result *infer_graph_cut(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_
     }
 
 
-    Infer_Result *res = (Infer_Result *) malloc(sizeof(Infer_Result));
-    res->y_labels = (int **) malloc(sparm->options.H * sizeof(int *));
-    for (int m = 0; m < sparm->options.H; ++m)
-        res->y_labels[m] = (int *) malloc(sparm->options.W * sizeof(int));
-    res->auxiliary = (int **) malloc(sparm->options.numCliques * sizeof(int *));
-    for (int n = 0; n < sparm->options.numCliques; ++n)
-        res->auxiliary[n] = (int *) malloc((K - 1) * sizeof(int));
+    ybar->ground_truth_label = (int **) malloc(sparm->options.H * sizeof(int *));
+    ybar->clique_indexes = (int **) malloc(sparm->options.H * sizeof(int *));
+    for (int m = 0; m < sparm->options.H; ++m) {
+        ybar->ground_truth_label[m] = (int *) malloc(sparm->options.W * sizeof(int));
+        ybar->clique_indexes[m] = (int *) malloc(sparm->options.W * sizeof(int));
+    }
+    ybar->n_rows = y.n_rows;
+    ybar->n_cols = y.n_cols;
 
-    res->e = g->maxflow();
+    hbar->auxiliary_z = (int **) malloc(sparm->options.numCliques * sizeof(int *));
+    for (int n = 0; n < sparm->options.numCliques; ++n)
+        hbar->auxiliary_z[n] = (int *) malloc((K - 1) * sizeof(int));
+    hbar->n_rows = sparm->options.numCliques;
+    hbar->n_cols = sparm->options.K - 1;
+
+    double e = g->maxflow();
 
     int row = 0;
     int col = 0;
@@ -242,19 +227,18 @@ Infer_Result *infer_graph_cut(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_
             col = 0;
             row++;
         }
-        res->y_labels[row][col] = (g->what_segment(i1) == GraphType::SOURCE) ? 1 : 0;
+        ybar->ground_truth_label[row][col] = (g->what_segment(i1) == GraphType::SOURCE) ? 1 : 0;
+        ybar->clique_indexes[row][col] = y.clique_indexes[row][col];
         col++;
     }
 
     for (int l1 = 0; l1 < sparm->options.numCliques; ++l1) {
         for (int k1 = 0; k1 < K - 1; ++k1) {
-            res->auxiliary[l1][k1] = (g->what_segment(z_index[l1] + k1) == GraphType::SOURCE) ? 1 : 0;
+            hbar->auxiliary_z[l1][k1] = (g->what_segment(z_index[l1] + k1) == GraphType::SOURCE) ? 1 : 0;
         }
     }
 
     delete (g);
-
-    return res;
 }
 
 void copy_check_options(STRUCT_LEARN_PARM *sparm, Options *options) {
@@ -291,17 +275,6 @@ inline int *argmax_hidden_var(LATENT_VAR h) {
     }
 
     return argmax_z_array;
-}
-
-void free_infer_res(Infer_Result *res, STRUCT_LEARN_PARM *sparm) {
-    for (int i = 0; i < sparm->options.numCliques; ++i) {
-        free(res->auxiliary[i]);
-    }
-    for (int j = 0; j < sparm->options.H; ++j) {
-        free(res->y_labels[j]);
-    }
-    free(res->auxiliary);
-    free(res->y_labels);
 }
 
 //int main(int argc, char **argv) {
