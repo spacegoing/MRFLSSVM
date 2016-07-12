@@ -83,6 +83,7 @@ void find_most_violated_constraint_marginrescaling(PATTERN x, LABEL y, LABEL *yb
 */
 
     /* your code here */
+    find_most_violated_constraint_marginrescaling_helper(x, y, ybar, hbar, sm, sparm);
 }
 
 LATENT_VAR infer_latent_variables(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm) {

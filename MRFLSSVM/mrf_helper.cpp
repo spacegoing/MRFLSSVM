@@ -99,7 +99,7 @@ SVECTOR *psi_helper(PATTERN x, LABEL y, LATENT_VAR h, STRUCTMODEL *sm, STRUCT_LE
     for (int i = 0; i < y.n_rows; ++i) {
         for (int j = 0; j < y.n_cols; ++j) {
             if (y.ground_truth_label[i][j] == 1)
-                unary_psi += x.observed_unary[i][j][sparm->options.dimUnary-1];
+                unary_psi += x.observed_unary[i][j][sparm->options.dimUnary - 1];
         }
     }
 
@@ -125,13 +125,29 @@ SVECTOR *psi_helper(PATTERN x, LABEL y, LATENT_VAR h, STRUCTMODEL *sm, STRUCT_LE
 
 LATENT_VAR infer_latent_variables_helper(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm) {
     LATENT_VAR h;
-    h.auxiliary_z = infer_graph_cut(x, y, sm, sparm)->auxiliary;
+    h.n_rows = sparm->options.numCliques;
+    h.n_cols = sparm->options.K - 1;
+    h.auxiliary_z = (int **) calloc(h.n_rows, sizeof(int *));
+    for (int i = 0; i < h.n_rows; ++i) {
+        h.auxiliary_z[i] = (int *) malloc(h.n_cols * sizeof(int));
+        for (int j = 0; j < h.n_cols; ++j) {
+            h.auxiliary_z[i][j] = (-1.0 * sm->w[j + 1] >= sm->w[sparm->options.K + j]) ? 1 : 0;
+        }
+    }
     return h;
 }
 
 void find_most_violated_constraint_marginrescaling_helper(PATTERN x, LABEL y, LABEL *ybar, LATENT_VAR *hbar,
                                                           STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm) {
+    Infer_Result *res = infer_graph_cut(x, y, sm, sparm);
+    ybar->ground_truth_label = res->y_labels;
+    ybar->clique_indexes = y.clique_indexes;
+    ybar->n_cols = y.n_cols;
+    ybar->n_rows = y.n_rows;
 
+    hbar->auxiliary_z = res->auxiliary;
+    hbar->n_rows = sparm->options.numCliques;
+    hbar->n_cols = sparm->options.K - 1;
 }
 
 
