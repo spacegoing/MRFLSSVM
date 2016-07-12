@@ -50,12 +50,13 @@ public:
     double ** mat_to_std_vec(mat &A);
 
     double ***cube_to_std_vec(cube &A);
+    float ***cube_to_float(cube &A);
 
     void printVector(int **vec);
 
     void printVector(double **vec);
 
-    void printCube(double ***cube);
+    void printCube(float ***cube);
 
 
 private:

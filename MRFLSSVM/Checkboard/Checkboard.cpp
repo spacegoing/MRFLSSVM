@@ -50,7 +50,7 @@ int **Checkboard::mat_to_std_vec(Mat<int> &A) {
     return V;
 }
 
-double ** Checkboard::mat_to_std_vec(mat &A) {
+double **Checkboard::mat_to_std_vec(mat &A) {
     double **V = (double **) malloc(sizeof(double *) * A.n_rows);
     for (size_t i = 0; i < A.n_rows; i++) {
         double *temp = (double *) malloc(sizeof(double) * A.n_cols);
@@ -62,7 +62,7 @@ double ** Checkboard::mat_to_std_vec(mat &A) {
     return V;
 }
 
-float ** Checkboard::mat_to_float_vec(mat &A) {
+float **Checkboard::mat_to_float_vec(mat &A) {
     float **V = (float **) malloc(sizeof(float *) * A.n_rows);
     for (size_t i = 0; i < A.n_rows; i++) {
         float *temp = (float *) malloc(sizeof(float) * A.n_cols);
@@ -84,6 +84,27 @@ double ***Checkboard::cube_to_std_vec(cube &A) {
             double *V = (double *) malloc(sizeof(double) * A.n_rows);
             for (int k = 0; k < A.n_slices; ++k) {
                 V[k] = A(i, j, k);
+            }
+
+            VV[j] = V;
+        }
+
+        VVV[i] = VV;
+    }
+
+    return VVV;
+}
+
+float ***Checkboard::cube_to_float(cube &A) {
+    float ***VVV = (float ***) malloc(sizeof(float **) * A.n_rows);
+    for (size_t i = 0; i < A.n_rows; i++) {
+        float **VV = (float **) malloc(sizeof(float *) * A.n_cols);
+
+        for (size_t j = 0; j < A.n_cols; j++) {
+
+            float *V = (float *) malloc(sizeof(float) * A.n_slices);
+            for (int k = 0; k < A.n_slices; ++k) {
+                V[k] = (float) A(i, j, k);
             }
 
             VV[j] = V;
@@ -124,7 +145,7 @@ void Checkboard::printVector(double **vec) {
     }
 }
 
-void Checkboard::printCube(double ***cube) {
+void Checkboard::printCube(float ***cube) {
     for (int i = 0; i < options.H; i++) {
         for (int j = 0; j < options.W; j++) {
             for (int k = 0; k < options.dimUnary; ++k) {
@@ -140,10 +161,11 @@ void Checkboard::printCube(double ***cube) {
 
 //int main(int argc, char **argv) {
 //    Checkboard checkboard;
-//    checkboard.printStdVector(
-//            checkboard.mat_to_std_vec(checkboard.cliques));
-//    checkboard.printStdCube(
-//            checkboard.cube_to_std_vec(checkboard.unary));
+////    checkboard.printStdVector(
+////            checkboard.mat_to_std_vec(checkboard.cliques));
+////    checkboard.printStdCube(
+////            checkboard.cube_to_std_vec(checkboard.unary));
+//    checkboard.printCube(checkboard.cube_to_float(checkboard.unary));
 //
 //    return 0;
 //}

@@ -28,7 +28,7 @@ SAMPLE read_struct_examples_helper(char *filename, STRUCT_LEARN_PARM *sparm) {
 
     sample.examples[0].x.n_rows = checkboard.options.H;
     sample.examples[0].x.n_cols = checkboard.options.W;
-    sample.examples[0].x.observed_unary = checkboard.mat_to_float_vec(checkboard.unary.slice(1));
+    sample.examples[0].x.observed_unary = checkboard.cube_to_float(checkboard.unary);
 
     sample.examples[0].y.n_rows = checkboard.options.H;
     sample.examples[0].y.n_cols = checkboard.options.W;
@@ -99,7 +99,7 @@ SVECTOR *psi_helper(PATTERN x, LABEL y, LATENT_VAR h, STRUCTMODEL *sm, STRUCT_LE
     for (int i = 0; i < y.n_rows; ++i) {
         for (int j = 0; j < y.n_cols; ++j) {
             if (y.ground_truth_label[i][j] == 1)
-                unary_psi += x.observed_unary[i][j];
+                unary_psi += x.observed_unary[i][j][sparm->options.dimUnary-1];
         }
     }
 
@@ -129,6 +129,11 @@ LATENT_VAR infer_latent_variables_helper(PATTERN x, LABEL y, STRUCTMODEL *sm, ST
     return h;
 }
 
+void find_most_violated_constraint_marginrescaling_helper(PATTERN x, LABEL y, LABEL *ybar, LATENT_VAR *hbar,
+                                                          STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm) {
+
+}
+
 
 Infer_Result *infer_graph_cut(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm) {
     // The valid index of sm->w starts from 1. Thus the length is sm.sizePsi+1
@@ -138,7 +143,7 @@ Infer_Result *infer_graph_cut(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_
 //    int nMaxCliquesPerVariable = 1;
     double *w = sm->w;
 
-    float **unaryWeights = x.observed_unary;
+    float ***unaryWeights = x.observed_unary;
 
     typedef Graph<double, double, double> GraphType;
     GraphType *g = new GraphType(nVariables, 8 * nVariables);
@@ -148,7 +153,7 @@ Infer_Result *infer_graph_cut(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_
     int counter = 0;
     for (int i = 0; i < x.n_rows; ++i) {
         for (int j = 0; j < x.n_cols; ++j) {
-            g->add_tweights(counter, 0, unaryWeights[i][j]);
+            g->add_tweights(counter, unaryWeights[i][j][0], unaryWeights[i][j][1]);
             counter++;
         }
     }
