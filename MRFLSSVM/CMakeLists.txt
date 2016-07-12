@@ -32,6 +32,8 @@ SET_TARGET_PROPERTIES(
         LINKER_LANGUAGE CXX
 )
 
+add_library(GraphCut STATIC maxflow-v3.03.src/maxflow.cpp maxflow-v3.03.src/graph.cpp)
+
 add_library(CHBD STATIC Checkboard/Checkboard.cpp)
 
 add_library(lssvm STATIC svm_struct_latent_api.c)
@@ -39,4 +41,4 @@ add_library(lssvm STATIC svm_struct_latent_api.c)
 set(SOURCE_FILES mrf_helper.cpp)
 
 add_executable(mrflssvm ${SOURCE_FILES})
-target_link_libraries(mrflssvm CHBD SSVM ${ARMADILLO_LIBRARIES})
+target_link_libraries(mrflssvm CHBD GraphCut SSVM ${ARMADILLO_LIBRARIES})
