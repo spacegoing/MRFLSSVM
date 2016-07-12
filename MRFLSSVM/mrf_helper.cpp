@@ -56,7 +56,7 @@ SVECTOR *psi_helper(PATTERN x, LABEL y, LATENT_VAR h, STRUCTMODEL *sm, STRUCT_LE
 
     // Calculate W(y)-------------------------------------------------------------------
     int *clique_size_vector = (int *) calloc(sparm->options.numCliques, sizeof(int));
-    float *clique_value_vector= (float *) calloc(sparm->options.numCliques, sizeof(float));
+    float *clique_value_vector = (float *) calloc(sparm->options.numCliques, sizeof(float));
     int clique_id = 0;
     float w_y = 0.0;
     for (int i = 0; i < y.n_rows; ++i) {
@@ -123,11 +123,19 @@ SVECTOR *psi_helper(PATTERN x, LABEL y, LATENT_VAR h, STRUCTMODEL *sm, STRUCT_LE
     return create_svector(words, (char *) "", 1);
 }
 
+LATENT_VAR infer_latent_variables_helper(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm) {
+    LATENT_VAR h;
+    h.auxiliary_z = infer_graph_cut(x, y, sm, sparm)->auxiliary;
+    return h;
+}
+
+
 Infer_Result *infer_graph_cut(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm) {
     // The valid index of sm->w starts from 1. Thus the length is sm.sizePsi+1
     int nVariables = sparm->options.H * sparm->options.W;
     int K = sparm->options.K;
-    int nMaxCliquesPerVariable = 1;
+//    todo: multiple cliques
+//    int nMaxCliquesPerVariable = 1;
     double *w = sm->w;
 
     float **unaryWeights = x.observed_unary;
@@ -136,7 +144,7 @@ Infer_Result *infer_graph_cut(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_
     GraphType *g = new GraphType(nVariables, 8 * nVariables);
     g->add_node(nVariables);
 
-    // Add unary edges
+    // Add unary edges------------------------------------------------------------
     int counter = 0;
     for (int i = 0; i < x.n_rows; ++i) {
         for (int j = 0; j < x.n_cols; ++j) {
@@ -146,6 +154,8 @@ Infer_Result *infer_graph_cut(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_
     }
 
     // todo:Add pairwise edges
+
+    // Add higher-order terms (a,z between s and t)--------------------------------
 
     // Add auxiliary vars z for each clique
     int z_index[sparm->options.numCliques];
@@ -164,6 +174,7 @@ Infer_Result *infer_graph_cut(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_
 
     // Add higher-order terms for each clique (w_i = 1/cliqueSize)
     // Edges between y_i z_k and y_i t
+    // Edges between z_k and s and t
     // todo: nMaxCliquesPerVariable>1
     counter = 0;
     for (int i = 0; i < y.n_rows; ++i) {
@@ -183,7 +194,7 @@ Infer_Result *infer_graph_cut(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_
 
                 // edge between z_k and s and t
                 g->add_tweights(z_index[clique_index] + k,
-                                w_i * -1.0 * w[k + 1], w[K + k + 1]);
+                                w_i * -1.0 * w[k + 1], w[K + k]);
             }
             counter++;
         }
@@ -201,12 +212,14 @@ Infer_Result *infer_graph_cut(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_
     res->e = g->maxflow();
 
     int row = 0;
+    int col = 0;
     for (int i1 = 0; i1 < nVariables; ++i1) {
-        if (i1 == y.n_cols - 1) {
-            i1 = 0;
+        if (col == y.n_cols - 1) {
+            col = 0;
             row++;
         }
-        res->y_labels[row][i1] = (g->what_segment(i1) == GraphType::SOURCE) ? 1 : 0;
+        res->y_labels[row][col] = (g->what_segment(i1) == GraphType::SOURCE) ? 1 : 0;
+        col++;
     }
 
     for (int l1 = 0; l1 < sparm->options.numCliques; ++l1) {

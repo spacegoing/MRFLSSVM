@@ -91,11 +91,7 @@ LATENT_VAR infer_latent_variables(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LE
   computing argmax_{h} <w,psi(x,y,h)>. 
 */
 
-    LATENT_VAR h;
-
-    /* your code here */
-
-    return (h);
+    return infer_latent_variables_helper(x, y, sm, sparm);
 }
 
 
