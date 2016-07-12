@@ -238,7 +238,7 @@ Infer_Result *infer_graph_cut(PATTERN x, LABEL y, STRUCTMODEL *sm, STRUCT_LEARN_
     int row = 0;
     int col = 0;
     for (int i1 = 0; i1 < nVariables; ++i1) {
-        if (col == y.n_cols - 1) {
+        if (col == y.n_cols) {
             col = 0;
             row++;
         }
@@ -304,42 +304,52 @@ void free_infer_res(Infer_Result *res, STRUCT_LEARN_PARM *sparm) {
     free(res->y_labels);
 }
 
-int main(int argc, char **argv) {
-
-    // test read_example()
-    STRUCT_LEARN_PARM sparm;
-    SAMPLE sample = read_struct_examples_helper((char *) "", &sparm);
-
-//     // print checkboard matrix value--------------------------------------------
-//    for (int i = 0; i < sample.examples[0].y.n_rows; ++i) {
-//        for (int j = 0; j < sample.examples[0].y.n_cols; ++j) {
-//            std::cout << sample.examples[0].y.clique_indexes[i][j];
+//int main(int argc, char **argv) {
+//
+//    // test read_example()
+//    STRUCT_LEARN_PARM sparm;
+//    SAMPLE sample = read_struct_examples_helper((char *) "", &sparm);
+//
+////     // print checkboard matrix value--------------------------------------------
+////    for (int i = 0; i < sample.examples[0].y.n_rows; ++i) {
+////        for (int j = 0; j < sample.examples[0].y.n_cols; ++j) {
+////            std::cout << sample.examples[0].y.clique_indexes[i][j];
+////        }
+////        std::cout << "\n";
+////    }
+//
+//    // test psi()---------------------------------------------------------------
+//    EXAMPLE example0 = sample.examples[0];
+//    PATTERN x0 = example0.x;
+//    LABEL y0 = example0.y;
+//    LATENT_VAR h0 = example0.h;
+//    STRUCTMODEL *sm0;
+////    h0.auxiliary_z[1][0] = 1;
+////    h0.auxiliary_z[1][1] = 1;
+////    h0.auxiliary_z[1][2] = 1;
+//    for (int i = 0; i < h0.n_rows; ++i) {
+//        for (int j = 0; j < h0.n_cols; ++j) {
+//            h0.auxiliary_z[i][j] = 1;
 //        }
-//        std::cout << "\n";
 //    }
-
-    // test psi()---------------------------------------------------------------
-    EXAMPLE example0 = sample.examples[0];
-    PATTERN x0 = example0.x;
-    LABEL y0 = example0.y;
-    LATENT_VAR h0 = example0.h;
-    STRUCTMODEL *sm0;
-//    h0.auxiliary_z[1][0] = 1;
-//    h0.auxiliary_z[1][1] = 1;
-//    h0.auxiliary_z[1][2] = 1;
-    for (int i = 0; i < h0.n_rows; ++i) {
-        for (int j = 0; j < h0.n_cols; ++j) {
-            h0.auxiliary_z[i][j] = 1;
-        }
-    }
-
-    SVECTOR *svec0 = psi_helper(x0, y0, h0, sm0, &sparm);
-    WORD *index = svec0->words;
-    while (index->wnum) {
-        cout << "Key: " << index->wnum << ", Value: " << index->weight << "\n";
-        index++;
-    }
-
-
-    return 0;
-}
+//
+//    SVECTOR *svec0 = psi_helper(x0, y0, h0, sm0, &sparm);
+//    WORD *index = svec0->words;
+//    while (index->wnum) {
+//        cout << "Key: " << index->wnum << ", Value: " << index->weight << "\n";
+//        index++;
+//    }
+//
+//    int row = 0;
+//    int col = 0;
+//    for (int i1 = 0; i1 < 16384; ++i1) {
+//        if (col == 127) {
+//            col = 0;
+//            row++;
+//        }
+//        col++;
+//    }
+//
+//
+//    return 0;
+//}

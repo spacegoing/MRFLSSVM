@@ -36,9 +36,9 @@ add_library(GraphCut STATIC maxflow-v3.03.src/maxflow.cpp maxflow-v3.03.src/grap
 
 add_library(CHBD STATIC Checkboard/Checkboard.cpp)
 
-add_library(lssvm STATIC svm_struct_latent_api.c)
+add_library(LSSVMY STATIC svm_struct_latent_api.c)
 
-set(SOURCE_FILES mrf_helper.cpp svm_struct_latent_api_types.h)
+set(SOURCE_FILES mrf_helper.cpp svm_struct_latent_api_types.h svm_struct_latent_cccp.c)
 
-add_executable(mrflssvm ${SOURCE_FILES})
-target_link_libraries(mrflssvm CHBD GraphCut SSVM ${ARMADILLO_LIBRARIES})
+add_executable(mrflssvm_learn ${SOURCE_FILES})
+target_link_libraries(mrflssvm_learn CHBD GraphCut SSVM LSSVMY ${ARMADILLO_LIBRARIES})

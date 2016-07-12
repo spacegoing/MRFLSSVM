@@ -16,7 +16,6 @@
 
 #include <stdio.h>
 #include <assert.h>
-#include "svm_struct_latent_api_types.h"
 #include "mrf_helper.h"
 
 

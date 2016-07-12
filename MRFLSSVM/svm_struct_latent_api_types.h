@@ -116,7 +116,7 @@ typedef struct struct_learn_parm {
 				  functions via -l command line
 				  option */
     /* add your own variables */
-    check_options options;
+    struct check_options options;
 } STRUCT_LEARN_PARM;
 
 
