@@ -33,7 +33,7 @@ void Checkboard::checkboardHelper() {
     unary.slice(1) = 2 * (randomMatrix(options.H, options.W) - 0.5) + eta1 * (1 - y) - eta2 * y;
 
     // generate pairwise labels;
-    if (options.hasPairwise) {
+    if (options.hasPairwise) { // if this options is false, dimPairwise = 0
         int pairwiseLength = options.H * options.W * 2 - options.H - options.W;
         pairwise = (float **) malloc(pairwiseLength * sizeof(float *));
 

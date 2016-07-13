@@ -6,6 +6,7 @@
 #include "Checkboard/Checkboard.h"
 #include "maxflow-v3.03.src/graph.h"
 #include <iostream>
+#include <stdlib.h>
 
 void copy_check_options(STRUCT_LEARN_PARM *sparm, Options *options);
 
@@ -88,6 +89,8 @@ SVECTOR *psi_helper(PATTERN x, LABEL y, LATENT_VAR h, STRUCTMODEL *sm, STRUCT_LE
 
     //-------------------------------------------------------------------------
     // unary & pairwise features
+
+    // calculate unary psi
     int unary_key = sparm->options.K * 2 - 1;
     float unary_psi = 0;
     for (int i = 0; i < y.n_rows; ++i) {
@@ -97,9 +100,22 @@ SVECTOR *psi_helper(PATTERN x, LABEL y, LATENT_VAR h, STRUCTMODEL *sm, STRUCT_LE
         }
     }
 
-    //todo: pariwise psi
+    // calculate pariwise psi
     int pairwise_key = unary_key + 1;
     float pairwise_psi = 0.0;
+    if (sparm->options.dimPairwise) {
+        int dim_pariwise = sparm->options.H * sparm->options.W * 2
+                           - sparm->options.H - sparm->options.W;
+        for (int i = 0; i < dim_pariwise; ++i) {
+            div_t ind0 = div((int) x.pairwise[i][0], sparm->options.H);
+            div_t ind1 = div((int) x.pairwise[i][1], sparm->options.H);
+
+            if (y.ground_truth_label[ind0.rem][ind0.quot] !=
+                y.ground_truth_label[ind1.rem][ind1.quot]) {
+                pairwise_psi += 1;
+            }
+        }
+    }
 
     // Assign unary & pairwise
     // Notice: the wnum of unary & pairwise are always
@@ -155,7 +171,14 @@ void find_most_violated_constraint_marginrescaling_helper(PATTERN x, LABEL y, LA
         }
     }
 
-    // todo:Add pairwise edges
+    // Add pairwise edges
+    if (sparm->options.dimPairwise) {
+        int dim_pariwise = sparm->options.H * sparm->options.W * 2
+                           - sparm->options.H - sparm->options.W;
+        for (int i = 0; i < dim_pariwise; ++i) {
+            g->add_edge((int) x.pairwise[i][0], (int) x.pairwise[i][1], x.pairwise[i][2], x.pairwise[i][2]);
+        }
+    }
 
     // Add higher-order terms (a,z between s and t)--------------------------------
 
@@ -277,61 +300,69 @@ inline int *argmax_hidden_var(LATENT_VAR h) {
     return argmax_z_array;
 }
 
-int main(int argc, char **argv) {
-
-    // test read_example()
-    STRUCT_LEARN_PARM sparm;
-    SAMPLE sample = read_struct_examples_helper((char *) "", &sparm);
-
-    EXAMPLE example0 = sample.examples[0];
-    PATTERN x0 = example0.x;
-    LABEL y0 = example0.y;
-    LATENT_VAR h0 = example0.h;
-    STRUCTMODEL *sm0;
-
-//    // Check pairwise
-//    cout<<"127th: "<<x0.pairwise[126][0]<<" "<<x0.pairwise[126][1]<<"\n";
-//    cout<<"128th: "<<x0.pairwise[127][0]<<" "<<x0.pairwise[127][1]<<"\n";
-//    cout<<"1015th: "<<x0.pairwise[1014][0]<<" "<<x0.pairwise[1014][1]<<"\n";
-//    cout<<"1016th: "<<x0.pairwise[1015][0]<<" "<<x0.pairwise[1015][1]<<"\n";
-//    cout<<"1017th: "<<x0.pairwise[1016][0]<<" "<<x0.pairwise[1016][1]<<"\n";
-//    cout<<"16255th: "<<x0.pairwise[16254][0]<<" "<<x0.pairwise[16254][1]<<"\n";
-//    cout<<"16256th: "<<x0.pairwise[16255][0]<<" "<<x0.pairwise[16255][1]<<"\n";
-//    cout<<"16257th: "<<x0.pairwise[16256][0]<<" "<<x0.pairwise[16256][1]<<"\n";
-//    cout<<"32512th: "<<x0.pairwise[32511][0]<<" "<<x0.pairwise[32511][1]<<"\n";
-
-//     // print checkboard matrix value--------------------------------------------
-//    for (int i = 0; i < sample.examples[0].y.n_rows; ++i) {
-//        for (int j = 0; j < sample.examples[0].y.n_cols; ++j) {
-//            std::cout << sample.examples[0].y.clique_indexes[i][j];
-//        }
-//        std::cout << "\n";
-//    }
-
-//    for (int i = 0; i < x0.n_rows; ++i) {
-//        for (int j = 0; j < x0.n_cols; ++j) {
-//            cout << x0.observed_unary[i][j][0] << ":" << x0.observed_unary[i][j][1] << " ";
-//        }
-//        cout<<"\n";
-//    }
-
-
-    // test psi()---------------------------------------------------------------
-//    h0.auxiliary_z[1][0] = 1;
-//    h0.auxiliary_z[1][1] = 1;
-//    h0.auxiliary_z[1][2] = 1;
-//    for (int i = 0; i < h0.n_rows; ++i) {
-//        for (int j = 0; j < h0.n_cols; ++j) {
-//            h0.auxiliary_z[i][j] = 1;
-//        }
-//    }
+//int main(int argc, char **argv) {
 //
-//    SVECTOR *svec0 = psi_helper(x0, y0, h0, sm0, &sparm);
-//    WORD *index = svec0->words;
-//    while (index->wnum) {
-//        cout << "Key: " << index->wnum << ", Value: " << index->weight << "\n";
-//        index++;
-//    }
-
-    return 0;
-}
+//    // test read_example()
+//    STRUCT_LEARN_PARM sparm;
+//    SAMPLE sample = read_struct_examples_helper((char *) "", &sparm);
+//
+//    EXAMPLE example0 = sample.examples[0];
+//    PATTERN x0 = example0.x;
+//    LABEL y0 = example0.y;
+//    LATENT_VAR h0 = example0.h;
+//    STRUCTMODEL *sm0;
+//
+////    // calculate [i][j] from index
+////    float a = 130.0;
+////    div_t q = div((int) a, 128);
+////    cout << "r: " << q.rem << " q: " << q.quot << endl;
+//
+////    // Check pairwise
+////    cout<<"127th: "<<x0.pairwise[126][0]<<" "<<x0.pairwise[126][1]<<"\n";
+////    cout<<"128th: "<<x0.pairwise[127][0]<<" "<<x0.pairwise[127][1]<<"\n";
+////    cout<<"1015th: "<<x0.pairwise[1014][0]<<" "<<x0.pairwise[1014][1]<<"\n";
+////    cout<<"1016th: "<<x0.pairwise[1015][0]<<" "<<x0.pairwise[1015][1]<<"\n";
+////    cout<<"1017th: "<<x0.pairwise[1016][0]<<" "<<x0.pairwise[1016][1]<<"\n";
+////    cout<<"16255th: "<<x0.pairwise[16254][0]<<" "<<x0.pairwise[16254][1]<<"\n";
+////    cout<<"16256th: "<<x0.pairwise[16255][0]<<" "<<x0.pairwise[16255][1]<<"\n";
+////    cout<<"16257th: "<<x0.pairwise[16256][0]<<" "<<x0.pairwise[16256][1]<<"\n";
+////    cout<<"32512th: "<<x0.pairwise[32511][0]<<" "<<x0.pairwise[32511][1]<<"\n";
+//
+////     // print checkboard matrix value--------------------------------------------
+////    for (int i = 0; i < sample.examples[0].y.n_rows; ++i) {
+////        for (int j = 0; j < sample.examples[0].y.n_cols; ++j) {
+////            std::cout << sample.examples[0].y.clique_indexes[i][j];
+////        }
+////        std::cout << "\n";
+////    }
+//
+////    for (int i = 0; i < x0.n_rows; ++i) {
+////        for (int j = 0; j < x0.n_cols; ++j) {
+////            cout << x0.observed_unary[i][j][0] << ":" << x0.observed_unary[i][j][1] << " ";
+////        }
+////        cout<<"\n";
+////    }
+//
+//
+//    // test psi()---------------------------------------------------------------
+////    h0.auxiliary_z[1][0] = 1;
+////    h0.auxiliary_z[1][1] = 1;
+////    h0.auxiliary_z[1][2] = 1;
+////    for (int i = 0; i < h0.n_rows; ++i) {
+////        for (int j = 0; j < h0.n_cols; ++j) {
+////            h0.auxiliary_z[i][j] = 1;
+////        }
+////    }
+////
+////    SVECTOR *svec0 = psi_helper(x0, y0, h0, sm0, &sparm);
+////    WORD *index = svec0->words;
+////    while (index->wnum) {
+////        cout << "Key: " << index->wnum << ", Value: " << index->weight << "\n";
+////        index++;
+////    }
+//
+//    // test psi() with / without pariwise---------------------------------------
+//
+//
+//    return 0;
+//}

@@ -31,7 +31,7 @@ struct Options {
     // Other Configs
     int learningQP = 1;  // encoding for learning QP (1, 2, or 3)
     int figWnd = 0;  // figure for showing results
-    bool hasPairwise = true;
+    bool hasPairwise = true; //dimPairwise = 0 when it's false
 };
 
 class Checkboard {
