@@ -5,8 +5,7 @@
 Checkboard::Checkboard() :
         cliques(options.H, options.W),
         y(options.H, options.W),
-        unary(options.H, options.W, options.dimUnary),
-        pairwise(options.H, options.W, options.dimPairwise) {
+        unary(options.H, options.W, options.dimUnary) {
     checkboardHelper();
 }
 
@@ -33,7 +32,37 @@ void Checkboard::checkboardHelper() {
     unary.slice(0).fill(0);
     unary.slice(1) = 2 * (randomMatrix(options.H, options.W) - 0.5) + eta1 * (1 - y) - eta2 * y;
 
-    pairwise.fill(0);
+    // generate pairwise labels;
+    if (options.hasPairwise) {
+        int pairwiseLength = options.H * options.W * 2 - options.H - options.W;
+        pairwise = (float **) malloc(pairwiseLength * sizeof(float *));
+
+        int counter = 0;
+        for (int i = 0; i < pairwiseLength / 2; ++i) {
+            if (((counter + 1) % 128) == 0) {
+                counter++;
+            }
+            pairwise[i] = (float *) malloc(options.dimPairwise * sizeof(float));
+            // todo: magic number
+            pairwise[i][0] = counter;
+            pairwise[i][1] = counter + 1;
+            pairwise[i][2] = 0;
+            counter++;
+        }
+
+        counter = 0;
+        for (int i = pairwiseLength / 2; i < pairwiseLength; ++i) {
+            pairwise[i] = (float *) malloc(options.dimPairwise * sizeof(float));
+            // todo: magic number
+            pairwise[i][0] = counter;
+            pairwise[i][1] = counter + options.H;
+            pairwise[i][2] = 0;
+            counter++;
+        }
+    } else {
+        options.dimPairwise = 0;
+    }
+
 
 }
 

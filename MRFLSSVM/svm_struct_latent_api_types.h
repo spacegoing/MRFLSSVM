@@ -25,6 +25,7 @@ typedef struct pattern {
     int dim_unary;
     int dim_pairwise;
     float ***observed_unary;
+    float **pairwise;
 } PATTERN;
 
 typedef struct label {

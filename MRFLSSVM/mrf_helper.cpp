@@ -22,7 +22,7 @@ SAMPLE read_struct_examples_helper(char *filename, STRUCT_LEARN_PARM *sparm) {
     sample.examples[0].x.dim_unary = checkboard.options.dimUnary;
     sample.examples[0].x.dim_pairwise = checkboard.options.dimPairwise;
     sample.examples[0].x.observed_unary = checkboard.cube_to_float(checkboard.unary);
-    //todo: pairwise
+    sample.examples[0].x.pairwise = checkboard.pairwise;
 
     sample.examples[0].y.n_rows = checkboard.options.H;
     sample.examples[0].y.n_cols = checkboard.options.W;
@@ -288,6 +288,17 @@ int main(int argc, char **argv) {
     LABEL y0 = example0.y;
     LATENT_VAR h0 = example0.h;
     STRUCTMODEL *sm0;
+
+//    // Check pairwise
+//    cout<<"127th: "<<x0.pairwise[126][0]<<" "<<x0.pairwise[126][1]<<"\n";
+//    cout<<"128th: "<<x0.pairwise[127][0]<<" "<<x0.pairwise[127][1]<<"\n";
+//    cout<<"1015th: "<<x0.pairwise[1014][0]<<" "<<x0.pairwise[1014][1]<<"\n";
+//    cout<<"1016th: "<<x0.pairwise[1015][0]<<" "<<x0.pairwise[1015][1]<<"\n";
+//    cout<<"1017th: "<<x0.pairwise[1016][0]<<" "<<x0.pairwise[1016][1]<<"\n";
+//    cout<<"16255th: "<<x0.pairwise[16254][0]<<" "<<x0.pairwise[16254][1]<<"\n";
+//    cout<<"16256th: "<<x0.pairwise[16255][0]<<" "<<x0.pairwise[16255][1]<<"\n";
+//    cout<<"16257th: "<<x0.pairwise[16256][0]<<" "<<x0.pairwise[16256][1]<<"\n";
+//    cout<<"32512th: "<<x0.pairwise[32511][0]<<" "<<x0.pairwise[32511][1]<<"\n";
 
 //     // print checkboard matrix value--------------------------------------------
 //    for (int i = 0; i < sample.examples[0].y.n_rows; ++i) {

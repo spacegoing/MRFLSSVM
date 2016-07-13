@@ -31,6 +31,7 @@ struct Options {
     // Other Configs
     int learningQP = 1;  // encoding for learning QP (1, 2, or 3)
     int figWnd = 0;  // figure for showing results
+    bool hasPairwise = true;
 };
 
 class Checkboard {
@@ -39,7 +40,7 @@ public:
     Mat<int> cliques;
     Mat<int> y;
     cube unary;
-    cube pairwise;
+    float** pairwise;
 
     Checkboard();
 
