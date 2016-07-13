@@ -31,8 +31,7 @@ void Checkboard::checkboardHelper() {
     double eta1 = 0.1;
     double eta2 = 0.1;
     unary.slice(0).fill(0);
-    unary.slice(1) = 2 * (randomMatrix(options.H, options.W) - 0.5);
-    +eta1 * (1 - y) - eta2 * y;
+    unary.slice(1) = 2 * (randomMatrix(options.H, options.W) - 0.5) + eta1 * (1 - y) - eta2 * y;
 
     pairwise.fill(0);
 

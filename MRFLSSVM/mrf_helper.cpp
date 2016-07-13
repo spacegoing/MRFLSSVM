@@ -277,29 +277,38 @@ inline int *argmax_hidden_var(LATENT_VAR h) {
     return argmax_z_array;
 }
 
-//int main(int argc, char **argv) {
-//
-//    // test read_example()
-//    STRUCT_LEARN_PARM sparm;
-//    SAMPLE sample = read_struct_examples_helper((char *) "", &sparm);
-//
-////     // print checkboard matrix value--------------------------------------------
-////    for (int i = 0; i < sample.examples[0].y.n_rows; ++i) {
-////        for (int j = 0; j < sample.examples[0].y.n_cols; ++j) {
-////            std::cout << sample.examples[0].y.clique_indexes[i][j];
-////        }
-////        std::cout << "\n";
-////    }
-//
-//    // test psi()---------------------------------------------------------------
-//    EXAMPLE example0 = sample.examples[0];
-//    PATTERN x0 = example0.x;
-//    LABEL y0 = example0.y;
-//    LATENT_VAR h0 = example0.h;
-//    STRUCTMODEL *sm0;
-////    h0.auxiliary_z[1][0] = 1;
-////    h0.auxiliary_z[1][1] = 1;
-////    h0.auxiliary_z[1][2] = 1;
+int main(int argc, char **argv) {
+
+    // test read_example()
+    STRUCT_LEARN_PARM sparm;
+    SAMPLE sample = read_struct_examples_helper((char *) "", &sparm);
+
+    EXAMPLE example0 = sample.examples[0];
+    PATTERN x0 = example0.x;
+    LABEL y0 = example0.y;
+    LATENT_VAR h0 = example0.h;
+    STRUCTMODEL *sm0;
+
+//     // print checkboard matrix value--------------------------------------------
+//    for (int i = 0; i < sample.examples[0].y.n_rows; ++i) {
+//        for (int j = 0; j < sample.examples[0].y.n_cols; ++j) {
+//            std::cout << sample.examples[0].y.clique_indexes[i][j];
+//        }
+//        std::cout << "\n";
+//    }
+
+//    for (int i = 0; i < x0.n_rows; ++i) {
+//        for (int j = 0; j < x0.n_cols; ++j) {
+//            cout << x0.observed_unary[i][j][0] << ":" << x0.observed_unary[i][j][1] << " ";
+//        }
+//        cout<<"\n";
+//    }
+
+
+    // test psi()---------------------------------------------------------------
+//    h0.auxiliary_z[1][0] = 1;
+//    h0.auxiliary_z[1][1] = 1;
+//    h0.auxiliary_z[1][2] = 1;
 //    for (int i = 0; i < h0.n_rows; ++i) {
 //        for (int j = 0; j < h0.n_cols; ++j) {
 //            h0.auxiliary_z[i][j] = 1;
@@ -312,17 +321,6 @@ inline int *argmax_hidden_var(LATENT_VAR h) {
 //        cout << "Key: " << index->wnum << ", Value: " << index->weight << "\n";
 //        index++;
 //    }
-//
-//    int row = 0;
-//    int col = 0;
-//    for (int i1 = 0; i1 < 16384; ++i1) {
-//        if (col == 127) {
-//            col = 0;
-//            row++;
-//        }
-//        col++;
-//    }
-//
-//
-//    return 0;
-//}
+
+    return 0;
+}

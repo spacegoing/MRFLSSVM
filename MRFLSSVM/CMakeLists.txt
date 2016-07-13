@@ -38,7 +38,7 @@ add_library(CHBD STATIC Checkboard/Checkboard.cpp)
 
 add_library(LSSVMY STATIC svm_struct_latent_api.c)
 
-set(SOURCE_FILES mrf_helper.cpp svm_struct_latent_api_types.h svm_struct_latent_cccp.c)
+set(SOURCE_FILES mrf_helper.cpp )#svm_struct_latent_api_types.h svm_struct_latent_cccp.c)
 
 add_executable(mrflssvm_learn ${SOURCE_FILES})
 target_link_libraries(mrflssvm_learn CHBD GraphCut SSVM LSSVMY ${ARMADILLO_LIBRARIES})
