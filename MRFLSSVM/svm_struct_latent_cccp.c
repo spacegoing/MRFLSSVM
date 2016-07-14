@@ -16,8 +16,6 @@
 
 #include <stdio.h>
 #include <assert.h>
-//#include "./svm_light/svm_common.h"
-//#include "svm_struct_latent_api_types.h"
 #include "svm_struct_latent_api.h"
 #include "./svm_light/svm_learn.h"
 
