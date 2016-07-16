@@ -36,10 +36,10 @@ void init_struct_model(SAMPLE sample, STRUCTMODEL *sm, STRUCT_LEARN_PARM *sparm,
   of the feature space sm->sizePsi. Can also initialize your own
   variables in sm here. 
 */
-
-    sm->sizePsi = 2 * sparm->options.K + 1; /* replace with appropriate number */
-
     /* your code here*/
+
+    int higher_order_length = 2 * sparm->options.K - 1;
+    sm->sizePsi = higher_order_length + 1 + 1; // unary + pairwise
 
 }
 

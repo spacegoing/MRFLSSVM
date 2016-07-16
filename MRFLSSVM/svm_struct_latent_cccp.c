@@ -98,13 +98,7 @@ SVECTOR *find_cutting_plane(EXAMPLE *ex, SVECTOR **fycache, double *margin, long
     *margin = 0;
     for (i = 0; i < m; i++) {
         find_most_violated_constraint_marginrescaling(ex[i].x, ex[i].y, &ybar, &hbar, sm, sparm);
-        printf("\n apsoijfoiejwfpojap cpcpcpcpcpc\n");
-        for (int i = 0; i < ex[0].y.n_rows; i++) {
-            for (int j = 0; j < ex[0].y.n_cols; j++) {
-                printf("%d", ex[0].y.clique_indexes[i][j]);
-            }
-            printf("\n");
-        }
+
         /* get difference vector */
         fy = copy_svector(fycache[i]);
         fybar = psi(ex[i].x, ybar, hbar, sm, sparm);
@@ -256,6 +250,10 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
 
     proximal_rhs = NULL;
     cut_error = NULL;
+
+
+
+    dXc = (DOC *) malloc()
 
     new_constraint = find_cutting_plane(ex, fycache, &margin, m, sm, sparm);
     value = margin - sprod_ns(w, new_constraint);
