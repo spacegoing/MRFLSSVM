@@ -277,7 +277,7 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
     idle = (int *) malloc(size_active * sizeof(int));
     cut_error = (double *) malloc(size_active * sizeof(double));
     gammaG0 = (double *) malloc(size_active * sizeof(double));
-    
+
     while ((!suff_decrease_cond) && (expected_descent < -epsilon) && (iter < MAX_ITER)) {
         iter += 1;
         size_active += 1;

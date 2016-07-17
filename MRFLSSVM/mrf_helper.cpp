@@ -156,6 +156,22 @@ void find_most_violated_constraint_marginrescaling_helper(PATTERN x, LABEL y, LA
 //    int nMaxCliquesPerVariable = 1;
     double *w = sm->w;
 
+    // remove redundancy-------------------------------------------------------
+    // compute (b_k-b_{k-1})/a_{k-1}-a_k
+    double b_a_ratio[K - 1];
+    for (int i = 0; i < K - 1; ++i) {
+        b_a_ratio[i] = w[i + K] / (-1.0 * w[i + 1]);
+    }
+
+    // ensure (b_k-b_{k-1})/a_{k-1}-a_k < (b_{k+1}-b_{k})/a_k-a_{k+1}
+    // if not then use w[i-1] & w[i+K-1] replace w[i] & w[i+K]
+    for (int i = 1; i < K - 1; ++i) {
+        if (b_a_ratio[i] < b_a_ratio[i - 1]) {
+            w[i + 1] = w[i];
+            w[i + K] = w[i + K - 1];
+        }
+    }
+
     float ***unaryWeights = x.observed_unary;
 
     typedef Graph<double, double, double> GraphType;
