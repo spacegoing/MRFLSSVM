@@ -265,9 +265,12 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
     fflush(stdout);
 
 //    size_active, proximal_rhs, dXc, delta, alpha, idle, cut_error, gammaG0, G
+//    Initial Values:    constraints    0      C      0    4 lines      0     no changes
+//                                                               changes in while
 //    size_active, delta, alpha, idle, cut_error, gammaG0, G
 
-    size_active = 3 * (sparm->options.K - 1) + 1;
+    int pos_cons_size = 3 * (sparm->options.K - 1) + 1;
+    size_active = pos_cons_size;
     dXc = (DOC **) malloc(size_active * sizeof(DOC *));
     proximal_rhs = (double *) malloc(size_active * sizeof(double));
 
@@ -332,13 +335,13 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
         if (null_step == 1) {
             gammaG0[size_active - 1] = sprod_ns(w_b, dXc[size_active - 1]->fvec);
         } else {
-            for (i = 0; i < size_active; i++) {
+            for (i = pos_cons_size; i < size_active; i++) {
                 gammaG0[i] = sprod_ns(w_b, dXc[i]->fvec);
             }
         }
 
         /* update proximal_rhs */
-        for (i = 0; i < size_active; i++) {
+        for (i = pos_cons_size; i < size_active; i++) {
             proximal_rhs[i] = (1 + rho) * delta[i] - rho * gammaG0[i];
         }
 
@@ -346,13 +349,13 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
         /* solve QP to update alpha */
         //dual_obj = 0;
         //r = mosek_qp_optimize(G, proximal_rhs, alpha, (long) size_active, C, &dual_obj,rho);
-        if (size_active > 1) {
+        if (size_active > pos_cons_size+1) {
             if (svmModel != NULL) free_model(svmModel, 0);
             svmModel = (MODEL *) my_malloc(sizeof(MODEL));
             svm_learn_optimization(dXc, proximal_rhs, size_active, sm->sizePsi, &lparm, &kparm, NULL, svmModel, alpha);
         } else {
-            assert(size_active == 1);
-            alpha[0] = C;
+            assert(size_active == pos_cons_size+1);
+            alpha[pos_cons_size] = C;
         }
         /* DEBUG */
         //printf("r: %d\n", r); fflush(stdout);
@@ -492,10 +495,10 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
             suff_decrease_cond = 1;
         }
 
-        /* clean up */
-        if (iter % CLEANUP_CHECK == 0) {
-            size_active = resize_cleanup(size_active, idle, alpha, delta, gammaG0, proximal_rhs, G, dXc, cut_error);
-        }
+//        /* clean up */
+//        if (iter % CLEANUP_CHECK == 0) {
+//            size_active = resize_cleanup(size_active, idle, alpha, delta, gammaG0, proximal_rhs, G, dXc, cut_error);
+//        }
 
 
     } // end cutting plane while loop
