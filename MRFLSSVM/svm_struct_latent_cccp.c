@@ -243,8 +243,6 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
     }
 
     iter = 0;
-    G = NULL;
-
 
     new_constraint = find_cutting_plane(ex, fycache, &margin, m, sm, sparm);
     value = margin - sprod_ns(w, new_constraint);
@@ -317,21 +315,6 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
 
         gammaG0 = (double *) realloc(gammaG0, sizeof(double) * size_active);
         assert(gammaG0 != NULL);
-
-        /* update Gram matrix */
-        G = (double **) realloc(G, sizeof(double *) * size_active);
-        assert(G != NULL);
-        G[size_active - 1] = NULL;
-        for (j = 0; j < size_active; j++) {
-            G[j] = (double *) realloc(G[j], sizeof(double) * size_active);
-            assert(G[j] != NULL);
-        }
-        for (j = 0; j < size_active - 1; j++) {
-            G[size_active - 1][j] = sprod_ss(dXc[size_active - 1]->fvec, dXc[j]->fvec);
-            G[j][size_active - 1] = G[size_active - 1][j];
-        }
-        G[size_active - 1][size_active - 1] = sprod_ss(dXc[size_active - 1]->fvec, dXc[size_active - 1]->fvec);
-
 
         /* update gammaG0 */
         if (null_step == 1) {
@@ -510,10 +493,8 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
 
     /* free memory */
     for (j = 0; j < size_active; j++) {
-        free(G[j]);
         free_example(dXc[j], 0);
     }
-    free(G);
     free(dXc);
     free(alpha);
     free(delta);
