@@ -172,7 +172,7 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
     double margin;
     double primal_obj;
     double *proximal_rhs;
-    double *gammaG0 = NULL;
+    double *gammaG0;
     double min_rho = 0.001;
     double max_rho;
     double serious_counter = 0;
@@ -243,12 +243,8 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
     }
 
     iter = 0;
-    alpha = NULL;
     G = NULL;
-    delta = NULL;
-    idle = NULL;
 
-    cut_error = NULL;
 
     new_constraint = find_cutting_plane(ex, fycache, &margin, m, sm, sparm);
     value = margin - sprod_ns(w, new_constraint);
@@ -265,10 +261,9 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
     fflush(stdout);
 
 //    size_active, proximal_rhs, dXc, delta, alpha, idle, cut_error, gammaG0, G
-//    Initial Values:    constraints    0      C      0    4 lines      0     no changes
+//    Initial Values:    constraints    0      0      0       0         0     no changes
 //                                                               changes in while
-//    size_active, delta, alpha, idle, cut_error, gammaG0, G
-
+    // Add positive constraints
     int pos_cons_size = 3 * (sparm->options.K - 1) + 1;
     size_active = pos_cons_size;
     dXc = (DOC **) malloc(size_active * sizeof(DOC *));
@@ -276,6 +271,13 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
 
     add_positive_constraint(sm, sparm, dXc, size_active, proximal_rhs);
 
+    // Initialize delta, alpha, idle, cut_error, gammaG0
+    delta = (double *) malloc(size_active * sizeof(double));
+    alpha = (double *) malloc(size_active * sizeof(double));
+    idle = (int *) malloc(size_active * sizeof(int));
+    cut_error = (double *) malloc(size_active * sizeof(double));
+    gammaG0 = (double *) malloc(size_active * sizeof(double));
+    
     while ((!suff_decrease_cond) && (expected_descent < -epsilon) && (iter < MAX_ITER)) {
         iter += 1;
         size_active += 1;
