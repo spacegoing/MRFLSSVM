@@ -634,7 +634,7 @@ void add_positive_constraint(const STRUCTMODEL *sm, const STRUCT_LEARN_PARM *spa
     // dXc[k] > 0.0
     proximal_rhs[3 * (sparm->options.K - 1)] = 0.0;
 
-
+    free(words);
 }
 
 
