@@ -41,6 +41,9 @@ void my_wait_any_key();
 int resize_cleanup(int size_active, int *idle, double *alpha, double *delta, double *gammaG0, double *proximal_rhs,
                    double **G, DOC **dXc, double *cut_error);
 
+void add_positive_constraint(const STRUCTMODEL *sm, const STRUCT_LEARN_PARM *sparm, DOC **dXc, int size_active,
+                             double *proximal_rhs);
+
 double sprod_nn(double *a, double *b, long n) {
     double ans = 0.0;
     long i;
@@ -240,20 +243,12 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
     }
 
     iter = 0;
-    size_active = 0;
-    xi = 0.0;
     alpha = NULL;
     G = NULL;
-    dXc = NULL;
     delta = NULL;
     idle = NULL;
 
-    proximal_rhs = NULL;
     cut_error = NULL;
-
-
-
-    dXc = (DOC *) malloc()
 
     new_constraint = find_cutting_plane(ex, fycache, &margin, m, sm, sparm);
     value = margin - sprod_ns(w, new_constraint);
@@ -268,6 +263,15 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
 
     printf("Running CCCP inner loop solver: ");
     fflush(stdout);
+
+//    size_active, proximal_rhs, dXc, delta, alpha, idle, cut_error, gammaG0, G
+//    size_active, delta, alpha, idle, cut_error, gammaG0, G
+
+    size_active = 3 * (sparm->options.K - 1) + 1;
+    dXc = (DOC **) malloc(size_active * sizeof(DOC *));
+    proximal_rhs = (double *) malloc(size_active * sizeof(double));
+
+    add_positive_constraint(sm, sparm, dXc, size_active, proximal_rhs);
 
     while ((!suff_decrease_cond) && (expected_descent < -epsilon) && (iter < MAX_ITER)) {
         iter += 1;
@@ -521,6 +525,115 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
     free(w_b);
 
     return (primal_obj_b);
+
+}
+
+void add_positive_constraint(const STRUCTMODEL *sm, const STRUCT_LEARN_PARM *sparm, DOC **dXc, int size_active,
+                             double *proximal_rhs) {
+
+    // positive constraints for a_k - a_{k+1}------------------------------------
+    // dXc[0] = [0 -1 0 0 ...]
+    // dXc[1] = [0 0 -1 0 ...]
+    for (int k = 0; k < sparm->options.K - 1; ++k) {
+        dXc[k] = (DOC *) malloc(sizeof(DOC));
+
+        // Initialization
+        WORD *words = (WORD *) malloc((sm->sizePsi + 1) * sizeof(WORD));
+        for (int l = 0; l < sm->sizePsi; ++l) {
+            words[l].wnum = l + 1;
+            words[l].weight = 0.0;
+        }
+        words[sm->sizePsi].wnum = 0;
+        words[sm->sizePsi].weight = 0.0;
+        // Assign k_1 to -1
+        words[k + 1].weight = -1;
+
+        dXc[k]->fvec = create_svector(words, "", 1.0);
+        dXc[k]->slackid = 1; // only one common slackid (one-slack)
+        dXc[k]->costfactor = 1.0;
+
+        // dXc[k] > 0.0
+        proximal_rhs[k] = 0.0;
+
+        free(words);
+    }
+
+    // positive constraints for b_{k+1} - b_k------------------------------------
+    // dXc[K-1] = [0 0 0 0 ... 1 0 0 0 ...]
+    // dXc[K] = [0 0 0 0   ... 0 1 0 0 ...]
+    for (int k = sparm->options.K - 1; k < 2 * (sparm->options.K - 1); ++k) {
+        dXc[k] = (DOC *) malloc(sizeof(DOC));
+
+        // Initialization
+        WORD *words = (WORD *) malloc((sm->sizePsi + 1) * sizeof(WORD));
+        for (int l = 0; l < sm->sizePsi; ++l) {
+            words[l].wnum = l + 1;
+            words[l].weight = 0.0;
+        }
+        words[sm->sizePsi].wnum = 0;
+        words[sm->sizePsi].weight = 0.0;
+        // Assign k_1 to -1
+        words[k + 1].weight = 1;
+
+        dXc[k]->fvec = create_svector(words, "", 1.0);
+        dXc[k]->slackid = 1; // only one common slackid (one-slack)
+        dXc[k]->costfactor = 1.0;
+
+        // dXc[k] > 0.0
+        proximal_rhs[k] = 0.0;
+
+        free(words);
+    }
+
+    // positive constraints for a_k - a_{k+1} - (b_{k+1} - b_k) > 0----------------
+    // dXc[K-1] = [0 0 0 0 ... 1 0 0 0 ...]
+    // dXc[K] = [0 0 0 0   ... 0 1 0 0 ...]
+    for (int k = 2 * (sparm->options.K - 1); k < 3 * (sparm->options.K - 1); ++k) {
+        dXc[k] = (DOC *) malloc(sizeof(DOC));
+
+        // Initialization
+        WORD *words = (WORD *) malloc((sm->sizePsi + 1) * sizeof(WORD));
+        for (int l = 0; l < sm->sizePsi; ++l) {
+            words[l].wnum = l + 1;
+            words[l].weight = 0.0;
+        }
+        words[sm->sizePsi].wnum = 0;
+        words[sm->sizePsi].weight = 0.0;
+        // Assign a_{k+1} - a_k to -1 and (b_{k+1} - b_k) to -1
+        words[k + 1].weight = -1;
+        words[k + sparm->options.K].weight = -1;
+
+        dXc[k]->fvec = create_svector(words, "", 1.0);
+        dXc[k]->slackid = 1; // only one common slackid (one-slack)
+        dXc[k]->costfactor = 1.0;
+
+        // dXc[k] > 0.0
+        proximal_rhs[k] = 0.0;
+
+        free(words);
+    }
+
+    // positive constraint for pairwise param----------------------------------------
+    // dXc[3*(K-1)] = w[sm->sizePsi - 2] = 1
+    dXc[3 * (sparm->options.K - 1)] = (DOC *) malloc(sizeof(DOC));
+    // Initialization
+    WORD *words = (WORD *) malloc((sm->sizePsi + 1) * sizeof(WORD));
+    for (int l = 0; l < sm->sizePsi; ++l) {
+        words[l].wnum = l + 1;
+        words[l].weight = 0.0;
+    }
+    words[sm->sizePsi].wnum = 0;
+    words[sm->sizePsi].weight = 0.0;
+    // Assign k_1 to -1
+    words[sm->sizePsi-2].weight = 1;
+
+    dXc[3 * (sparm->options.K - 1)]->fvec = create_svector(words, "", 1.0);
+    dXc[3 * (sparm->options.K - 1)]->slackid = 1; // only one common slackid (one-slack)
+    dXc[3 * (sparm->options.K - 1)]->costfactor = 1.0;
+
+    // dXc[k] > 0.0
+    proximal_rhs[3 * (sparm->options.K - 1)] = 0.0;
+
 
 }
 
