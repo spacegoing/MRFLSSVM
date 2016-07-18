@@ -6,11 +6,32 @@
 #include "Checkboard/Checkboard.h"
 #include "maxflow-v3.03.src/graph.h"
 #include <iostream>
-#include <stdlib.h>
+#include <stdio.h>
 
 void copy_check_options(STRUCT_LEARN_PARM *sparm, Options *options);
 
 inline int *argmax_hidden_var(LATENT_VAR h);
+
+void write_pairwise(float** pairwise, int n_rows) {
+/*
+  Writes the learned weight vector sm->w to file after training.
+*/
+    FILE *modelfl;
+    long i;
+
+    modelfl = fopen("pairwise.txt", "w");
+    if (modelfl == NULL) {
+        printf("Cannot open model file %s for output!", "pairwise.txt");
+        exit(1);
+    }
+
+//    fprintf(modelfl, "# sizePsi:%ld\n", sm->sizePsi);
+    for (i = 0; i < n_rows; i++) {
+        fprintf(modelfl, "%f, %f, %f\n", pairwise[i][0]+1, pairwise[i][1]+1, pairwise[i][2]);
+    }
+    fclose(modelfl);
+
+}
 
 SAMPLE read_struct_examples_helper(char *filename, STRUCT_LEARN_PARM *sparm) {
     SAMPLE sample;
@@ -38,6 +59,10 @@ SAMPLE read_struct_examples_helper(char *filename, STRUCT_LEARN_PARM *sparm) {
 
     copy_check_options(sparm, &checkboard.options);
 
+    int dim_pariwise = sparm->options.H * sparm->options.W * 2
+                       - sparm->options.H - sparm->options.W;
+    write_pairwise(checkboard.pairwise, dim_pariwise);
+
     return sample;
 }
 
@@ -61,12 +86,24 @@ SVECTOR *psi_helper(PATTERN x, LABEL y, LATENT_VAR h, STRUCTMODEL *sm, STRUCT_LE
             clique_value_vector[clique_id] += y.ground_truth_label[i][j];
         }
     }
+
+    cout<<"clique value vector\n$$$$$$$$$$$$$$$$$$$$$$$#############"<<endl;
+    for (int n = 0; n < sparm->options.numCliques; ++n) {
+        cout<<clique_value_vector[n]<<" ";
+    }
+    cout<<endl;
+
     for (int k = 0; k < sparm->options.numCliques; ++k) {
         if (clique_size_vector[k]) {
             clique_value_vector[k] /= clique_size_vector[k];
             w_y += clique_value_vector[k];
         }
     }
+    cout<<"clique value vector\n$$$$$$$$$$$$$$$$$$$$$$$#############"<<endl;
+    for (int n = 0; n < sparm->options.numCliques; ++n) {
+        cout<<clique_value_vector[n]<<" ";
+    }
+    cout<<endl;
 
     // Assign higher order vector to words[]--------------------------------------------
     for (int l = 0; l < higher_order_length; ++l) {
@@ -275,6 +312,22 @@ void find_most_violated_constraint_marginrescaling_helper(PATTERN x, LABEL y, LA
         for (int k1 = 0; k1 < K - 1; ++k1) {
             hbar->auxiliary_z[l1][k1] = (g->what_segment(z_index[l1] + k1) == GraphType::SOURCE) ? 1 : 0;
         }
+    }
+
+    cout<<"ybar##############################"<<endl;
+    for (int m1 = 0; m1 < y.n_rows; ++m1) {
+        for (int i = 0; i < y.n_cols; ++i) {
+            cout<< ybar->ground_truth_label[m1][i]<<" ";
+        }
+        cout<<endl;
+    }
+
+    cout<<"hbar##############################"<<endl;
+    for (int m1 = 0; m1 < hbar->n_rows; ++m1) {
+        for (int i = 0; i < hbar->n_cols; ++i) {
+            cout<< hbar->auxiliary_z[m1][i]<<" ";
+        }
+        cout<<endl;
     }
 
     delete (g);
