@@ -8,11 +8,20 @@
 #include <iostream>
 #include <stdio.h>
 
+#define DEBUG_LEVEL 0
+
+/**
+ * -1 for all
+ * 0 for null
+ * 1 for psi
+ * 2 for graph-cut
+ */
+
 void copy_check_options(STRUCT_LEARN_PARM *sparm, Options *options);
 
 inline int *argmax_hidden_var(LATENT_VAR h);
 
-void write_pairwise(float** pairwise, int n_rows) {
+void write_pairwise(float **pairwise, int n_rows) {
 /*
   Writes the learned weight vector sm->w to file after training.
 */
@@ -27,7 +36,7 @@ void write_pairwise(float** pairwise, int n_rows) {
 
 //    fprintf(modelfl, "# sizePsi:%ld\n", sm->sizePsi);
     for (i = 0; i < n_rows; i++) {
-        fprintf(modelfl, "%f, %f, %f\n", pairwise[i][0]+1, pairwise[i][1]+1, pairwise[i][2]);
+        fprintf(modelfl, "%f, %f, %f\n", pairwise[i][0] + 1, pairwise[i][1] + 1, pairwise[i][2]);
     }
     fclose(modelfl);
 
@@ -87,11 +96,13 @@ SVECTOR *psi_helper(PATTERN x, LABEL y, LATENT_VAR h, STRUCTMODEL *sm, STRUCT_LE
         }
     }
 
-    cout<<"clique value vector\n$$$$$$$$$$$$$$$$$$$$$$$#############"<<endl;
+#if ((DEBUG_LEVEL == 1) || (DEBUG_LEVEL == -1))
+    cout << "clique value vector\n$$$$$$$$$$$$$$$$$$$$$$$#############" << endl;
     for (int n = 0; n < sparm->options.numCliques; ++n) {
-        cout<<clique_value_vector[n]<<" ";
+        cout << clique_value_vector[n] << " ";
     }
-    cout<<endl;
+    cout << endl;
+#endif
 
     for (int k = 0; k < sparm->options.numCliques; ++k) {
         if (clique_size_vector[k]) {
@@ -99,11 +110,13 @@ SVECTOR *psi_helper(PATTERN x, LABEL y, LATENT_VAR h, STRUCTMODEL *sm, STRUCT_LE
             w_y += clique_value_vector[k];
         }
     }
-    cout<<"clique value vector\n$$$$$$$$$$$$$$$$$$$$$$$#############"<<endl;
+#if ((DEBUG_LEVEL == 1) || (DEBUG_LEVEL == -1))
+    cout << "clique value vector\n$$$$$$$$$$$$$$$$$$$$$$$#############" << endl;
     for (int n = 0; n < sparm->options.numCliques; ++n) {
-        cout<<clique_value_vector[n]<<" ";
+        cout << clique_value_vector[n] << " ";
     }
-    cout<<endl;
+    cout << endl;
+#endif
 
     // Assign higher order vector to words[]--------------------------------------------
     for (int l = 0; l < higher_order_length; ++l) {
@@ -136,7 +149,15 @@ SVECTOR *psi_helper(PATTERN x, LABEL y, LATENT_VAR h, STRUCTMODEL *sm, STRUCT_LE
                 unary_psi += x.observed_unary[i][j][x.dim_unary - 1];
         }
     }
+#if ((DEBUG_LEVEL == 1) || (DEBUG_LEVEL == -1))
+    FILE *modelfl;
 
+    modelfl = fopen("pairwise.txt", "w");
+    if (modelfl == NULL) {
+        printf("Cannot open model file %s for output!", "pairwise.txt");
+        exit(1);
+    }
+#endif
     // calculate pariwise psi
     int pairwise_key = unary_key + 1;
     float pairwise_psi = 0.0;
@@ -150,9 +171,16 @@ SVECTOR *psi_helper(PATTERN x, LABEL y, LATENT_VAR h, STRUCTMODEL *sm, STRUCT_LE
             if (y.ground_truth_label[ind0.rem][ind0.quot] !=
                 y.ground_truth_label[ind1.rem][ind1.quot]) {
                 pairwise_psi += 1;
+#if ((DEBUG_LEVEL == 1) || (DEBUG_LEVEL == -1))
+                fprintf(modelfl, "%d\n", i);
+#endif
             }
         }
     }
+#if ((DEBUG_LEVEL == 1) || (DEBUG_LEVEL == -1))
+    fclose(modelfl);
+#endif
+
 
     // Assign unary & pairwise
     // Notice: the wnum of unary & pairwise are always
@@ -314,22 +342,23 @@ void find_most_violated_constraint_marginrescaling_helper(PATTERN x, LABEL y, LA
         }
     }
 
-    cout<<"ybar##############################"<<endl;
+#if ((DEBUG_LEVEL == 2) || (DEBUG_LEVEL==-1))
+    cout << "ybar##############################" << endl;
     for (int m1 = 0; m1 < y.n_rows; ++m1) {
         for (int i = 0; i < y.n_cols; ++i) {
-            cout<< ybar->ground_truth_label[m1][i]<<" ";
+            cout << ybar->ground_truth_label[m1][i] << " ";
         }
-        cout<<endl;
+        cout << endl;
     }
 
-    cout<<"hbar##############################"<<endl;
+    cout << "hbar##############################" << endl;
     for (int m1 = 0; m1 < hbar->n_rows; ++m1) {
         for (int i = 0; i < hbar->n_cols; ++i) {
-            cout<< hbar->auxiliary_z[m1][i]<<" ";
+            cout << hbar->auxiliary_z[m1][i] << " ";
         }
-        cout<<endl;
+        cout << endl;
     }
-
+#endif
     delete (g);
 }
 
