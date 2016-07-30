@@ -32,6 +32,10 @@
 #define MIN(x, y) ((x) > (y) ? (y) : (x))
 
 #define DEBUG_LEVEL 0
+/**
+ * 0 for null
+ * -1 for constraint
+ */
 
 void my_read_input_parameters(int argc, char *argv[], char *trainfile, char *modelfile,
                               LEARN_PARM *learn_parm, KERNEL_PARM *kernel_parm, STRUCT_LEARN_PARM *struct_parm);
@@ -276,6 +280,16 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
     cut_error = (double *) malloc(size_active * sizeof(double));
     gammaG0 = (double *) malloc(size_active * sizeof(double));
 
+#if (DEBUG_LEVEL == -1)
+    for (int k = 0; k < size_active; ++k) {
+        printf("\nline no: %d", k);
+        for (int l = 0; l < sm->sizePsi + 1; ++l) {
+            printf("id: %d, value%f; ",dXc[k]->fvec->words[l].wnum,dXc[k]->fvec->words[l].weight);
+        }
+        printf("\n");
+    }
+#endif
+
     while ((!suff_decrease_cond) && (expected_descent < -epsilon) && (iter < MAX_ITER)) {
         iter += 1;
         size_active += 1;
@@ -293,6 +307,16 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
         dXc[size_active - 1]->fvec = new_constraint;
         dXc[size_active - 1]->slackid = 1; // only one common slackid (one-slack)
         dXc[size_active - 1]->costfactor = 1.0;
+
+#if (DEBUG_LEVEL == -1)
+        for (int k = 0; k < size_active; ++k) {
+        printf("\nline no: %d", k);
+        for (int l = 0; l < sm->sizePsi + 1; ++l) {
+            printf("id: %d, value%f; ",dXc[k]->fvec->words[l].wnum,dXc[k]->fvec->words[l].weight);
+        }
+        printf("\n");
+        }
+#endif
 
         delta = (double *) realloc(delta, sizeof(double) * size_active);
         assert(delta != NULL);
@@ -334,14 +358,23 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
         /* solve QP to update alpha */
         //dual_obj = 0;
         //r = mosek_qp_optimize(G, proximal_rhs, alpha, (long) size_active, C, &dual_obj,rho);
-        if (size_active > pos_cons_size+1) {
+        if (size_active > pos_cons_size + 1) {
             if (svmModel != NULL) free_model(svmModel, 0);
             svmModel = (MODEL *) my_malloc(sizeof(MODEL));
             svm_learn_optimization(dXc, proximal_rhs, size_active, sm->sizePsi, &lparm, &kparm, NULL, svmModel, alpha);
         } else {
-            assert(size_active == pos_cons_size+1);
+            assert(size_active == pos_cons_size + 1);
             alpha[pos_cons_size] = C;
         }
+#if (DEBUG_LEVEL == -1)
+        for (int k = 0; k < size_active; ++k) {
+        printf("\nline no: %d", k);
+        for (int l = 0; l < sm->sizePsi + 1; ++l) {
+            printf("id: %d, value%f; ",dXc[k]->fvec->words[l].wnum,dXc[k]->fvec->words[l].weight);
+        }
+        printf("\n");
+        }
+#endif
         /* DEBUG */
         //printf("r: %d\n", r); fflush(stdout);
         /* END DEBUG */
@@ -589,7 +622,7 @@ void add_positive_constraint(const STRUCTMODEL *sm, const STRUCT_LEARN_PARM *spa
         words[sm->sizePsi].weight = 0.0;
         // Assign a_{k+1} - a_k to -1 and (b_{k+1} - b_k) to -1
         words[word_ind].weight = -1;
-        words[word_ind + sparm->options.K-1].weight = -1;
+        words[word_ind + sparm->options.K - 1].weight = -1;
 
         dXc[k]->fvec = create_svector(words, "", 1.0);
         dXc[k]->slackid = 1; // only one common slackid (one-slack)
@@ -613,7 +646,7 @@ void add_positive_constraint(const STRUCTMODEL *sm, const STRUCT_LEARN_PARM *spa
     words[sm->sizePsi].wnum = 0;
     words[sm->sizePsi].weight = 0.0;
     // Assign k_1 to -1
-    words[sm->sizePsi-1].weight = 1;
+    words[sm->sizePsi - 1].weight = 1;
 
     dXc[3 * (sparm->options.K - 1)]->fvec = create_svector(words, "", 1.0);
     dXc[3 * (sparm->options.K - 1)]->slackid = 1; // only one common slackid (one-slack)
