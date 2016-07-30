@@ -8,7 +8,7 @@
 #include <iostream>
 #include <stdio.h>
 
-#define DEBUG_LEVEL 0
+#define DEBUG_LEVEL 10
 
 /**
  * -1 for all
@@ -264,9 +264,15 @@ void find_most_violated_constraint_marginrescaling_helper(PATTERN x, LABEL y, LA
     // Add higher-order terms (a,z between s and t)--------------------------------
 
     // Add auxiliary vars z for each clique
+#if (DEBUG_LEVEL==10)
+    printf("pfweijpawjefpajifpoaiwejfopaijeopfijaoepjfpaje");
+#endif
     int z_index[sparm->options.numCliques];
     for (int k = 0; k < sparm->options.numCliques; ++k) {
         z_index[k] = g->add_node(K - 1);
+#if(DEBUG_LEVEL==10)
+        cout<<z_index[k]<<" ";
+#endif
     }
 
     // compute clique size

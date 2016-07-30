@@ -395,6 +395,7 @@ double cutting_plane_algorithm(double *w, long m, int MAX_ITER, double C, double
         }
 
         new_constraint = find_cutting_plane(ex, fycache, &margin, m, sm, sparm);
+
         value = margin - sprod_ns(w, new_constraint);
 
         /* print primal objective */
@@ -574,6 +575,7 @@ void add_positive_constraint(const STRUCTMODEL *sm, const STRUCT_LEARN_PARM *spa
     // positive constraints for a_k - a_{k+1} - (b_{k+1} - b_k) > 0----------------
     // dXc[K-1] = [0 0 0 0 ... 1 0 0 0 ...]
     // dXc[K] = [0 0 0 0   ... 0 1 0 0 ...]
+    int word_ind = 1;
     for (int k = 2 * (sparm->options.K - 1); k < 3 * (sparm->options.K - 1); ++k) {
         dXc[k] = (DOC *) malloc(sizeof(DOC));
 
@@ -586,8 +588,8 @@ void add_positive_constraint(const STRUCTMODEL *sm, const STRUCT_LEARN_PARM *spa
         words[sm->sizePsi].wnum = 0;
         words[sm->sizePsi].weight = 0.0;
         // Assign a_{k+1} - a_k to -1 and (b_{k+1} - b_k) to -1
-        words[k + 1].weight = -1;
-        words[k + sparm->options.K].weight = -1;
+        words[word_ind].weight = -1;
+        words[word_ind + sparm->options.K-1].weight = -1;
 
         dXc[k]->fvec = create_svector(words, "", 1.0);
         dXc[k]->slackid = 1; // only one common slackid (one-slack)
@@ -611,7 +613,7 @@ void add_positive_constraint(const STRUCTMODEL *sm, const STRUCT_LEARN_PARM *spa
     words[sm->sizePsi].wnum = 0;
     words[sm->sizePsi].weight = 0.0;
     // Assign k_1 to -1
-    words[sm->sizePsi-2].weight = 1;
+    words[sm->sizePsi-1].weight = 1;
 
     dXc[3 * (sparm->options.K - 1)]->fvec = create_svector(words, "", 1.0);
     dXc[3 * (sparm->options.K - 1)]->slackid = 1; // only one common slackid (one-slack)
