@@ -37,7 +37,6 @@ def linEnvInf(unaryWeights, pairWeights, envCoeffs, cliques):
 
     # add auxiliary variables for each clique
     cliqueIDs = np.unique(cliques)
-    numCliques = cliqueIDs.shape[0]
     z = list()
 
     if (K > 1):
@@ -92,4 +91,12 @@ def linEnvInf(unaryWeights, pairWeights, envCoeffs, cliques):
     for i in range(nVariables):
         y_hat[i] = g.what_segment(i)
 
-    return y_hat, e
+    z_hat = np.zeros(len(cliqueIDs) * (K-1))
+    for i,hi in enumerate(z):
+        z_hat[i] = g.what_segment(hi)
+
+    #todo: debug
+    z_hat.reshape([64,9])
+    print(z_hat)
+
+    return y_hat, z_hat, e

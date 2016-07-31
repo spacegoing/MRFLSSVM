@@ -9,6 +9,7 @@ from CyInf.InfAlgo import linEnvInf
 
 eng = matlab.engine.start_matlab()
 
+
 class Params:
     def __init__(self, options):
         self.unaryWeight = 1.0
@@ -36,7 +37,6 @@ def quadprog(P, q, A, b, theta, solverName):
 
 
 def quadprog_matlab(P, q, A, b, theta):
-
     P, q, A, b, theta = [matlab.double(i.tolist())
                          for i in [P, q, A, b, theta]]
     null = matlab.double([])
@@ -52,7 +52,7 @@ def featureVector(instance, y_hat, options):
     pairwisePhi = 0
     if instance.pairwise:
         pairwisePhi = np.sum(y_hat(instance.pairwise[:, 0]) != \
-                          y_hat(instance.pairwise[:, 1]))
+                             y_hat(instance.pairwise[:, 1]))
 
     highOrderPhi = np.zeros(options.K + 1)
     for cliqueId in range(1, int(instance.numCliques + 1)):
@@ -125,15 +125,11 @@ def linEnvLearn(instance, options):
         for k in range(1, options.K):
             params.linEnvCoeffs[k, 1] = params.linEnvCoeffs[k - 1, 1] + \
                                         k * (params.linEnvCoeffs[k - 1, 0] -
-                                                   params.linEnvCoeffs[k, 0])
-        params.linEnvCoeffs[:,0] = params.linEnvCoeffs[:,0] * options.K
-        dCoeffs = np.diff(params.linEnvCoeffs, axis = 0)
-        tf = [dCoeffs[:,0].all(), -dCoeffs[:,1].all()]
-        print(tf)
-        dCoeffs
+                                             params.linEnvCoeffs[k, 0])
+        params.linEnvCoeffs[:, 0] = params.linEnvCoeffs[:, 0] * options.K
 
         y_hat, z_hat, e_hat = linEnvInf(params.unaryWeight * instance.unary, instance.pairwise,
-                          params.linEnvCoeffs, instance.cliques)
+                                        params.linEnvCoeffs, instance.cliques)
 
         history.append({'params': params, 'y_hat': y_hat})
 
@@ -145,11 +141,11 @@ def linEnvLearn(instance, options):
         # lossUnary[instance.y == 1, 1] = 1.0 / instance.N
 
         y_loss, z_loss, e_loss = linEnvInf(params.unaryWeight * instance.unary - lossUnary,
-                           instance.pairwise, params.linEnvCoeffs, instance.cliques)
+                                           instance.pairwise, params.linEnvCoeffs, instance.cliques)
         # add constraint
         phi = featureVector(instance, y_loss, options)
         loss = np.sum(y_loss != instance.y) / numVariables
-        slack = loss - np.dot((phi - truePhi) , theta[:-1])[0]
+        slack = loss - np.dot((phi - truePhi), theta[:-1])[0]
         violation = slack - theta[-1]
 
         if violation < options.eps:
@@ -159,4 +155,3 @@ def linEnvLearn(instance, options):
         b = np.r_[b, loss]
 
     return history, y_hat
-

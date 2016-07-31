@@ -1,0 +1,6 @@
+K = 10;            # number of lower linear functions
+gridStep = 16;     # grid size for defining cliques
+maxIters = 100;    # maximum learning iterations
+eps = 1.0e-16;     # constraint violation threshold
+learningQP = 1;    # encoding for learning QP (1, 2, or 3)
+figWnd = -1;       # figure for showing results
