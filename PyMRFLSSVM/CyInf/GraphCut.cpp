@@ -2,6 +2,12 @@
 // Created by spacegoing on 7/30/16.
 //
 #include "GraphCut.h"
+#include <stdio.h>
+#include <algorithm>
+#include <iostream>
+
+#define DEBUG_LEVEL -1
+using namespace std;
 
 double graph_cut_method(float *observed_unary, float *pairwise,
                         int *clique_indexes,
@@ -15,19 +21,19 @@ double graph_cut_method(float *observed_unary, float *pairwise,
 
     // remove redundancy-------------------------------------------------------
     // compute (b_k-b_{k-1})/a_{k-1}-a_k
-    double b_a_ratio[K - 1];
-    for (int i = 0; i < K - 1; ++i) {
-        b_a_ratio[i] = w[i + K] / (-1.0 * w[i + 1]);
-    }
-
-    // ensure (b_k-b_{k-1})/a_{k-1}-a_k < (b_{k+1}-b_{k})/a_k-a_{k+1}
-    // if not then use w[i-1] & w[i+K-1] replace w[i] & w[i+K]
-    for (int i = 1; i < K - 1; ++i) {
-        if (b_a_ratio[i] < b_a_ratio[i - 1]) {
-            w[i + 1] = w[i];
-            w[i + K] = w[i + K - 1];
-        }
-    }
+//    double b_a_ratio[K - 1];
+//    for (int i = 0; i < K - 1; ++i) {
+//        b_a_ratio[i] = w[i + K] / (-1.0 * w[i + 1]);
+//    }
+//
+//    // ensure (b_k-b_{k-1})/a_{k-1}-a_k < (b_{k+1}-b_{k})/a_k-a_{k+1}
+//    // if not then use w[i-1] & w[i+K-1] replace w[i] & w[i+K]
+//    for (int i = 1; i < K - 1; ++i) {
+//        if (b_a_ratio[i] < b_a_ratio[i - 1]) {
+//            w[i + 1] = w[i];
+//            w[i + K] = w[i + K - 1];
+//        }
+//    }
 
     float *unaryWeights = observed_unary;
 
@@ -36,11 +42,15 @@ double graph_cut_method(float *observed_unary, float *pairwise,
     g->add_node(nVariables);
 
     // Add unary edges------------------------------------------------------------
+#if ((DEBUG_LEVEL == 10) || (DEBUG_LEVEL == -1))
+    printf("inspect unary edges: inspect unary edges: inspect unary edges: inspect unary edges: ");
+#endif
     int counter = 0;
     for (int i = 0; i < options.rows; ++i) {
         for (int j = 0; j < options.cols; ++j) {
             g->add_tweights(counter, unaryWeights[i * options.cols * 2 + j * 2],
                             unaryWeights[i * options.cols * 2 + j * 2 + 1]);
+
             counter++;
         }
     }
@@ -57,13 +67,13 @@ double graph_cut_method(float *observed_unary, float *pairwise,
 
     // Add auxiliary vars z for each clique
 #if ((DEBUG_LEVEL == 10) || (DEBUG_LEVEL == -1))
-    printf("pfweijpawjefpajifpoaiwejfopaijeopfijaoepjfpaje");
+    printf("inspect auxiliary vars: inspect auxiliary vars: inspect auxiliary vars: ");
 #endif
     int z_index[options.numCliques];
     for (int k = 0; k < options.numCliques; ++k) {
         z_index[k] = g->add_node(K - 1);
 #if((DEBUG_LEVEL == 10) || (DEBUG_LEVEL == -1))
-        cout<<z_index[k]<<" ";
+        cout << z_index[k] << " ";
 #endif
     }
 
@@ -98,7 +108,7 @@ double graph_cut_method(float *observed_unary, float *pairwise,
 
                 // edge between z_k and s and t
                 g->add_tweights(z_index[clique_index] + k,
-                                w_i * -1.0 * w[k + 1], w[K + k]);
+                                -1.0 * w[k + 1], w[K + k]);
             }
             counter++;
         }
@@ -144,7 +154,7 @@ double graph_cut_method(float *observed_unary, float *pairwise,
     cout << "ybar##############################" << endl;
     for (int m1 = 0; m1 < options.rows; ++m1) {
         for (int i = 0; i < options.cols; ++i) {
-            cout << inferred_label[m1*cols+i] << " ";
+            cout << inferred_label[m1 * options.cols + i] << " ";
         }
         cout << endl;
     }
@@ -152,7 +162,7 @@ double graph_cut_method(float *observed_unary, float *pairwise,
     cout << "hbar##############################" << endl;
     for (int m1 = 0; m1 < options.numCliques; ++m1) {
         for (int i = 0; i < K - 1; ++i) {
-            cout << inferred_z[m1*(K-1)+i] << " ";
+            cout << inferred_z[m1 * (K - 1) + i] << " ";
         }
         cout << endl;
     }
