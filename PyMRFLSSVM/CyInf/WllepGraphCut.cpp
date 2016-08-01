@@ -1016,11 +1016,11 @@ static int __Pyx_ValidateAndInit_memviewslice(
                 __Pyx_memviewslice *memviewslice,
                 PyObject *original_obj);
 
-static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dsdsds_float(PyObject *);
+static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_d_d_dc_double(PyObject *);
 
-static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dsds_float(PyObject *);
+static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(PyObject *);
 
-static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dsds_int(PyObject *);
+static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_d_dc_int(PyObject *);
 
 static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_ds_double(PyObject *);
 
@@ -1105,9 +1105,8 @@ static void __pyx_memoryview_refcount_objects_in_slice_with_gil(char *, Py_ssize
 static void __pyx_memoryview_refcount_objects_in_slice(char *, Py_ssize_t *, Py_ssize_t *, int, int); /*proto*/
 static void __pyx_memoryview_slice_assign_scalar(__Pyx_memviewslice *, int, size_t, void *, int); /*proto*/
 static void __pyx_memoryview__slice_assign_scalar(char *, Py_ssize_t *, Py_ssize_t *, int, size_t, void *); /*proto*/
-static __Pyx_TypeInfo __Pyx_TypeInfo_float = { "float", NULL, sizeof(float), { 0 }, 0, 'R', 0, 0 };
-static __Pyx_TypeInfo __Pyx_TypeInfo_int = { "int", NULL, sizeof(int), { 0 }, 0, IS_UNSIGNED(int) ? 'U' : 'I', IS_UNSIGNED(int), 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_double = { "double", NULL, sizeof(double), { 0 }, 0, 'R', 0, 0 };
+static __Pyx_TypeInfo __Pyx_TypeInfo_int = { "int", NULL, sizeof(int), { 0 }, 0, IS_UNSIGNED(int) ? 'U' : 'I', IS_UNSIGNED(int), 0 };
 #define __Pyx_MODULE_NAME "WllepGraphCut"
 int __pyx_module_is_main_WllepGraphCut = 0;
 
@@ -1125,7 +1124,6 @@ static char __pyx_k_K[] = "K";
 static char __pyx_k_O[] = "O";
 static char __pyx_k_W[] = "W";
 static char __pyx_k_c[] = "c";
-static char __pyx_k_w[] = "w";
 static char __pyx_k_id[] = "id";
 static char __pyx_k_obj[] = "obj";
 static char __pyx_k_base[] = "base";
@@ -1145,6 +1143,7 @@ static char __pyx_k_flags[] = "flags";
 static char __pyx_k_range[] = "range";
 static char __pyx_k_shape[] = "shape";
 static char __pyx_k_start[] = "start";
+static char __pyx_k_theta[] = "theta";
 static char __pyx_k_encode[] = "encode";
 static char __pyx_k_format[] = "format";
 static char __pyx_k_import[] = "__import__";
@@ -1276,11 +1275,11 @@ static PyObject *__pyx_kp_s_strided_and_direct_or_indirect;
 static PyObject *__pyx_kp_s_strided_and_indirect;
 static PyObject *__pyx_n_s_struct;
 static PyObject *__pyx_n_s_test;
+static PyObject *__pyx_n_s_theta;
 static PyObject *__pyx_kp_s_unable_to_allocate_array_data;
 static PyObject *__pyx_kp_s_unable_to_allocate_shape_and_str;
 static PyObject *__pyx_n_s_unpack;
-static PyObject *__pyx_n_s_w;
-static PyObject *__pyx_pf_13WllepGraphCut_Inf_Algo(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_observed_unary, __Pyx_memviewslice __pyx_v_pairwise, __Pyx_memviewslice __pyx_v_clique_indexes, __Pyx_memviewslice __pyx_v_inferred_label, __Pyx_memviewslice __pyx_v_inferred_z, __Pyx_memviewslice __pyx_v_w, PyObject *__pyx_v_options); /* proto */
+static PyObject *__pyx_pf_13WllepGraphCut_Inf_Algo(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_observed_unary, __Pyx_memviewslice __pyx_v_pairwise, __Pyx_memviewslice __pyx_v_clique_indexes, __Pyx_memviewslice __pyx_v_inferred_label, __Pyx_memviewslice __pyx_v_inferred_z, __Pyx_memviewslice __pyx_v_theta, PyObject *__pyx_v_options); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -1344,9 +1343,9 @@ static PyObject *__pyx_codeobj__15;
 /* "WllepGraphCut.pyx":24
  *                             double *w, OPTIONS options)
  * 
- * def Inf_Algo(float[:,:,:]observed_unary, float [:,:]pairwise,             # <<<<<<<<<<<<<<
- *                             int [:,:]clique_indexes,
- *                             int [:,:]inferred_label, int [:,:]inferred_z,
+ * def Inf_Algo(double[:,:,::1]observed_unary, double [:,::1]pairwise,             # <<<<<<<<<<<<<<
+ *                             int [:,::1]clique_indexes,
+ *                             int [:,::1]inferred_label, int [:,::1]inferred_z,
  */
 
 /* Python wrapper */
@@ -1358,7 +1357,7 @@ static PyObject *__pyx_pw_13WllepGraphCut_1Inf_Algo(PyObject *__pyx_self, PyObje
   __Pyx_memviewslice __pyx_v_clique_indexes = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_inferred_label = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_inferred_z = { 0, 0, { 0 }, { 0 }, { 0 } };
-  __Pyx_memviewslice __pyx_v_w = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_theta = { 0, 0, { 0 }, { 0 }, { 0 } };
   PyObject *__pyx_v_options = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
@@ -1367,7 +1366,7 @@ static PyObject *__pyx_pw_13WllepGraphCut_1Inf_Algo(PyObject *__pyx_self, PyObje
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("Inf_Algo (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_observed_unary,&__pyx_n_s_pairwise,&__pyx_n_s_clique_indexes,&__pyx_n_s_inferred_label,&__pyx_n_s_inferred_z,&__pyx_n_s_w,&__pyx_n_s_options,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_observed_unary,&__pyx_n_s_pairwise,&__pyx_n_s_clique_indexes,&__pyx_n_s_inferred_label,&__pyx_n_s_inferred_z,&__pyx_n_s_theta,&__pyx_n_s_options,0};
     PyObject* values[7] = {0,0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -1409,7 +1408,7 @@ static PyObject *__pyx_pw_13WllepGraphCut_1Inf_Algo(PyObject *__pyx_self, PyObje
           __Pyx_RaiseArgtupleInvalid("Inf_Algo", 1, 7, 7, 4); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  5:
-        if (likely((values[5] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_w)) != 0)) kw_args--;
+        if (likely((values[5] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_theta)) != 0)) kw_args--;
         else {
           __Pyx_RaiseArgtupleInvalid("Inf_Algo", 1, 7, 7, 5); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
@@ -1433,12 +1432,12 @@ static PyObject *__pyx_pw_13WllepGraphCut_1Inf_Algo(PyObject *__pyx_self, PyObje
       values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
       values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
     }
-    __pyx_v_observed_unary = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_float(values[0]); if (unlikely(!__pyx_v_observed_unary.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_pairwise = __Pyx_PyObject_to_MemoryviewSlice_dsds_float(values[1]); if (unlikely(!__pyx_v_pairwise.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_clique_indexes = __Pyx_PyObject_to_MemoryviewSlice_dsds_int(values[2]); if (unlikely(!__pyx_v_clique_indexes.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 25; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_inferred_label = __Pyx_PyObject_to_MemoryviewSlice_dsds_int(values[3]); if (unlikely(!__pyx_v_inferred_label.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 26; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_inferred_z = __Pyx_PyObject_to_MemoryviewSlice_dsds_int(values[4]); if (unlikely(!__pyx_v_inferred_z.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 26; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_w = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[5]); if (unlikely(!__pyx_v_w.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 27; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_observed_unary = __Pyx_PyObject_to_MemoryviewSlice_d_d_dc_double(values[0]); if (unlikely(!__pyx_v_observed_unary.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_pairwise = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(values[1]); if (unlikely(!__pyx_v_pairwise.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_clique_indexes = __Pyx_PyObject_to_MemoryviewSlice_d_dc_int(values[2]); if (unlikely(!__pyx_v_clique_indexes.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 25; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_inferred_label = __Pyx_PyObject_to_MemoryviewSlice_d_dc_int(values[3]); if (unlikely(!__pyx_v_inferred_label.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 26; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_inferred_z = __Pyx_PyObject_to_MemoryviewSlice_d_dc_int(values[4]); if (unlikely(!__pyx_v_inferred_z.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 26; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_theta = __Pyx_PyObject_to_MemoryviewSlice_ds_double(values[5]); if (unlikely(!__pyx_v_theta.memview)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 27; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     __pyx_v_options = values[6];
   }
   goto __pyx_L4_argument_unpacking_done;
@@ -1449,14 +1448,14 @@ static PyObject *__pyx_pw_13WllepGraphCut_1Inf_Algo(PyObject *__pyx_self, PyObje
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_13WllepGraphCut_Inf_Algo(__pyx_self, __pyx_v_observed_unary, __pyx_v_pairwise, __pyx_v_clique_indexes, __pyx_v_inferred_label, __pyx_v_inferred_z, __pyx_v_w, __pyx_v_options);
+  __pyx_r = __pyx_pf_13WllepGraphCut_Inf_Algo(__pyx_self, __pyx_v_observed_unary, __pyx_v_pairwise, __pyx_v_clique_indexes, __pyx_v_inferred_label, __pyx_v_inferred_z, __pyx_v_theta, __pyx_v_options);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13WllepGraphCut_Inf_Algo(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_observed_unary, __Pyx_memviewslice __pyx_v_pairwise, __Pyx_memviewslice __pyx_v_clique_indexes, __Pyx_memviewslice __pyx_v_inferred_label, __Pyx_memviewslice __pyx_v_inferred_z, __Pyx_memviewslice __pyx_v_w, PyObject *__pyx_v_options) {
+static PyObject *__pyx_pf_13WllepGraphCut_Inf_Algo(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_observed_unary, __Pyx_memviewslice __pyx_v_pairwise, __Pyx_memviewslice __pyx_v_clique_indexes, __Pyx_memviewslice __pyx_v_inferred_label, __Pyx_memviewslice __pyx_v_inferred_z, __Pyx_memviewslice __pyx_v_theta, PyObject *__pyx_v_options) {
   OPTIONS __pyx_v_c_options;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -1479,59 +1478,59 @@ static PyObject *__pyx_pf_13WllepGraphCut_Inf_Algo(CYTHON_UNUSED PyObject *__pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("Inf_Algo", 0);
 
-  /* "WllepGraphCut.pyx":30
+  /* "WllepGraphCut.pyx":32
  *     cdef OPTIONS c_options
  * 
  *     c_options.rows = options.H             # <<<<<<<<<<<<<<
  *     c_options.cols = options.W
  *     c_options.numCliques = options.numCliques
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_options, __pyx_n_s_H); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 30; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_options, __pyx_n_s_H); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 32; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 30; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 32; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_c_options.rows = __pyx_t_2;
 
-  /* "WllepGraphCut.pyx":31
+  /* "WllepGraphCut.pyx":33
  * 
  *     c_options.rows = options.H
  *     c_options.cols = options.W             # <<<<<<<<<<<<<<
  *     c_options.numCliques = options.numCliques
  *     c_options.K = options.K
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_options, __pyx_n_s_W); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 31; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_options, __pyx_n_s_W); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 31; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_c_options.cols = __pyx_t_2;
 
-  /* "WllepGraphCut.pyx":32
+  /* "WllepGraphCut.pyx":34
  *     c_options.rows = options.H
  *     c_options.cols = options.W
  *     c_options.numCliques = options.numCliques             # <<<<<<<<<<<<<<
  *     c_options.K = options.K
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_options, __pyx_n_s_numCliques); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 32; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_options, __pyx_n_s_numCliques); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 34; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 32; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 34; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_c_options.numCliques = __pyx_t_2;
 
-  /* "WllepGraphCut.pyx":33
+  /* "WllepGraphCut.pyx":35
  *     c_options.cols = options.W
  *     c_options.numCliques = options.numCliques
  *     c_options.K = options.K             # <<<<<<<<<<<<<<
  * 
  *     c_options.n_pairwise_rows = pairwise.shape[0]
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_options, __pyx_n_s_K); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_options, __pyx_n_s_K); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 35; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 35; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_c_options.K = __pyx_t_2;
 
-  /* "WllepGraphCut.pyx":35
+  /* "WllepGraphCut.pyx":37
  *     c_options.K = options.K
  * 
  *     c_options.n_pairwise_rows = pairwise.shape[0]             # <<<<<<<<<<<<<<
@@ -1540,24 +1539,24 @@ static PyObject *__pyx_pf_13WllepGraphCut_Inf_Algo(CYTHON_UNUSED PyObject *__pyx
  */
   __pyx_v_c_options.n_pairwise_rows = (__pyx_v_pairwise.shape[0]);
 
-  /* "WllepGraphCut.pyx":36
+  /* "WllepGraphCut.pyx":38
  * 
  *     c_options.n_pairwise_rows = pairwise.shape[0]
  *     c_options.learningQP = options.learningQP             # <<<<<<<<<<<<<<
  * 
  *     return graph_cut_method(&observed_unary[0,0,0], &pairwise[0,0], &clique_indexes[0,0],
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_options, __pyx_n_s_learningQP); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 36; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_options, __pyx_n_s_learningQP); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 38; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 36; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 38; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_c_options.learningQP = __pyx_t_2;
 
-  /* "WllepGraphCut.pyx":38
+  /* "WllepGraphCut.pyx":40
  *     c_options.learningQP = options.learningQP
  * 
  *     return graph_cut_method(&observed_unary[0,0,0], &pairwise[0,0], &clique_indexes[0,0],             # <<<<<<<<<<<<<<
- *                             &inferred_label[0,0], &inferred_z[0,0], &w[0], c_options)
+ *                             &inferred_label[0,0], &inferred_z[0,0], &theta[0], c_options)
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_3 = 0;
@@ -1578,7 +1577,7 @@ static PyObject *__pyx_pf_13WllepGraphCut_Inf_Algo(CYTHON_UNUSED PyObject *__pyx
   } else if (unlikely(__pyx_t_5 >= __pyx_v_observed_unary.shape[2])) __pyx_t_2 = 2;
   if (unlikely(__pyx_t_2 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_2);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 38; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_6 = 0;
   __pyx_t_7 = 0;
@@ -1593,7 +1592,7 @@ static PyObject *__pyx_pf_13WllepGraphCut_Inf_Algo(CYTHON_UNUSED PyObject *__pyx
   } else if (unlikely(__pyx_t_7 >= __pyx_v_pairwise.shape[1])) __pyx_t_2 = 1;
   if (unlikely(__pyx_t_2 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_2);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 38; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_8 = 0;
   __pyx_t_9 = 0;
@@ -1608,13 +1607,13 @@ static PyObject *__pyx_pf_13WllepGraphCut_Inf_Algo(CYTHON_UNUSED PyObject *__pyx
   } else if (unlikely(__pyx_t_9 >= __pyx_v_clique_indexes.shape[1])) __pyx_t_2 = 1;
   if (unlikely(__pyx_t_2 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_2);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 38; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "WllepGraphCut.pyx":39
+  /* "WllepGraphCut.pyx":41
  * 
  *     return graph_cut_method(&observed_unary[0,0,0], &pairwise[0,0], &clique_indexes[0,0],
- *                             &inferred_label[0,0], &inferred_z[0,0], &w[0], c_options)             # <<<<<<<<<<<<<<
+ *                             &inferred_label[0,0], &inferred_z[0,0], &theta[0], c_options)             # <<<<<<<<<<<<<<
  */
   __pyx_t_10 = 0;
   __pyx_t_11 = 0;
@@ -1629,7 +1628,7 @@ static PyObject *__pyx_pf_13WllepGraphCut_Inf_Algo(CYTHON_UNUSED PyObject *__pyx
   } else if (unlikely(__pyx_t_11 >= __pyx_v_inferred_label.shape[1])) __pyx_t_2 = 1;
   if (unlikely(__pyx_t_2 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_2);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 39; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_12 = 0;
   __pyx_t_13 = 0;
@@ -1644,26 +1643,26 @@ static PyObject *__pyx_pf_13WllepGraphCut_Inf_Algo(CYTHON_UNUSED PyObject *__pyx
   } else if (unlikely(__pyx_t_13 >= __pyx_v_inferred_z.shape[1])) __pyx_t_2 = 1;
   if (unlikely(__pyx_t_2 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_2);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 39; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_t_14 = 0;
   __pyx_t_2 = -1;
   if (__pyx_t_14 < 0) {
-    __pyx_t_14 += __pyx_v_w.shape[0];
+    __pyx_t_14 += __pyx_v_theta.shape[0];
     if (unlikely(__pyx_t_14 < 0)) __pyx_t_2 = 0;
-  } else if (unlikely(__pyx_t_14 >= __pyx_v_w.shape[0])) __pyx_t_2 = 0;
+  } else if (unlikely(__pyx_t_14 >= __pyx_v_theta.shape[0])) __pyx_t_2 = 0;
   if (unlikely(__pyx_t_2 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_2);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 39; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "WllepGraphCut.pyx":38
+  /* "WllepGraphCut.pyx":40
  *     c_options.learningQP = options.learningQP
  * 
  *     return graph_cut_method(&observed_unary[0,0,0], &pairwise[0,0], &clique_indexes[0,0],             # <<<<<<<<<<<<<<
- *                             &inferred_label[0,0], &inferred_z[0,0], &w[0], c_options)
+ *                             &inferred_label[0,0], &inferred_z[0,0], &theta[0], c_options)
  */
-  __pyx_t_1 = PyFloat_FromDouble(graph_cut_method((&(*((float *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_observed_unary.data + __pyx_t_3 * __pyx_v_observed_unary.strides[0]) ) + __pyx_t_4 * __pyx_v_observed_unary.strides[1]) ) + __pyx_t_5 * __pyx_v_observed_unary.strides[2]) )))), (&(*((float *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_pairwise.data + __pyx_t_6 * __pyx_v_pairwise.strides[0]) ) + __pyx_t_7 * __pyx_v_pairwise.strides[1]) )))), (&(*((int *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_clique_indexes.data + __pyx_t_8 * __pyx_v_clique_indexes.strides[0]) ) + __pyx_t_9 * __pyx_v_clique_indexes.strides[1]) )))), (&(*((int *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_inferred_label.data + __pyx_t_10 * __pyx_v_inferred_label.strides[0]) ) + __pyx_t_11 * __pyx_v_inferred_label.strides[1]) )))), (&(*((int *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_inferred_z.data + __pyx_t_12 * __pyx_v_inferred_z.strides[0]) ) + __pyx_t_13 * __pyx_v_inferred_z.strides[1]) )))), (&(*((double *) ( /* dim=0 */ (__pyx_v_w.data + __pyx_t_14 * __pyx_v_w.strides[0]) )))), __pyx_v_c_options)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 38; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(graph_cut_method((&(*((double *) ( /* dim=2 */ ((char *) (((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_observed_unary.data + __pyx_t_3 * __pyx_v_observed_unary.strides[0]) ) + __pyx_t_4 * __pyx_v_observed_unary.strides[1]) )) + __pyx_t_5)) )))), (&(*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_pairwise.data + __pyx_t_6 * __pyx_v_pairwise.strides[0]) )) + __pyx_t_7)) )))), (&(*((int *) ( /* dim=1 */ ((char *) (((int *) ( /* dim=0 */ (__pyx_v_clique_indexes.data + __pyx_t_8 * __pyx_v_clique_indexes.strides[0]) )) + __pyx_t_9)) )))), (&(*((int *) ( /* dim=1 */ ((char *) (((int *) ( /* dim=0 */ (__pyx_v_inferred_label.data + __pyx_t_10 * __pyx_v_inferred_label.strides[0]) )) + __pyx_t_11)) )))), (&(*((int *) ( /* dim=1 */ ((char *) (((int *) ( /* dim=0 */ (__pyx_v_inferred_z.data + __pyx_t_12 * __pyx_v_inferred_z.strides[0]) )) + __pyx_t_13)) )))), (&(*((double *) ( /* dim=0 */ (__pyx_v_theta.data + __pyx_t_14 * __pyx_v_theta.strides[0]) )))), __pyx_v_c_options)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1672,9 +1671,9 @@ static PyObject *__pyx_pf_13WllepGraphCut_Inf_Algo(CYTHON_UNUSED PyObject *__pyx
   /* "WllepGraphCut.pyx":24
  *                             double *w, OPTIONS options)
  * 
- * def Inf_Algo(float[:,:,:]observed_unary, float [:,:]pairwise,             # <<<<<<<<<<<<<<
- *                             int [:,:]clique_indexes,
- *                             int [:,:]inferred_label, int [:,:]inferred_z,
+ * def Inf_Algo(double[:,:,::1]observed_unary, double [:,::1]pairwise,             # <<<<<<<<<<<<<<
+ *                             int [:,::1]clique_indexes,
+ *                             int [:,::1]inferred_label, int [:,::1]inferred_z,
  */
 
   /* function exit code */
@@ -1688,7 +1687,7 @@ static PyObject *__pyx_pf_13WllepGraphCut_Inf_Algo(CYTHON_UNUSED PyObject *__pyx
   __PYX_XDEC_MEMVIEW(&__pyx_v_clique_indexes, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_inferred_label, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_v_inferred_z, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_w, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_theta, 1);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -13971,10 +13970,10 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_strided_and_indirect, __pyx_k_strided_and_indirect, sizeof(__pyx_k_strided_and_indirect), 0, 0, 1, 0},
   {&__pyx_n_s_struct, __pyx_k_struct, sizeof(__pyx_k_struct), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
+  {&__pyx_n_s_theta, __pyx_k_theta, sizeof(__pyx_k_theta), 0, 0, 1, 1},
   {&__pyx_kp_s_unable_to_allocate_array_data, __pyx_k_unable_to_allocate_array_data, sizeof(__pyx_k_unable_to_allocate_array_data), 0, 0, 1, 0},
   {&__pyx_kp_s_unable_to_allocate_shape_and_str, __pyx_k_unable_to_allocate_shape_and_str, sizeof(__pyx_k_unable_to_allocate_shape_and_str), 0, 0, 1, 0},
   {&__pyx_n_s_unpack, __pyx_k_unpack, sizeof(__pyx_k_unpack), 0, 0, 1, 1},
-  {&__pyx_n_s_w, __pyx_k_w, sizeof(__pyx_k_w), 0, 0, 1, 1},
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
@@ -14144,11 +14143,11 @@ static int __Pyx_InitCachedConstants(void) {
   /* "WllepGraphCut.pyx":24
  *                             double *w, OPTIONS options)
  * 
- * def Inf_Algo(float[:,:,:]observed_unary, float [:,:]pairwise,             # <<<<<<<<<<<<<<
- *                             int [:,:]clique_indexes,
- *                             int [:,:]inferred_label, int [:,:]inferred_z,
+ * def Inf_Algo(double[:,:,::1]observed_unary, double [:,::1]pairwise,             # <<<<<<<<<<<<<<
+ *                             int [:,::1]clique_indexes,
+ *                             int [:,::1]inferred_label, int [:,::1]inferred_z,
  */
-  __pyx_tuple__14 = PyTuple_Pack(8, __pyx_n_s_observed_unary, __pyx_n_s_pairwise, __pyx_n_s_clique_indexes, __pyx_n_s_inferred_label, __pyx_n_s_inferred_z, __pyx_n_s_w, __pyx_n_s_options, __pyx_n_s_c_options); if (unlikely(!__pyx_tuple__14)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__14 = PyTuple_Pack(8, __pyx_n_s_observed_unary, __pyx_n_s_pairwise, __pyx_n_s_clique_indexes, __pyx_n_s_inferred_label, __pyx_n_s_inferred_z, __pyx_n_s_theta, __pyx_n_s_options, __pyx_n_s_c_options); if (unlikely(!__pyx_tuple__14)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__14);
   __Pyx_GIVEREF(__pyx_tuple__14);
   __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(7, 0, 8, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_spacegoing_macCodeLab_MBP, __pyx_n_s_Inf_Algo, 24, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -14353,9 +14352,9 @@ PyMODINIT_FUNC PyInit_WllepGraphCut(void)
   /* "WllepGraphCut.pyx":24
  *                             double *w, OPTIONS options)
  * 
- * def Inf_Algo(float[:,:,:]observed_unary, float [:,:]pairwise,             # <<<<<<<<<<<<<<
- *                             int [:,:]clique_indexes,
- *                             int [:,:]inferred_label, int [:,:]inferred_z,
+ * def Inf_Algo(double[:,:,::1]observed_unary, double [:,::1]pairwise,             # <<<<<<<<<<<<<<
+ *                             int [:,::1]clique_indexes,
+ *                             int [:,::1]inferred_label, int [:,::1]inferred_z,
  */
   __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_13WllepGraphCut_1Inf_Algo, NULL, __pyx_n_s_WllepGraphCut); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -16682,18 +16681,18 @@ no_fail:
     return retval;
 }
 
-static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dsdsds_float(PyObject *obj) {
+static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_d_d_dc_double(PyObject *obj) {
     __Pyx_memviewslice result = { 0, 0, { 0 }, { 0 }, { 0 } };
     __Pyx_BufFmt_StackElem stack[1];
-    int axes_specs[] = { (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_STRIDED), (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_STRIDED), (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_STRIDED) };
+    int axes_specs[] = { (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_FOLLOW), (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_FOLLOW), (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_CONTIG) };
     int retcode;
     if (obj == Py_None) {
         result.memview = (struct __pyx_memoryview_obj *) Py_None;
         return result;
     }
-    retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, 0,
-                                                 PyBUF_RECORDS, 3,
-                                                 &__Pyx_TypeInfo_float, stack,
+    retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, __Pyx_IS_C_CONTIG,
+                                                 (PyBUF_C_CONTIGUOUS | PyBUF_FORMAT | PyBUF_WRITABLE), 3,
+                                                 &__Pyx_TypeInfo_double, stack,
                                                  &result, obj);
     if (unlikely(retcode == -1))
         goto __pyx_fail;
@@ -16704,18 +16703,18 @@ __pyx_fail:
     return result;
 }
 
-static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dsds_float(PyObject *obj) {
+static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(PyObject *obj) {
     __Pyx_memviewslice result = { 0, 0, { 0 }, { 0 }, { 0 } };
     __Pyx_BufFmt_StackElem stack[1];
-    int axes_specs[] = { (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_STRIDED), (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_STRIDED) };
+    int axes_specs[] = { (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_FOLLOW), (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_CONTIG) };
     int retcode;
     if (obj == Py_None) {
         result.memview = (struct __pyx_memoryview_obj *) Py_None;
         return result;
     }
-    retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, 0,
-                                                 PyBUF_RECORDS, 2,
-                                                 &__Pyx_TypeInfo_float, stack,
+    retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, __Pyx_IS_C_CONTIG,
+                                                 (PyBUF_C_CONTIGUOUS | PyBUF_FORMAT | PyBUF_WRITABLE), 2,
+                                                 &__Pyx_TypeInfo_double, stack,
                                                  &result, obj);
     if (unlikely(retcode == -1))
         goto __pyx_fail;
@@ -16726,17 +16725,17 @@ __pyx_fail:
     return result;
 }
 
-static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_dsds_int(PyObject *obj) {
+static CYTHON_INLINE __Pyx_memviewslice __Pyx_PyObject_to_MemoryviewSlice_d_dc_int(PyObject *obj) {
     __Pyx_memviewslice result = { 0, 0, { 0 }, { 0 }, { 0 } };
     __Pyx_BufFmt_StackElem stack[1];
-    int axes_specs[] = { (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_STRIDED), (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_STRIDED) };
+    int axes_specs[] = { (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_FOLLOW), (__Pyx_MEMVIEW_DIRECT | __Pyx_MEMVIEW_CONTIG) };
     int retcode;
     if (obj == Py_None) {
         result.memview = (struct __pyx_memoryview_obj *) Py_None;
         return result;
     }
-    retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, 0,
-                                                 PyBUF_RECORDS, 2,
+    retcode = __Pyx_ValidateAndInit_memviewslice(axes_specs, __Pyx_IS_C_CONTIG,
+                                                 (PyBUF_C_CONTIGUOUS | PyBUF_FORMAT | PyBUF_WRITABLE), 2,
                                                  &__Pyx_TypeInfo_int, stack,
                                                  &result, obj);
     if (unlikely(retcode == -1))

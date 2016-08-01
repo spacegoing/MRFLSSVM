@@ -5,7 +5,7 @@ from scipy.linalg import toeplitz
 from scipy import optimize
 import matlab.engine
 
-from CyInf.InfAlgo import linEnvInf
+from CyInf.testCases import linEnvInf
 
 eng = matlab.engine.start_matlab()
 
