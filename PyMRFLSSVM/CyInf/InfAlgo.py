@@ -127,8 +127,8 @@ options = Options()
 observed_unary = np.zeros([128,128,2],dtype=np.float32)
 for i in range(128):
     for j in range(128):
-        observed_unary[i][j][0]=0.0
-        observed_unary[i][j][1]=unary_observed[i][j]
+        observed_unary[i][j][0]=unary_observed[i][j][0]
+        observed_unary[i][j][1]=unary_observed[i][j][1]
 
 pairwise=np.zeros(pairwise_raw.shape,order='C',dtype=np.float32)
 for i in range(pairwise_raw.shape[0]):
@@ -153,8 +153,15 @@ e_i = Inf_Algo(observed_unary, pairwise, clique_indexes, inferred_label, inferre
 
 inferred_label = inferred_label.reshape([128,128])
 inferred_z = inferred_z.reshape([64,9])
-print(y_inferred[:16,:16])
-print(inferred_label[:16,:16])
+for i in range(128):
+    for j in range(128):
+        if inferred_label[i][j] != y_inferred[i][j]:
+            print(str(i)+' '+str(j))
+
+for i in range(64):
+    for j in range(9):
+        if inferred_z[i][j] != z_inferred.T[i][j]:
+            print(str(i) + str(j))
 # z_inferred.T
 # inferred_z
 # for i in range(128):
