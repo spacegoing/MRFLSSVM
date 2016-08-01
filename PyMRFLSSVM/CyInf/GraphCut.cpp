@@ -182,52 +182,35 @@ double graph_cut_method(float *observed_unary, float *pairwise,
 
     double e = g->maxflow();
 
-    for (int m = 0; m < nVariables; ++m) {
-        inferred_label[m] = (g->what_segment(m) == GraphType::SOURCE) ? 1 : 0;
-    }
-
-    int idx = 0;
-    for (int n = 0; n < options.numCliques; ++n) {
-        for (int i = 0; i < K - 1; ++i) {
-            inferred_z[idx] = (g->what_segment(z_index[n] + i) == GraphType::SOURCE) ? 1 : 0;
-            idx++;
-        }
-    }
-
-//    int row = 0;
-//    int col = 0;
-//    for (int i1 = 0; i1 < nVariables; ++i1) {
-//        if (col == options.cols) {
-//            col = 0;
-//            row++;
-//        }
-//        inferred_label[row * options.cols + col] = (g->what_segment(i1) == GraphType::SOURCE) ? 1 : 0;
-//        col++;
+//    for (int m = 0; m < nVariables; ++m) {
+//        inferred_label[m] = (g->what_segment(m) == GraphType::SOURCE) ? 1 : 0;
 //    }
 //
-//    for (int l1 = 0; l1 < options.numCliques; ++l1) {
-//        for (int k1 = 0; k1 < K - 1; ++k1) {
-//            inferred_z[l1 * (K - 1) + k1] = (g->what_segment(z_index[l1] + k1) == GraphType::SOURCE) ? 1 : 0;
+//    int idx = 0;
+//    for (int n = 0; n < options.numCliques; ++n) {
+//        for (int i = 0; i < K - 1; ++i) {
+//            inferred_z[idx] = (g->what_segment(z_index[n] + i) == GraphType::SOURCE) ? 1 : 0;
+//            idx++;
 //        }
 //    }
 
-#if ((DEBUG_LEVEL == 2) || (DEBUG_LEVEL == -1))
-    cout << "ybar##############################" << endl;
-    for (int m1 = 0; m1 < options.rows; ++m1) {
-        for (int i = 0; i < options.cols; ++i) {
-            cout << inferred_label[m1 * options.cols + i] << " ";
+    int row = 0;
+    int col = 0;
+    for (int i1 = 0; i1 < nVariables; ++i1) {
+        if (col == options.cols) {
+            col = 0;
+            row++;
         }
-        cout << endl;
+        inferred_label[row * options.cols + col] = (g->what_segment(i1) == GraphType::SOURCE) ? 1 : 0;
+        col++;
     }
 
-    cout << "hbar##############################" << endl;
-    for (int m1 = 0; m1 < options.numCliques; ++m1) {
-        for (int i = 0; i < K - 1; ++i) {
-            cout << inferred_z[m1 * (K - 1) + i] << " ";
+    for (int l1 = 0; l1 < options.numCliques; ++l1) {
+        for (int k1 = 0; k1 < K - 1; ++k1) {
+            inferred_z[l1 * (K - 1) + k1] = (g->what_segment(z_index[l1] + k1) == GraphType::SOURCE) ? 1 : 0;
         }
-        cout << endl;
     }
-#endif
+
 
 #if ((DEBUG_LEVEL == 1) || (DEBUG_LEVEL == -1))
     fclose(modelfl);

@@ -141,8 +141,8 @@ for i in range(128):
     for j in range(128):
         clique_indexes[i][j] = indexes[i][j]
 
-inferred_label = np.zeros(128*128,dtype=np.int32)
-inferred_z = np.zeros(64*9,dtype=np.int32)
+inferred_label = np.zeros([128,128],dtype=np.int32)
+inferred_z = np.zeros([64,9],dtype=np.int32)
 w=np.zeros(1+2*9,dtype=np.double)
 w[0]=w_raw[0,0]
 for i in range(1,10):
@@ -151,8 +151,6 @@ for i in range(1,10):
 
 e_i = Inf_Algo(observed_unary, pairwise, clique_indexes, inferred_label, inferred_z, w, options)
 
-inferred_label = inferred_label.reshape([128,128])
-inferred_z = inferred_z.reshape([64,9])
 for i in range(128):
     for j in range(128):
         if inferred_label[i][j] != y_inferred[i][j]:

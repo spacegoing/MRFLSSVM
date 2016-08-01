@@ -23,7 +23,7 @@ cdef extern from "/Users/spacegoing/macCodeLab-MBP2015/Python/MRFLSVM/PyMRFLSSVM
 
 def Inf_Algo(float[:,:,:]observed_unary, float [:,:]pairwise,
                             int [:,:]clique_indexes,
-                            int [:]inferred_label, int [:]inferred_z,
+                            int [:,:]inferred_label, int [:,:]inferred_z,
                             double [:]w, options):
     cdef OPTIONS c_options
 
@@ -36,4 +36,4 @@ def Inf_Algo(float[:,:,:]observed_unary, float [:,:]pairwise,
     c_options.learningQP = options.learningQP
 
     return graph_cut_method(&observed_unary[0,0,0], &pairwise[0,0], &clique_indexes[0,0],
-                            &inferred_label[0], &inferred_z[0], &w[0], c_options)
+                            &inferred_label[0,0], &inferred_z[0,0], &w[0], c_options)
