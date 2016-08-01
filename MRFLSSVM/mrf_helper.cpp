@@ -8,7 +8,7 @@
 #include <iostream>
 #include <stdio.h>
 
-#define DEBUG_LEVEL 0
+#define DEBUG_LEVEL 1
 
 /**
  * -1 for all
