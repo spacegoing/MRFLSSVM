@@ -45,16 +45,26 @@ def phi_helper(unary_observed, pairwise, labels, latent_var, clique_indexes, opt
     for i in range(options.K, 2 * options.K - 1):
         higher_order_phi[i] = db_z[i - options.K]
 
-    phi = np.zeros(2 * options.K + 1, dtype=np.double, order='C')
-    phi[:2 * options.K - 1] = higher_order_phi
-    phi[2 * options.K - 1] = unary_phi
-    phi[2 * options.K] = pairwise_phi
+    phi = np.zeros(options.sizePhi, dtype=np.double, order='C')
+    phi[:options.sizeHighPhi] = higher_order_phi
+    phi[options.sizeHighPhi] = unary_phi
+    phi[options.sizeHighPhi + 1] = pairwise_phi
 
     return phi
 
-# def inf_helper(observed_unary, pairwise, clique_indexes, theta, options):
-#     inferred_label=
-#     inferred_z=
+
+def inf_helper(unary_observed, pairwise, clique_indexes, theta_full, options):
+    # theta_full contains unary & pairwise params
+    # Inf_Algo only accepts higher-order params
+    theta = theta_full[:options.sizeHighPhi]
+
+    inferred_label = np.zeros([options.H, options.W], dtype=np.int32, order='C')
+    inferred_z = np.zeros([options.numCliques, options.K - 1], dtype=np.int32, order='C')
+
+    e_i = Inf_Algo(unary_observed, pairwise, clique_indexes, inferred_label, inferred_z, theta, options)
+
+    return inferred_label, inferred_z, e_i
+
 
 if __name__ == '__main__':
     from Checkboard import Instance, Options
@@ -64,8 +74,11 @@ if __name__ == '__main__':
     pairwise = instance.pairwise
     labels = instance.y
     latent_var = instance.latent_var
-    cliques_indexes = instance.clique_indexes  # Note: clique id starts from 1
+    clique_indexes = instance.clique_indexes  # Note: clique id starts from 1
 
     options = Options()
 
-    phi = phi_helper(unary_observed, pairwise, labels, latent_var, cliques_indexes, options)
+    phi = phi_helper(unary_observed, pairwise, labels, latent_var, clique_indexes, options)
+
+    theta_full = np.zeros(options.sizePhi, dtype=np.double, order='C')
+    inf_helper(unary_observed, pairwise, clique_indexes, theta_full, options)

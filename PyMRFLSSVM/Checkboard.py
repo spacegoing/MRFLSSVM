@@ -25,7 +25,7 @@ class Options:
     # Learning Configs
     K = 4  # number of lower linear functions
     sizeHighPhi = 2 * K - 1
-    sizePhi = 2 * K + 1
+    sizePhi = sizeHighPhi + 2
     maxIters = 100  # maximum learning iterations
     eps = 1.0e-16  # constraint violation threshold
 
