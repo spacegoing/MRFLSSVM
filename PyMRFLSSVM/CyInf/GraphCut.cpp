@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <iostream>
 
-#define DEBUG_LEVEL 1
+#define DEBUG_LEVEL 0
 /**
  * -1 all
  * 0  none
@@ -30,19 +30,19 @@ double graph_cut_method(float *observed_unary, float *pairwise,
 
     // remove redundancy-------------------------------------------------------
     // compute (b_k-b_{k-1})/a_{k-1}-a_k
-//    double b_a_ratio[K - 1];
-//    for (int i = 0; i < K - 1; ++i) {
-//        b_a_ratio[i] = w[i + K] / (-1.0 * w[i + 1]);
-//    }
-//
-//    // ensure (b_k-b_{k-1})/a_{k-1}-a_k < (b_{k+1}-b_{k})/a_k-a_{k+1}
-//    // if not then use w[i-1] & w[i+K-1] replace w[i] & w[i+K]
-//    for (int i = 1; i < K - 1; ++i) {
-//        if (b_a_ratio[i] < b_a_ratio[i - 1]) {
-//            w[i + 1] = w[i];
-//            w[i + K] = w[i + K - 1];
-//        }
-//    }
+    double b_a_ratio[K - 1];
+    for (int i = 0; i < K - 1; ++i) {
+        b_a_ratio[i] = w[i + K] / (-1.0 * w[i + 1]);
+    }
+
+    // ensure (b_k-b_{k-1})/a_{k-1}-a_k < (b_{k+1}-b_{k})/a_k-a_{k+1}
+    // if not then use w[i-1] & w[i+K-1] replace w[i] & w[i+K]
+    for (int i = 1; i < K - 1; ++i) {
+        if (b_a_ratio[i] < b_a_ratio[i - 1]) {
+            w[i + 1] = w[i];
+            w[i + K] = w[i + K - 1];
+        }
+    }
 
 #if ((DEBUG_LEVEL == 1) || (DEBUG_LEVEL == -1))
     FILE *modelfl;
@@ -64,31 +64,38 @@ double graph_cut_method(float *observed_unary, float *pairwise,
 #if ((DEBUG_LEVEL == 1) || (DEBUG_LEVEL == -1))
     fprintf(modelfl, "LineNos:%d\n", options.rows * options.cols);
 #endif
+
     int counter = 0;
     for (int i = 0; i < options.rows; ++i) {
         for (int j = 0; j < options.cols; ++j) {
             g->add_tweights(counter, unaryWeights[i * options.cols * 2 + j * 2],
                             unaryWeights[i * options.cols * 2 + j * 2 + 1]);
+
 #if ((DEBUG_LEVEL == 1) || (DEBUG_LEVEL == -1))
             fprintf(modelfl, "%d %f %f\n", counter, unaryWeights[i * options.cols * 2 + j * 2],
                     unaryWeights[i * options.cols * 2 + j * 2 + 1]);
 #endif
+
             counter++;
         }
     }
 
     // Add pairwise edges
     if (options.n_pairwise_rows) {
+
 #if ((DEBUG_LEVEL == 1) || (DEBUG_LEVEL == -1))
         fprintf(modelfl, "LineNos:%d\n", options.n_pairwise_rows);
 #endif
+
         for (int i = 0; i < options.n_pairwise_rows; ++i) {
             g->add_edge((int) pairwise[i * 3], (int) pairwise[i * 3 + 1], pairwise[i * 3 + 2],
                         pairwise[i * 3 + 2]);
+
 #if ((DEBUG_LEVEL == 1) || (DEBUG_LEVEL == -1))
             fprintf(modelfl, "%d %d %f\n", (int) pairwise[i * 3], (int) pairwise[i * 3 + 1],
                     pairwise[i * 3 + 2]);
 #endif
+
         }
     }
 
@@ -98,12 +105,15 @@ double graph_cut_method(float *observed_unary, float *pairwise,
 #if ((DEBUG_LEVEL == 10) || (DEBUG_LEVEL == -1))
     printf("inspect auxiliary vars: inspect auxiliary vars: inspect auxiliary vars: ");
 #endif
+
     int z_index[options.numCliques];
     for (int k = 0; k < options.numCliques; ++k) {
         z_index[k] = g->add_node(K - 1);
+
 #if((DEBUG_LEVEL == 10) || (DEBUG_LEVEL == -1))
         cout << z_index[k] << " ";
 #endif
+
     }
 
 #if ((DEBUG_LEVEL == 12) || (DEBUG_LEVEL == -1))
@@ -123,6 +133,7 @@ double graph_cut_method(float *observed_unary, float *pairwise,
             clique_size[clique_indexes[l * options.cols + i] - 1] += 1;
         }
     }
+
 #if ((DEBUG_LEVEL == 12) || (DEBUG_LEVEL == -1))
     printf("\n");
     for (int m = 0; m < options.numCliques; ++m) {
@@ -138,6 +149,7 @@ double graph_cut_method(float *observed_unary, float *pairwise,
 #if ((DEBUG_LEVEL == 1) || (DEBUG_LEVEL == -1))
     fprintf(modelfl, "yzLineNos:%d\n", options.rows * options.cols);
 #endif
+
     counter = 0;
     for (int i = 0; i < options.rows; ++i) {
         for (int j = 0; j < options.cols; ++j) {
@@ -146,19 +158,23 @@ double graph_cut_method(float *observed_unary, float *pairwise,
 
             // edge between y_i and t
             g->add_tweights(counter, 0.0, w[0] * w_i);
+
 #if ((DEBUG_LEVEL == 1) || (DEBUG_LEVEL == -1))
             fprintf(modelfl, "y_it:%d %f\n", counter, w[0] * w_i);
 #endif
+
             for (int k = 0; k < K - 1; ++k) {
                 // edge between y_i and z_k
                 // in w, w[0] element is a1, the followings are a_k+1 - a_k
                 // to w[K-1]. So the edge should be -w[k+1]
                 g->add_edge(counter, z_index[clique_index] + k,
                             0.0, w_i * -1.0 * w[k + 1]);
+
 #if ((DEBUG_LEVEL == 1) || (DEBUG_LEVEL == -1))
                 fprintf(modelfl, "y_iz:%d %d %f\n", counter,
                         z_index[clique_index] + k, w_i * -1.0 * w[k + 1]);
 #endif
+
             }
             counter++;
         }
@@ -168,31 +184,22 @@ double graph_cut_method(float *observed_unary, float *pairwise,
     fprintf(modelfl, "zstLineNos: %d\n",
             options.numCliques * (K - 1));
 #endif
+
     for (int i = 0; i < options.numCliques; ++i) {
         for (int k = 0; k < K - 1; ++k) {
             // edge between z_k and s and t
             g->add_tweights(z_index[i] + k, -1.0 * w[k + 1], w[K + k]);
+
 #if ((DEBUG_LEVEL == 1) || (DEBUG_LEVEL == -1))
             fprintf(modelfl, "%d %f %f\n",
                     z_index[i] + k, -1.0 * w[k + 1], w[K + k]);
 #endif
+
         }
     }
 
 
     double e = g->maxflow();
-
-//    for (int m = 0; m < nVariables; ++m) {
-//        inferred_label[m] = (g->what_segment(m) == GraphType::SOURCE) ? 1 : 0;
-//    }
-//
-//    int idx = 0;
-//    for (int n = 0; n < options.numCliques; ++n) {
-//        for (int i = 0; i < K - 1; ++i) {
-//            inferred_z[idx] = (g->what_segment(z_index[n] + i) == GraphType::SOURCE) ? 1 : 0;
-//            idx++;
-//        }
-//    }
 
     int row = 0;
     int col = 0;
@@ -215,6 +222,7 @@ double graph_cut_method(float *observed_unary, float *pairwise,
 #if ((DEBUG_LEVEL == 1) || (DEBUG_LEVEL == -1))
     fclose(modelfl);
 #endif
+
     delete (g);
 
     return e;

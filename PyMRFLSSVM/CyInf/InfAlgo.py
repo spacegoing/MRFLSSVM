@@ -160,7 +160,3 @@ for i in range(64):
     for j in range(9):
         if inferred_z[i][j] != z_inferred.T[i][j]:
             print(str(i) + str(j))
-# z_inferred.T
-# inferred_z
-# for i in range(128):
-#     for j in range(128):
