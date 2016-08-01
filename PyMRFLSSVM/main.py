@@ -4,7 +4,7 @@ __author__ = 'spacegoing'
 from Utils.ReadMat import loadCheckboard
 import numpy as np
 from pprint import pprint as pp
-from linEnvLearn import linEnvLearn
+# from linEnvLearn import linEnvLearn
 
 # initialize random number generator
 np.random.seed(0)
@@ -67,6 +67,6 @@ class Instance:
 # # U+H experiments --------------------------------------------
 instance = Instance()
 options = Options()
-history, y_hat = linEnvLearn(instance, options)
+# history, y_hat = linEnvLearn(instance, options)
 
 

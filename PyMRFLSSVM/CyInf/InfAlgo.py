@@ -2,7 +2,10 @@
 __author__ = 'spacegoing'
 
 from CyInf.GraphCy import GraphCy
+from CyInf.WllepGraphCut import Inf_Algo
 import numpy as np
+from Utils.ReadMat import loadTestInf
+from main import instance
 
 
 def linEnvInf(unaryWeights, pairWeights, envCoeffs, cliques):
@@ -100,3 +103,59 @@ def linEnvInf(unaryWeights, pairWeights, envCoeffs, cliques):
     print(z_hat)
 
     return y_hat, z_hat, e
+
+class Options:
+    H = 128
+    W = 128
+    numCliques = 64
+    K = 10
+    learningQP = 1
+
+
+unary_observed, pairwise_raw, w_raw, y_inferred, z_inferred, e = loadTestInf()
+options = Options()
+# float[:, :, :]
+# observed_unary, float[:, :]
+# pairwise,
+# int[:, :]
+# clique_indexes,
+# int[:, :]
+# inferred_label, int[:, :]
+# inferred_z,
+# double[:]
+# w, options
+observed_unary = np.zeros([128,128,2],dtype=np.float32)
+for i in range(128):
+    for j in range(128):
+        observed_unary[i][j][0]=0.0
+        observed_unary[i][j][1]=unary_observed[i][j]
+
+pairwise=np.zeros(pairwise_raw.shape,order='C',dtype=np.float32)
+for i in range(pairwise_raw.shape[0]):
+    for j in range(3):
+        pairwise[i][j] = pairwise_raw[i][j]
+
+indexes = instance.cliques.reshape([128,128],order='C').astype(np.int32).transpose()
+clique_indexes = np.zeros([128,128],order='C',dtype=np.int32)
+for i in range(128):
+    for j in range(128):
+        clique_indexes[i][j] = indexes[i][j]
+
+inferred_label = np.zeros(128*128,dtype=np.int32)
+inferred_z = np.zeros(64*9,dtype=np.int32)
+w=np.zeros(1+2*9,dtype=np.double)
+w[0]=w_raw[0,0]
+for i in range(1,10):
+    w[i] = w_raw[i,0]-w_raw[i-1,0]
+    w[i+9] = w_raw[i,1] -w_raw[i-1,1]
+
+e_i = Inf_Algo(observed_unary, pairwise, clique_indexes, inferred_label, inferred_z, w, options)
+
+inferred_label = inferred_label.reshape([128,128])
+inferred_z = inferred_z.reshape([64,9])
+print(y_inferred[:16,:16])
+print(inferred_label[:16,:16])
+# z_inferred.T
+# inferred_z
+# for i in range(128):
+#     for j in range(128):
