@@ -47,7 +47,7 @@ double graph_cut_method(double *observed_unary, double *pairwise,
 #if ((DEBUG_LEVEL == 1) || (DEBUG_LEVEL == -1))
     FILE *modelfl;
 
-    modelfl = fopen("graph.txt", "w");
+    modelfl = fopen("./tmpData/graph.txt", "w");
     if (modelfl == NULL) {
         printf("Cannot open model file %s for output!", "pairwise.txt");
         exit(1);

@@ -28,8 +28,8 @@ def phi_helper(unary_observed, pairwise, labels, latent_var, clique_indexes, opt
     max_latent_index = [int(sum(latent_var[i, :])) for i in range(options.numCliques)]
 
     cliques_size = [sum(sum(clique_indexes == i + 1)) for i in range(options.numCliques)]  # clique index starts from 1
-    cliques_value = [sum(labels.flatten()[clique_indexes.flatten() == i + 1]) / cliques_size[i] for i in range(int(
-        options.numCliques))]
+    cliques_value = [sum(labels.flatten()[clique_indexes.flatten() == i + 1]) /
+                     cliques_size[i] for i in range(options.numCliques)]
 
     higher_order_phi[0] = sum(cliques_value)
     # 1 < i < K
@@ -38,9 +38,10 @@ def phi_helper(unary_observed, pairwise, labels, latent_var, clique_indexes, opt
         # then higher_order_phi[1:max_latent_index[i]] returns empty
         higher_order_phi[1:max_latent_index[i]] += cliques_value[i]
 
-    # sum of [[ i-K <= k^* ]] by cliqueID
+    # sum of [[ i-K <= k^* ]] by clique_index
     # where k^* is the max_latent_index
     db_z = np.sum(latent_var, axis=0)
+
     # K <= i < 2K - 1
     for i in range(options.K, 2 * options.K - 1):
         higher_order_phi[i] = db_z[i - options.K]
@@ -53,11 +54,31 @@ def phi_helper(unary_observed, pairwise, labels, latent_var, clique_indexes, opt
     return phi
 
 
-def inf_helper(unary_observed, pairwise, clique_indexes, theta_full, options):
-    # theta_full contains unary & pairwise params
+def inf_latent_helper(labels, clique_indexes, theta_full, options):
+    # np.double[:] theta_full contains unary & pairwise params
     # Inf_Algo only accepts higher-order params
     theta = theta_full[:options.sizeHighPhi]
 
+    cliques_size = [sum(sum(clique_indexes == i + 1)) for i in range(options.numCliques)]  # clique index starts from 1
+    cliques_value = [sum(labels.flatten()[clique_indexes.flatten() == i + 1]) /
+                     cliques_size[i] for i in range(options.numCliques)]
+
+    inferred_latent = np.zeros([options.numCliques, options.K - 1], dtype=np.int32, order='C')
+    for i in range(options.numCliques):
+        for j in range(options.K - 1):
+            # z_k = 1 only if (a_{k+1}-a_k)W_c(y_c) + b_{k+1}-b_k) < 0
+            inferred_latent[i][j] = 1 if (theta[1 + j] * cliques_value[i] +
+                                          theta[j + options.K] < 0) else 0
+
+    return inferred_latent
+
+
+def inf_yz_helper(unary_observed, pairwise, clique_indexes, theta_full, options):
+    # np.double[:] theta_full contains unary & pairwise params
+    # Inf_Algo only accepts higher-order params
+    theta = theta_full[:options.sizeHighPhi]
+
+    # inferred_label & inferred_z are assigned inside Inf_Algo()
     inferred_label = np.zeros([options.H, options.W], dtype=np.int32, order='C')
     inferred_z = np.zeros([options.numCliques, options.K - 1], dtype=np.int32, order='C')
 
@@ -81,4 +102,6 @@ if __name__ == '__main__':
     phi = phi_helper(unary_observed, pairwise, labels, latent_var, clique_indexes, options)
 
     theta_full = np.zeros(options.sizePhi, dtype=np.double, order='C')
-    inf_helper(unary_observed, pairwise, clique_indexes, theta_full, options)
+    inferred_label, inferred_z, e_i = \
+        inf_yz_helper(unary_observed, pairwise, clique_indexes, theta_full, options)
+    inferred_latent = inf_latent_helper(labels, clique_indexes, theta_full, options)
