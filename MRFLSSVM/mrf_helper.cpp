@@ -133,7 +133,7 @@ SVECTOR *psi_helper(PATTERN x, LABEL y, LATENT_VAR h, STRUCTMODEL *sm, STRUCT_LE
         }
         // K< l <= 2K - 1
         for (int l = sparm->options.K; l < sparm->options.K + argmax_z_array[m]; ++l) {
-            words[l].weight += clique_value_vector[m];
+            words[l].weight += 1;
         }
     }
 
