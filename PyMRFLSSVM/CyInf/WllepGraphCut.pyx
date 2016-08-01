@@ -21,9 +21,9 @@ cdef extern from "/Users/spacegoing/macCodeLab-MBP2015/Python/MRFLSVM/PyMRFLSSVM
                             int * inferred_label, int * inferred_z,
                             double *w, OPTIONS options)
 
-def Inf_Algo(double[:,:,:1]observed_unary, double [:,:1]pairwise,
-                            int [:,:1]clique_indexes,
-                            int [:,:1]inferred_label, int [:,:1]inferred_z,
+def Inf_Algo(double[:,:,::1]observed_unary, double [:,::1]pairwise,
+                            int [:,::1]clique_indexes,
+                            int [:,::1]inferred_label, int [:,::1]inferred_z,
                             double [:]theta, options):
     # w only contains parameters for higher order terms
 
