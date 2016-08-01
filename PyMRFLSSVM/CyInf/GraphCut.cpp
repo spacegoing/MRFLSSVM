@@ -18,7 +18,7 @@
 
 using namespace std;
 
-double graph_cut_method(float *observed_unary, float *pairwise,
+double graph_cut_method(double *observed_unary, double *pairwise,
                         int *clique_indexes,
                         int *inferred_label, int *inferred_z,
                         double *w, OPTIONS options) {
@@ -54,7 +54,7 @@ double graph_cut_method(float *observed_unary, float *pairwise,
     }
 #endif
 
-    float *unaryWeights = observed_unary;
+    double *unaryWeights = observed_unary;
 
     typedef Graph<double, double, double> GraphType;
     GraphType *g = new GraphType(nVariables, 8 * nVariables);
