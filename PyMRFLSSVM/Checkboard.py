@@ -17,13 +17,14 @@ class Options:
     H = 128  # rows image height
     W = 128  # cols image width
     numCliques = (int)(H / gridStep) ** 2  # number of clique_indexes
+    numVariables = H * W
     N = H * W  # number of variables
 
     dimUnary = 2
     dimPairwise = 3
 
     # Learning Configs
-    K = 4  # number of lower linear functions
+    K = 10  # number of lower linear functions
     sizeHighPhi = 2 * K - 1
     sizePhi = sizeHighPhi + 2
     maxIters = 100  # maximum learning iterations
