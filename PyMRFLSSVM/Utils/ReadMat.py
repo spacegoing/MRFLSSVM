@@ -18,8 +18,8 @@ def loadCheckboard():
 
 def loadTestInf():
     mat = loadmat('tmpData/testInf.mat')
-    unary_observed = mat['unary_observed'].astype(np.float)
-    pairwise = mat['pairwise'].astype(np.float)
+    unary_observed = mat['unary_observed'].astype(np.double)
+    pairwise = mat['pairwise'].astype(np.double)
     w = mat['w']
     y_inferred = mat['y_inferred'].reshape([128, 128], order='F')
     z_inferred = mat['z_inferred'].reshape([9, 64], order='F')

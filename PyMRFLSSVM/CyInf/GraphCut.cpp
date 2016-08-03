@@ -18,7 +18,7 @@
 
 using namespace std;
 
-double graph_cut_method(float *observed_unary, float *pairwise,
+double graph_cut_method(double *observed_unary, double *pairwise,
                         int *clique_indexes,
                         int *inferred_label, int *inferred_z,
                         double *w, OPTIONS options) {
@@ -47,14 +47,14 @@ double graph_cut_method(float *observed_unary, float *pairwise,
 #if ((DEBUG_LEVEL == 1) || (DEBUG_LEVEL == -1))
     FILE *modelfl;
 
-    modelfl = fopen("graph.txt", "w");
+    modelfl = fopen("./tmpData/graph.txt", "w");
     if (modelfl == NULL) {
         printf("Cannot open model file %s for output!", "pairwise.txt");
         exit(1);
     }
 #endif
 
-    float *unaryWeights = observed_unary;
+    double *unaryWeights = observed_unary;
 
     typedef Graph<double, double, double> GraphType;
     GraphType *g = new GraphType(nVariables, 8 * nVariables);

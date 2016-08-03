@@ -21,7 +21,7 @@ typedef struct options {
     int learningQP;  // encoding for learning QP (1, 2, or 3)
 } OPTIONS;
 
-double graph_cut_method(float *observed_unary, float *pairwise,
+double graph_cut_method(double *observed_unary, double *pairwise,
                         int *clique_indexes,
                         int *inferred_label, int *inferred_z,
                         double *w, OPTIONS options);
