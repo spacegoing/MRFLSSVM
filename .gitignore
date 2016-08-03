@@ -1,3 +1,5 @@
 /MRFLSVM
 .idea/
 /.emacs.desktop
+/PyMRFLSSVM/.emacs.desktop
+/PyMRFLSSVM/.emacs.desktop.lock
