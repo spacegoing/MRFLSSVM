@@ -6,7 +6,7 @@ import MRF_Helpers as mrf
 from Checkboard import Instance, Options
 
 eng = matlab.engine.start_matlab()
-__DEBUG__ = 1
+__DEBUG__ = 'hat'
 
 
 def quadprog_matlab(P, q, A, b, theta):
@@ -18,23 +18,18 @@ def quadprog_matlab(P, q, A, b, theta):
     return np.array(theta, dtype=np.double, order='C').reshape(len(theta))
 
 
-def cutting_plane_ssvm(theta, vt, latent_inferred, instance, options):
+def cutting_plane_ssvm(theta, vt, instance, options):
     # theta: first 2K - 1 are higher order params, then unary, pairwise and slack
-    # vt = Inferred Cutting Plane
+    # vt = Inferred Cutting Plane = truePhi
     # instance = Instance()
     # options = Options()
 
     history = list()
 
-    # true feature vector
-    truePhi = mrf.phi_helper(instance.unary_observed, instance.pairwise, instance.y,
-                             latent_inferred, instance.clique_indexes, options)
-
     ## construct QP objective
     P = np.eye(options.sizePhi + 1, options.sizePhi + 1)
     P[-1, -1] = 0.0  # for slack variable
     q = np.zeros(options.sizePhi + 1)
-    q[:options.sizePhi] = -vt
     q[-1] = 1.0e3  # for slack variable
 
     ################## Adding Constraints ##########################
@@ -57,7 +52,18 @@ def cutting_plane_ssvm(theta, vt, latent_inferred, instance, options):
     A[options.sizeHighPhi - 1, options.sizePhi - 1] = 1
     # 1 positive constraints for slack
     A[options.sizeHighPhi, options.sizePhi] = 1
+    if __DEBUG__ == 'constraint':
+        for i in range(A.shape[0]):
+            for j in range(A.shape[1]):
+                print(A[i][j], end=' ')
+            print('')
 
+    # Loss augmented inference
+    lossUnary = np.zeros([options.H, options.W, 2])
+    lossUnary[instance.y == 1, 0] = 1.0 / options.numVariables
+    lossUnary[instance.y == 0, 1] = 1.0 / options.numVariables
+
+    violation_old = 0
     ################## iterate until convergence ####################
     for t in range(0, options.maxIters):
 
@@ -68,7 +74,7 @@ def cutting_plane_ssvm(theta, vt, latent_inferred, instance, options):
         if options.hasPairwise:
             instance.pairwise[:, 2] = pairwiseWeight
 
-        if __DEBUG__ > 0:
+        if __DEBUG__ == 'hat':
             y_hat, z_hat, e_hat = \
                 mrf.inf_label_latent_helper(unaryWeight * instance.unary_observed, instance.pairwise,
                                             instance.clique_indexes, theta, options)
@@ -81,16 +87,11 @@ def cutting_plane_ssvm(theta, vt, latent_inferred, instance, options):
             #     for j in range(options.K-1):
             #         print(z_hat[i][j], end='')
             #     print('\n')
-            if np.sum(z_hat)>0 and np.sum(z_hat)<1:
+            if np.sum(z_hat) > 0 and np.sum(z_hat) < 1:
                 print(z_hat)
                 break
 
         # infer most violated constraint
-        # Todo: Is there any bug?
-        lossUnary = np.zeros([options.H, options.W, 2])
-        lossUnary[instance.y == 1, 0] = 1.0 / options.numVariables
-        lossUnary[instance.y == 0, 1] = 1.0 / options.numVariables
-
         y_loss, z_loss, e_loss = \
             mrf.inf_label_latent_helper(unaryWeight * instance.unary_observed - lossUnary, instance.pairwise,
                                         instance.clique_indexes, theta, options)
@@ -99,13 +100,18 @@ def cutting_plane_ssvm(theta, vt, latent_inferred, instance, options):
         phi = mrf.phi_helper(instance.unary_observed, instance.pairwise, y_loss,
                              z_loss, instance.clique_indexes, options)
         loss = np.sum(y_loss != instance.y) / options.numVariables
-        slack = loss - np.dot((phi - truePhi), theta[:-1])
+        slack = loss - np.dot((phi - vt), theta[:-1])
         violation = slack - theta[-1]
+
+        if __DEBUG__:
+            if (violation - violation_old) < 0.001:
+                break
+            violation_old = violation
 
         if violation < options.eps:
             break
 
-        A = np.r_[A, [np.r_[phi - truePhi, 1]]]
+        A = np.r_[A, [np.r_[phi - vt, 1]]]
         b = np.r_[b, loss]
 
     return theta, history
@@ -114,13 +120,14 @@ def cutting_plane_ssvm(theta, vt, latent_inferred, instance, options):
 def cccp_outer_loop():
     instance = Instance()
     options = Options()
-    theta = np.zeros(options.sizePhi + 1, dtype=np.double, order='C')
-    theta[options.sizeHighPhi] = 1 # set unary weight to 1
-    # theta = np.asarray([np.random.uniform(-1, 1, 1)[0]] + list(-1 * np.random.rand(1, options.K - 1)[0, :]) + \
-    #                    list(np.random.rand(1, options.K - 1)[0, :]) + \
-    #                    [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :]),
-    #                    dtype=np.double, order='C')
+    # theta = np.zeros(options.sizePhi + 1, dtype=np.double, order='C')
+    # theta[options.sizeHighPhi] = 1  # set unary weight to 1
+    theta = np.asarray([np.random.uniform(-1, 1, 1)[0]] + list(-1 * np.random.rand(1, options.K - 1)[0, :]) + \
+                       list(np.random.rand(1, options.K - 1)[0, :]) + \
+                       [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :]),
+                       dtype=np.double, order='C')
 
+    counter = 0
     for t in range(10):
         theta_old = theta
 
@@ -131,12 +138,46 @@ def cccp_outer_loop():
         theta, history = cutting_plane_ssvm(theta, vt, latent_inferred, instance, options)
 
         if all(theta == theta_old):
-            print(t)
+            print('converge at iter: %d' % t)
             break
 
-        if np.abs(np.sum(instance.y - history[-1]['y_hat'])) / options.numVariables < options.eps:
-            break
+        # if np.sum(np.abs(instance.y - history[-1]['y_hat'])) / options.numVariables < options.eps:
+        #     break
+        print(np.sum(np.abs(instance.y - history[-1]['y_hat'])))
 
 
 if __name__ == "__main__":
-    cccp_outer_loop()
+
+    # cccp_outer_loop()
+    instance = Instance()
+    options = Options()
+    # theta = np.zeros(options.sizePhi + 1, dtype=np.double, order='C')
+    # theta[options.sizeHighPhi] = 1  # set unary weight to 1
+    theta = np.asarray([np.random.uniform(-1, 1, 1)[0]] + list(-1 * np.random.rand(1, options.K - 1)[0, :]) + \
+                       list(np.random.rand(1, options.K - 1)[0, :]) + \
+                       [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :]),
+                       dtype=np.double, order='C')
+
+    counter = 0
+    for t in range(10):
+        theta_old = theta
+
+        latent_inferred = mrf.inf_latent_helper(instance.y, instance.clique_indexes, theta, options)
+        black = True
+        for i in range(64):
+            if i % 8 == 0:
+                black = not black
+            latent_inferred[i, :] = 1 if black else 0
+            black = not black
+        vt = mrf.phi_helper(instance.unary_observed, instance.pairwise,
+                            instance.y, latent_inferred, instance.clique_indexes, options)
+
+        theta, history = cutting_plane_ssvm(theta, vt, instance, options)
+
+        if all(theta == theta_old):
+            print('converge at iter: %d' % (t))
+            break
+
+        # if np.sum(np.abs(instance.y - history[-1]['y_hat'])) / options.numVariables < options.eps:
+        #     break
+        print(np.sum(np.abs(instance.y - history[-1]['y_hat'])))
