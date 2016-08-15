@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
-__author__ = 'spacegoing'
 import numpy as np
 import matlab.engine
 import MRF_Helpers as mrf
 from Checkboard import Instance, Options
+from Utils.ReadMat import loadTestInf,loadMatPairwise
+
+__author__ = 'spacegoing'
 
 eng = matlab.engine.start_matlab()
 __DEBUG__ = 'hat'
@@ -68,9 +70,10 @@ def cutting_plane_ssvm(theta, vt, instance, options):
     for t in range(0, options.maxIters):
 
         theta = quadprog_matlab(P, q, -A, -b, theta)
+
+        # Decode parameters
         unaryWeight = theta[options.sizeHighPhi]
         pairwiseWeight = max(0, theta[options.sizeHighPhi + 1])
-
         if options.hasPairwise:
             instance.pairwise[:, 2] = pairwiseWeight
 
@@ -92,6 +95,22 @@ def cutting_plane_ssvm(theta, vt, instance, options):
                 break
 
         # infer most violated constraint
+
+        if __DEBUG__ == 'inference':
+            # load matlab .mat data
+            unary_observed, pairwise, theta, y_inferred, z_inferred, e = loadTestInf()
+            y_loss, z_loss, e_loss = \
+                mrf.inf_label_latent_helper(unary_observed, pairwise,
+                                            instance.clique_indexes, theta, options)
+            for i in range(128):
+                for j in range(128):
+                    if y_loss[i][j] != y_inferred[i][j]:
+                        print(str(i) + ' ' + str(j))
+            for i in range(64):
+                for j in range(9):
+                    if z_loss[i][j] != z_inferred.T[i][j]:
+                        print(str(i) + str(j))
+
         y_loss, z_loss, e_loss = \
             mrf.inf_label_latent_helper(unaryWeight * instance.unary_observed - lossUnary, instance.pairwise,
                                         instance.clique_indexes, theta, options)
@@ -112,6 +131,10 @@ def cutting_plane_ssvm(theta, vt, instance, options):
             break
 
         A = np.r_[A, [np.r_[phi - vt, 1]]]
+        # for i in range(A.shape[0]):
+        #     for j in range(A.shape[1]):
+        #         print(A[i][j],end=' ')
+        #     print('')
         b = np.r_[b, loss]
 
     return theta, history
@@ -120,12 +143,12 @@ def cutting_plane_ssvm(theta, vt, instance, options):
 def cccp_outer_loop():
     instance = Instance()
     options = Options()
-    # theta = np.zeros(options.sizePhi + 1, dtype=np.double, order='C')
-    # theta[options.sizeHighPhi] = 1  # set unary weight to 1
-    theta = np.asarray([np.random.uniform(-1, 1, 1)[0]] + list(-1 * np.random.rand(1, options.K - 1)[0, :]) + \
-                       list(np.random.rand(1, options.K - 1)[0, :]) + \
-                       [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :]),
-                       dtype=np.double, order='C')
+    theta = np.zeros(options.sizePhi + 1, dtype=np.double, order='C')
+    theta[options.sizeHighPhi] = 1  # set unary weight to 1
+    # theta = np.asarray([np.random.uniform(-1, 1, 1)[0]] + list(-1 * np.random.rand(1, options.K - 1)[0, :]) + \
+    #                    list(np.random.rand(1, options.K - 1)[0, :]) + \
+    #                    [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :]),
+    #                    dtype=np.double, order='C')
 
     counter = 0
     for t in range(10):
@@ -151,12 +174,17 @@ if __name__ == "__main__":
     # cccp_outer_loop()
     instance = Instance()
     options = Options()
-    # theta = np.zeros(options.sizePhi + 1, dtype=np.double, order='C')
-    # theta[options.sizeHighPhi] = 1  # set unary weight to 1
-    theta = np.asarray([np.random.uniform(-1, 1, 1)[0]] + list(-1 * np.random.rand(1, options.K - 1)[0, :]) + \
-                       list(np.random.rand(1, options.K - 1)[0, :]) + \
-                       [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :]),
-                       dtype=np.double, order='C')
+    # unary_observed, pairwise, theta_m, y_inferred, z_inferred, e = loadTestInf()
+    unary_observed, pairwise = loadMatPairwise()
+    instance.unary_observed = unary_observed
+    instance.pairwise = pairwise
+
+    theta = np.zeros(options.sizePhi + 1, dtype=np.double, order='C')
+    theta[options.sizeHighPhi] = 1  # set unary weight to 1
+    # theta = np.asarray([np.random.uniform(-1, 1, 1)[0]] + list(-1 * np.random.rand(1, options.K - 1)[0, :]) + \
+    #                    list(np.random.rand(1, options.K - 1)[0, :]) + \
+    #                    [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :]),
+    #                    dtype=np.double, order='C')
 
     counter = 0
     for t in range(10):
