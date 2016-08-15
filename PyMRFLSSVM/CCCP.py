@@ -11,11 +11,11 @@ eng = matlab.engine.start_matlab()
 __DEBUG__ = 'hat'
 
 
-def quadprog_matlab(P, q, A, b, theta):
-    P, q, A, b, theta = [matlab.double(i.tolist())
-                         for i in [P, q, A, b, theta]]
+def quadprog_matlab(P, q, A, b):
+    P, q, A, b = [matlab.double(i.tolist())
+                         for i in [P, q, A, b]]
     null = matlab.double([])
-    theta = eng.quadprog(P, q, A, b, null, null, null, null, theta)
+    theta = eng.quadprog(P, q, A, b, null, null, null, null)
 
     return np.array(theta, dtype=np.double, order='C').reshape(len(theta))
 
@@ -69,7 +69,7 @@ def cutting_plane_ssvm(theta, vt, instance, options):
     ################## iterate until convergence ####################
     for t in range(0, options.maxIters):
 
-        theta = quadprog_matlab(P, q, -A, -b, theta)
+        theta = quadprog_matlab(P, q, -A, -b)
 
         # Decode parameters
         unaryWeight = theta[options.sizeHighPhi]
@@ -77,7 +77,7 @@ def cutting_plane_ssvm(theta, vt, instance, options):
         if options.hasPairwise:
             instance.pairwise[:, 2] = pairwiseWeight
 
-        if __DEBUG__:
+        if __DEBUG__ == 'hat':
             y_hat, z_hat, e_hat = \
                 mrf.inf_label_latent_helper(unaryWeight * instance.unary_observed, instance.pairwise,
                                             instance.clique_indexes, theta, options)
@@ -126,10 +126,6 @@ def cutting_plane_ssvm(theta, vt, instance, options):
             break
 
         A = np.r_[A, [np.r_[phi - vt, 1]]]
-        # for i in range(A.shape[0]):
-        #     for j in range(A.shape[1]):
-        #         print(A[i][j],end=' ')
-        #     print('')
         b = np.r_[b, loss]
 
     return theta, history
@@ -184,9 +180,3 @@ def cccp_outer_loop():
 
 if __name__ == "__main__":
     cccp_outer_loop()
-    from datetime import date
-
-    d0 = date(2015, 11, 23)
-    d1 = date(2016, 8, 16)
-    delta = d1 - d0
-    print (delta.days)
