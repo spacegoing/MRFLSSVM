@@ -3,7 +3,7 @@ import numpy as np
 import matlab.engine
 import MRF_Helpers as mrf
 from Checkboard import Instance, Options
-from Utils.ReadMat import loadTestInf,loadMatPairwise
+from Utils.ReadMat import loadTestInf, loadMatPairwise
 
 __author__ = 'spacegoing'
 
@@ -77,7 +77,7 @@ def cutting_plane_ssvm(theta, vt, instance, options):
         if options.hasPairwise:
             instance.pairwise[:, 2] = pairwiseWeight
 
-        if __DEBUG__ == 'hat':
+        if __DEBUG__:
             y_hat, z_hat, e_hat = \
                 mrf.inf_label_latent_helper(unaryWeight * instance.unary_observed, instance.pairwise,
                                             instance.clique_indexes, theta, options)
@@ -122,11 +122,6 @@ def cutting_plane_ssvm(theta, vt, instance, options):
         slack = loss - np.dot((phi - vt), theta[:-1])
         violation = slack - theta[-1]
 
-        if __DEBUG__:
-            if (violation - violation_old) < 0.001:
-                break
-            violation_old = violation
-
         if violation < options.eps:
             break
 
@@ -143,69 +138,55 @@ def cutting_plane_ssvm(theta, vt, instance, options):
 def cccp_outer_loop():
     instance = Instance()
     options = Options()
-    theta = np.zeros(options.sizePhi + 1, dtype=np.double, order='C')
-    theta[options.sizeHighPhi] = 1  # set unary weight to 1
-    # theta = np.asarray([np.random.uniform(-1, 1, 1)[0]] + list(-1 * np.random.rand(1, options.K - 1)[0, :]) + \
-    #                    list(np.random.rand(1, options.K - 1)[0, :]) + \
-    #                    [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :]),
-    #                    dtype=np.double, order='C')
 
-    counter = 0
+    if __DEBUG__ == 'matlab':
+        unary_observed, pairwise = loadMatPairwise()
+        instance.unary_observed = unary_observed
+        instance.pairwise = pairwise
+
+    # theta = np.zeros(options.sizePhi + 1, dtype=np.double, order='C')
+    # theta[options.sizeHighPhi] = 1  # set unary weight to 1
+    theta = np.asarray([np.random.uniform(-1, 1, 1)[0]] + list(-1 * np.random.rand(1, options.K - 1)[0, :]) + \
+                       list(np.random.rand(1, options.K - 1)[0, :]) + \
+                       [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :]),
+                       dtype=np.double, order='C')
+
     for t in range(10):
         theta_old = theta
 
         latent_inferred = mrf.inf_latent_helper(instance.y, instance.clique_indexes, theta, options)
-        vt = mrf.phi_helper(instance.unary_observed, instance.pairwise,
-                            instance.y, latent_inferred, instance.clique_indexes, options)
 
-        theta, history = cutting_plane_ssvm(theta, vt, latent_inferred, instance, options)
-
-        if all(theta == theta_old):
-            print('converge at iter: %d' % t)
-            break
-
-        # if np.sum(np.abs(instance.y - history[-1]['y_hat'])) / options.numVariables < options.eps:
-        #     break
-        print(np.sum(np.abs(instance.y - history[-1]['y_hat'])))
-
-
-if __name__ == "__main__":
-
-    # cccp_outer_loop()
-    instance = Instance()
-    options = Options()
-    # unary_observed, pairwise, theta_m, y_inferred, z_inferred, e = loadTestInf()
-    unary_observed, pairwise = loadMatPairwise()
-    instance.unary_observed = unary_observed
-    instance.pairwise = pairwise
-
-    theta = np.zeros(options.sizePhi + 1, dtype=np.double, order='C')
-    theta[options.sizeHighPhi] = 1  # set unary weight to 1
-    # theta = np.asarray([np.random.uniform(-1, 1, 1)[0]] + list(-1 * np.random.rand(1, options.K - 1)[0, :]) + \
-    #                    list(np.random.rand(1, options.K - 1)[0, :]) + \
-    #                    [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :]),
-    #                    dtype=np.double, order='C')
-
-    counter = 0
-    for t in range(10):
-        theta_old = theta
-
-        latent_inferred = mrf.inf_latent_helper(instance.y, instance.clique_indexes, theta, options)
-        black = True
-        for i in range(64):
-            if i % 8 == 0:
+        if __DEBUG__ == 'matlab':
+            black = True
+            for i in range(64):
+                if i % 8 == 0:
+                    black = not black
+                latent_inferred[i, :] = 1 if black else 0
                 black = not black
-            latent_inferred[i, :] = 1 if black else 0
-            black = not black
+
         vt = mrf.phi_helper(instance.unary_observed, instance.pairwise,
                             instance.y, latent_inferred, instance.clique_indexes, options)
 
         theta, history = cutting_plane_ssvm(theta, vt, instance, options)
 
         if all(theta == theta_old):
-            print('converge at iter: %d' % (t))
+            print(latent_inferred)
+            print('stop converge at iter: %d' % t)
+            print('classification error: %d' % np.sum(np.abs(instance.y - history[-1]['y_hat'])))
             break
 
-        # if np.sum(np.abs(instance.y - history[-1]['y_hat'])) / options.numVariables < options.eps:
-        #     break
-        print(np.sum(np.abs(instance.y - history[-1]['y_hat'])))
+        if np.sum(np.abs(instance.y - history[-1]['y_hat'])) / options.numVariables < options.eps:
+            print(latent_inferred)
+            print('converge at iter: %d' % t)
+            print('classification error: %d' % np.sum(np.abs(instance.y - history[-1]['y_hat'])))
+            break
+
+
+if __name__ == "__main__":
+    cccp_outer_loop()
+    from datetime import date
+
+    d0 = date(2015, 11, 23)
+    d1 = date(2016, 8, 16)
+    delta = d1 - d0
+    print (delta.days)
