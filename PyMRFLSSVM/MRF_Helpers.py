@@ -37,14 +37,14 @@ def phi_helper(unary_observed, pairwise, labels, latent_var, clique_indexes, opt
     for i in range(options.numCliques):
         # if max_latent_index[i] = 0 < 1
         # then higher_order_phi[1:max_latent_index[i]] returns empty
-        higher_order_phi[1:max_latent_index[i]] += cliques_value[i]
+        higher_order_phi[1:max_latent_index[i]+1] += cliques_value[i]
 
     # sum of [[ i-K <= k^* ]] by clique_index
     # where k^* is the max_latent_index
     db_z = np.sum(latent_var, axis=0)
 
     # K <= i < 2K - 1
-    for i in range(options.K-1, 2 * options.K - 1):
+    for i in range(options.K, 2 * options.K - 1):
         higher_order_phi[i] = db_z[i - options.K]
 
     phi = np.zeros(options.sizePhi, dtype=np.double, order='C')
