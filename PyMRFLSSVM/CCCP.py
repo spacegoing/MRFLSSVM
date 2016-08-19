@@ -4,16 +4,18 @@ import matlab.engine
 import MRF_Helpers as mrf
 from Checkboard import Instance, Options
 from Utils.ReadMat import loadTestInf, loadMatPairwise
+import matplotlib.pyplot as plt
 
 __author__ = 'spacegoing'
 
 eng = matlab.engine.start_matlab()
 __DEBUG__ = 'hat'
+__plot__ = 1
 
 
 def quadprog_matlab(P, q, A, b):
     P, q, A, b = [matlab.double(i.tolist())
-                         for i in [P, q, A, b]]
+                  for i in [P, q, A, b]]
     null = matlab.double([])
     theta = eng.quadprog(P, q, A, b, null, null, null, null)
 
@@ -165,6 +167,23 @@ def cccp_outer_loop():
 
         theta, history = cutting_plane_ssvm(theta, vt, instance, options)
 
+        if __plot__:
+            latent_plot = mrf.inf_latent_helper(instance.y, instance.clique_indexes, theta, options)
+            for i in range(len(history)):
+                x_y_samples = gen_plot_samples(history[i]['theta'], options)
+                plt.plot(x_y_samples[:, 0], x_y_samples[:, 1], '-*')
+                # print order text
+                plt.text(x_y_samples[np.argmax(x_y_samples[:, 1]), 0],
+                         np.max(x_y_samples[:, 1]), str(i))
+
+            nonzero_idx = np.where(np.sum(latent_plot, axis=1) != 0)[0]
+            nonzero_idx = nonzero_idx[0] if nonzero_idx.shape[0] else 0
+            latent_str = str(latent_plot[nonzero_idx, :])
+            plt.title('active latent var: ' + latent_str)
+
+            plt.savefig('iteration_%d' % t, format='svg')
+            plt.close()
+
         if all(theta == theta_old):
             print(latent_inferred)
             print('stop converge at iter: %d' % t)
@@ -176,6 +195,25 @@ def cccp_outer_loop():
             print('converge at iter: %d' % t)
             print('classification error: %d' % np.sum(np.abs(instance.y - history[-1]['y_hat'])))
             break
+
+
+def gen_plot_samples(theta, options):
+    # decode theta
+    a_b_array = np.zeros([options.K, 2])
+    a_b_array[0, 0] = theta[0]
+    for i in range(1, options.K):
+        a_b_array[i, 0] = theta[i] + a_b_array[i - 1, 0]
+        a_b_array[i, 1] = theta[i + options.K - 1] + a_b_array[i - 1, 1]
+
+    # generate x-y pairs
+    step = 1 / options.K
+    x_y_samples = np.zeros([options.K + 1, 2])
+    x_y_samples[:-1, 0] = np.arange(0, 1, step)
+    x_y_samples[-1, 0] = 1
+    for i in range(1, options.K + 1):
+        x_y_samples[i, 1] = a_b_array[i - 1, 0] * x_y_samples[i, 0] + a_b_array[i - 1, 1]
+
+    return x_y_samples
 
 
 if __name__ == "__main__":
