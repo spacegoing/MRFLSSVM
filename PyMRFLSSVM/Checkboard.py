@@ -39,6 +39,9 @@ class Options:
 
 # Generate checkboard data
 def checkboardHelper():
+
+    _eta = [0.1, 0.1]
+
     H = Options.H
     W = Options.W
 
@@ -61,7 +64,6 @@ def checkboardHelper():
 
     # create unary features
     unary_observed = np.zeros([H, W, 2], dtype=np.double, order='C')
-    _eta = [0.1, 0.1]
     for i in range(H):
         for j in range(W):
             unary_observed[i][j][1] = 2 * (np.random.rand(1, 1)[0, 0] - 0.5) + \
