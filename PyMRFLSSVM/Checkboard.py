@@ -38,9 +38,8 @@ class Options:
 
 
 # Generate checkboard data
-def checkboardHelper():
-
-    _eta = [0.1, 0.1]
+def checkboardHelper(eta1=0.1, eta2=0.1):
+    _eta = [eta1, eta2]
 
     H = Options.H
     W = Options.W
