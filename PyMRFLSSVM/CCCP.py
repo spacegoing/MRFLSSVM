@@ -133,6 +133,41 @@ def cutting_plane_ssvm(theta, vt, instance, options):
     return theta, history
 
 
+def gen_plot_samples(theta, latent_plot, options):
+    # decode theta
+    a_b_array = np.zeros([options.K, 2])
+    a_b_array[0, 0] = theta[0]
+    for i in range(1, options.K):
+        a_b_array[i, 0] = theta[i] + a_b_array[i - 1, 0]
+        a_b_array[i, 1] = theta[i + options.K - 1] + a_b_array[i - 1, 1]
+
+    # generate intersection points
+    inter_points = np.zeros([options.K + 1, 2])
+    for i in range(1, options.K):
+        a_2 = a_b_array[i, 0]
+        b_2 = a_b_array[i, 1]
+        a_1 = a_b_array[i - 1, 0]
+        b_1 = a_b_array[i - 1, 1]
+        inter_points[i, 0] = (b_2 - b_1) / (a_1 - a_2)
+        inter_points[i, 1] = (a_1 * b_2 - a_2 * b_1) / (a_1 - a_2)
+
+    max_latent = np.max(np.sum(latent_plot, axis=1))
+
+    unique_inter_points = list()
+    for i in inter_points:
+        if i[0] >= 1:
+            i[0] = 1
+            i[1] = a_b_array[max_latent, 0] + a_b_array[max_latent, 1]
+        if tuple(i) not in unique_inter_points:
+            unique_inter_points += [tuple(i)]
+    unique_inter_points = np.asarray(unique_inter_points)
+    if unique_inter_points[-1][0] < 1:
+        np.r_['0,2', unique_inter_points, [1, a_b_array[max_latent, 0]
+                                           + a_b_array[max_latent, 1]]]
+
+    return unique_inter_points
+
+
 def cccp_outer_loop():
     instance = Instance()
     options = Options()
@@ -198,66 +233,13 @@ def cccp_outer_loop():
     return latent_inferred, history, options
 
 
-def gen_plot_samples(theta, latent_plot, options):
-    # decode theta
-    a_b_array = np.zeros([options.K, 2])
-    a_b_array[0, 0] = theta[0]
-    for i in range(1, options.K):
-        a_b_array[i, 0] = theta[i] + a_b_array[i - 1, 0]
-        a_b_array[i, 1] = theta[i + options.K - 1] + a_b_array[i - 1, 1]
-
-    # generate intersection points
-    inter_points = np.zeros([options.K + 1, 2])
-    for i in range(1, options.K):
-        a_2 = a_b_array[i, 0]
-        b_2 = a_b_array[i, 1]
-        a_1 = a_b_array[i - 1, 0]
-        b_1 = a_b_array[i - 1, 1]
-        inter_points[i, 0] = (b_2 - b_1) / (a_1 - a_2)
-        inter_points[i, 1] = (a_1 * b_2 - a_2 * b_1) / (a_1 - a_2)
-
-    max_latent = np.max(np.sum(latent_plot, axis=1))
-
-    unique_inter_points = list()
-    for i in inter_points:
-        if i[0] >= 1:
-            i[0] = 1
-            i[1] = a_b_array[max_latent, 0] + a_b_array[max_latent, 1]
-        if tuple(i) not in unique_inter_points:
-            unique_inter_points += [tuple(i)]
-    unique_inter_points = np.asarray(unique_inter_points)
-    if unique_inter_points[-1][0] < 1:
-        np.r_['0,2', unique_inter_points, [1, a_b_array[max_latent, 0]
-                                           + a_b_array[max_latent, 1]]]
-
-    return unique_inter_points
-
-
 if __name__ == "__main__":
     latent_inferred = 0
-    while (np.sum(latent_inferred) == 0):
+    while np.sum(latent_inferred) == 0:
         latent_inferred, history, options = cccp_outer_loop()
 
     import pickle
+
     with open('sym_inactive.pickle', 'wb') as f:
         # Pickle the 'data' dictionary using the highest protocol available.
         pickle.dump([latent_inferred, history, options], f, pickle.HIGHEST_PROTOCOL)
-
-# [[0., 0.],
-#  [0.49812508, 0.35850916],
-#  [0.49812508, 0.35850916],
-#  [0.49812508, 0.35850916],
-#  [0.49812508, 0.35850916],
-#  [1., -0.00624004]]
-#
-# [[0., 0.],
-#  [0.49812508, 0.35850916],
-#  [0.49812508, 0.35850916],
-#  [0.49812508, 0.35850916],
-#  [0.49812508, 0.35850916],
-#  [0.49812508, 0.35850916],
-#  [1., -0.00624004],
-#  [1., -0.00624004],
-#  [1., -0.00624004],
-#  [1., -0.00624004],
-#  [0., 0.]]
