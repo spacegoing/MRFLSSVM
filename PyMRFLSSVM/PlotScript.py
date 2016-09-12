@@ -8,11 +8,15 @@ from Checkboard import Options, Instance, checkboardHelper
 __author__ = 'spacegoing'
 root_path = '/Users/spacegoing/macCodeLab-MBP2015/HonoursDoc/ExperimentsLatex/temp/'
 checkboard_image_path = root_path + 'checkboard_images/'
-asym_active_path = checkboard_image_path + 'sym_active.pickle'
+sym_active_path = checkboard_image_path + 'sym_active.pickle'
 sym_inactive_path = checkboard_image_path + 'sym_inactive.pickle'
 asym_active_path = checkboard_image_path + 'asym_active.pickle'
 asym_inactive_path = checkboard_image_path + 'asym_inactive.pickle'
 
+# # Read after execute CCCP.py
+# sym_active_latent_inferred = latent_inferred
+# sym_active_history = history
+# sym_active_options = options
 
 def load_pickle(filepath):
     with open(filepath, 'rb') as f:
