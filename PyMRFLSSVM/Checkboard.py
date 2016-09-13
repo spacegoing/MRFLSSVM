@@ -35,6 +35,7 @@ class Options:
     figWnd = 0  # figure for showing results
     hasPairwise = True  # dimPairwise = 0 when it's false
     rowsPairwise = H * W * 2 - H - W
+    log_history = True
 
 
 # Generate checkboard data
@@ -111,7 +112,7 @@ def checkboardHelper_triad(eta1=0.1, eta2=0.1):
         for c in range(avg_no):
             y[r, c] = line_seg(c, 127 - r)
 
-        y[r, avg_no:] = y[r, avg_no-1::-1]
+        y[r, avg_no:] = y[r, avg_no - 1::-1]
 
     # create unary features
     unary_observed = np.zeros([H, W, 2], dtype=np.double, order='C')
