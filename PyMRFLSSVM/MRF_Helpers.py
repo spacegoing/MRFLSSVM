@@ -37,7 +37,7 @@ def phi_helper(unary_observed, pairwise, labels, latent_var, clique_indexes, opt
     for i in range(options.numCliques):
         # if max_latent_index[i] = 0 < 1
         # then higher_order_phi[1:max_latent_index[i]] returns empty
-        higher_order_phi[1:max_latent_index[i]+1] += cliques_value[i]
+        higher_order_phi[1:max_latent_index[i] + 1] += cliques_value[i]
 
     # sum of [[ i-K <= k^* ]] by clique_index
     # where k^* is the max_latent_index
@@ -58,11 +58,24 @@ def phi_helper(unary_observed, pairwise, labels, latent_var, clique_indexes, opt
 def inf_latent_helper(labels, clique_indexes, theta_full, options):
     # np.double[:] theta_full contains unary & pairwise params
     # Inf_Algo only accepts higher-order params
+
+    # # code for debugging
+    # theta_full = theta
+    # clique_indexes = instance.clique_indexes
+    # labels = instance.y
+
     theta = theta_full[:options.sizeHighPhi]
 
     cliques_size = [sum(sum(clique_indexes == i + 1)) for i in range(options.numCliques)]  # clique index starts from 1
     cliques_value = [sum(labels.flatten()[clique_indexes.flatten() == i + 1]) /
                      cliques_size[i] for i in range(options.numCliques)]
+
+    # # code for debugging
+    # cliques_unary_value = [sum(instance.unary_observed[:, :, 1].
+    #                            flatten()[clique_indexes.flatten() == i + 1]) / cliques_size[i]
+    #                        for i in range(options.numCliques)]
+    # a = np.reshape(cliques_value, [8, 8])
+    # b = np.reshape(cliques_unary_value, [8, 8])
 
     inferred_latent = np.zeros([options.numCliques, options.K - 1], dtype=np.int32, order='C')
     for i in range(options.numCliques):
@@ -86,6 +99,89 @@ def inf_label_latent_helper(unary_observed, pairwise, clique_indexes, theta_full
     e_i = Inf_Algo(unary_observed, pairwise, clique_indexes, inferred_label, inferred_z, theta, options)
 
     return inferred_label, inferred_z, e_i
+
+
+def init_theta_concave(instance, options):
+    '''
+    Initialize theta to encode a set of concave linear equations
+    according to training data "instance".
+
+    It first calculate W(y) of each cliques then determine how
+    many different W(y) exists (namely linear equations needed).
+    If options.K < desired number, this function will print a
+    warning message then quit. User should increase options.K then
+    run again.
+
+    Then it sample a concave linear function equals the estimated
+    (by W(y)) number of cliques. For extra linear functions
+    (options.K> number of cliques) it simply initialize them to
+    redundant functions.
+
+    :param instance:
+    :param options:
+    :return:
+    '''
+
+    # clique index starts from 1
+    cliques_size = [sum(sum(instance.clique_indexes == i + 1)) for i in range(options.numCliques)]
+    cliques_value = [sum(instance.y.flatten()[instance.clique_indexes.flatten() == i + 1]) /
+                     cliques_size[i] for i in range(options.numCliques)]
+    unique_value_array = np.unique(cliques_value)
+
+    # Check if Current K < potentially best number
+    print("Potentially best K: %d" % unique_value_array.shape[0])
+    if options.K < unique_value_array.shape[0]:
+        print("Warning: Current K: %d < potentially best %d, please increase K then run again"
+              % (options.K, unique_value_array[0]))
+        exit()
+
+    # Mid points between unique values.
+    mid_points_array = np.zeros([unique_value_array.shape[0] - 1])
+    for i in range(1, unique_value_array.shape[0]):
+        mid_points_array[i - 1] = (unique_value_array[i - 1] + unique_value_array[i]) / 2
+
+    # sample a set of concave linear functions based on those points
+    # initialize a_b parameters matrix (a,b) and sampled points matrix (x,y)
+    a_b = np.zeros([options.K, 2])
+    sampled_points = np.zeros([mid_points_array.shape[0] + 2, 2])
+    sampled_points[1:mid_points_array.shape[0] + 1, 0] = mid_points_array
+    sampled_points[mid_points_array.shape[0] + 1, 0] = 1
+    if sampled_points.shape[0] < options.K + 1:
+        redund_points = np.zeros([options.K + 1 - sampled_points.shape[0], 2])
+        redund_points[:, 0] = np.linspace(1.1,
+                                          1 + 0.1 * (options.K + 1 - sampled_points.shape[0]),
+                                          options.K + 1 - sampled_points.shape[0])
+        sampled_points = np.r_[sampled_points, redund_points]
+
+    # Sample the first point
+    sampled_points[1, 1] = np.random.uniform(sampled_points[1, 0], 1, 1)[0]
+    a_b[0, 0] = (sampled_points[1, 1] - sampled_points[0, 1]) / \
+                (sampled_points[1, 0] - sampled_points[0, 0])
+    # Sample other points
+    for i in range(1, options.K):
+        up_bound = a_b[i - 1, 0] * sampled_points[i + 1, 0] + a_b[i - 1, 1] - 1e-9
+        sampled_points[i + 1, 1] = np.random.uniform(up_bound - 0.5, up_bound, 1)[0]
+
+        if (sampled_points[i + 1, 0] - sampled_points[i, 0]) != 0:
+            a_b[i, 0] = (sampled_points[i + 1, 1] - sampled_points[i, 1]) / \
+                        (sampled_points[i + 1, 0] - sampled_points[i, 0])
+            a_b[i, 1] = sampled_points[i + 1, 1] - a_b[i, 0] * sampled_points[i + 1, 0]
+        else:
+            a_b[i, 0] = 0
+            a_b[i, 1] = sampled_points[i + 1, 1]
+
+    # encode a_b into theta
+    theta = [a_b[0, 0]]
+    # a_{k}-a{k-1}
+    for i in range(1, options.K):
+        theta.append(a_b[i, 0] - a_b[i - 1, 0])
+    # b{k}-b{k-1}
+    for i in range(1, options.K):
+        theta.append(a_b[i, 1] - a_b[i - 1, 1])
+    # unary, pairwise and slack
+    theta += [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :])
+
+    return theta
 
 
 if __name__ == '__main__':
