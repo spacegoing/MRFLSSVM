@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 __author__ = 'spacegoing'
 
 eng = matlab.engine.start_matlab()
-__DEBUG__ = 'hat'
+__DEBUG__ = 0
 __plot__ = 1
 
 
@@ -40,13 +40,13 @@ def cutting_plane_ssvm(theta, vt, instance, options):
     # positivity constraint on pairwise weight
     A = np.zeros([2 * options.K, options.sizePhi + 1], dtype=np.double, order='C')
     b = np.zeros(2 * options.K, dtype=np.double, order='C')
-    # options.K-1s' positive constraints for a_k - a_{k+1} -------------------------------------
+    # options.K-1s' positive constraints for a_k - a_{k+1} ---------
     # A[0] = [0 -1 0 0...]
     # A[1] = [0 0 -1 0...]
     # A[K-2] = [0 0 0 -1...]
     for i in range(0, options.K - 1):
         A[i, i + 1] = -1
-    # options.K-1s' positive constraints for b_{k+1} - b_k -------------------------------------
+    # options.K-1s' positive constraints for b_{k+1} - b_k ---------
     # A[K-1] = [0 0 0 0 ... 1 0 0 0 ...]
     # A[K]   = [0 0 0 0 ... 0 1 0 0 ...]
     # A[2*K-3] = [0 0 0 0 ... 0 0 0 1 ...]
@@ -67,7 +67,6 @@ def cutting_plane_ssvm(theta, vt, instance, options):
     lossUnary[instance.y == 1, 0] = 1.0 / options.numVariables
     lossUnary[instance.y == 0, 1] = 1.0 / options.numVariables
 
-    violation_old = 0
     ################## iterate until convergence ####################
     for t in range(0, options.maxIters):
 
@@ -79,25 +78,26 @@ def cutting_plane_ssvm(theta, vt, instance, options):
         if options.hasPairwise:
             instance.pairwise[:, 2] = pairwiseWeight
 
-        if __DEBUG__ == 'hat':
+        if options.log_history:
             y_hat, z_hat, e_hat = \
                 mrf.inf_label_latent_helper(unaryWeight * instance.unary_observed, instance.pairwise,
                                             instance.clique_indexes, theta, options)
             history.append({'theta': theta, 'y_hat': y_hat, 'z_hat': z_hat, 'e_hat': e_hat})
-            # for i in range(options.H):
-            #     for j in range(options.W):
-            #         print(y_hat[i][j], end='')
-            #     print('\n')
-            # for i in range(options.numCliques):
-            #     for j in range(options.K-1):
-            #         print(z_hat[i][j], end='')
-            #     print('\n')
+
+        if __DEBUG__ == 'hat':
+            for i in range(options.H):
+                for j in range(options.W):
+                    print(y_hat[i][j], end='')
+                print('\n')
+            for i in range(options.numCliques):
+                for j in range(options.K - 1):
+                    print(z_hat[i][j], end='')
+                print('\n')
             if np.sum(z_hat) > 0 and np.sum(z_hat) < 1:
                 print(z_hat)
                 break
 
         # infer most violated constraint
-
         if __DEBUG__ == 'inference':
             # load matlab .mat data
             unary_observed, pairwise, theta, y_inferred, z_inferred, e = loadTestInf()
@@ -133,44 +133,8 @@ def cutting_plane_ssvm(theta, vt, instance, options):
     return theta, history
 
 
-def gen_plot_samples(theta, latent_plot, options):
-    # decode theta
-    a_b_array = np.zeros([options.K, 2])
-    a_b_array[0, 0] = theta[0]
-    for i in range(1, options.K):
-        a_b_array[i, 0] = theta[i] + a_b_array[i - 1, 0]
-        a_b_array[i, 1] = theta[i + options.K - 1] + a_b_array[i - 1, 1]
-
-    # generate intersection points
-    inter_points = np.zeros([options.K + 1, 2])
-    for i in range(1, options.K):
-        a_2 = a_b_array[i, 0]
-        b_2 = a_b_array[i, 1]
-        a_1 = a_b_array[i - 1, 0]
-        b_1 = a_b_array[i - 1, 1]
-        inter_points[i, 0] = (b_2 - b_1) / (a_1 - a_2)
-        inter_points[i, 1] = (a_1 * b_2 - a_2 * b_1) / (a_1 - a_2)
-
-    max_latent = np.max(np.sum(latent_plot, axis=1))
-
-    unique_inter_points = list()
-    for i in inter_points:
-        if i[0] >= 1:
-            i[0] = 1
-            i[1] = a_b_array[max_latent, 0] + a_b_array[max_latent, 1]
-        if tuple(i) not in unique_inter_points:
-            unique_inter_points += [tuple(i)]
-    unique_inter_points = np.asarray(unique_inter_points)
-    if unique_inter_points[-1][0] < 1:
-        np.r_['0,2', unique_inter_points, [1, a_b_array[max_latent, 0]
-                                           + a_b_array[max_latent, 1]]]
-
-    return unique_inter_points
-
-
-def cccp_outer_loop():
-    instance = Instance()
-    options = Options()
+def cccp_outer_loop(instance, options):
+    outer_history = list()
 
     if __DEBUG__ == 'matlab':
         unary_observed, pairwise = loadMatPairwise()
@@ -179,10 +143,11 @@ def cccp_outer_loop():
 
     # theta = np.zeros(options.sizePhi + 1, dtype=np.double, order='C')
     # theta[options.sizeHighPhi] = 1  # set unary weight to 1
-    theta = np.asarray([np.random.uniform(-1, 1, 1)[0]] + list(-1 * np.random.rand(1, options.K - 1)[0, :]) + \
-                       list(np.random.rand(1, options.K - 1)[0, :]) + \
-                       [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :]),
-                       dtype=np.double, order='C')
+    # theta = np.asarray([np.random.uniform(-1, 1, 1)[0]] + list(-1 * np.random.rand(1, options.K - 1)[0, :]) + \
+    #                    list(np.random.rand(1, options.K - 1)[0, :]) + \
+    #                    [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :]),
+    #                    dtype=np.double, order='C')
+    theta = mrf.init_theta_concave(instance, options)
 
     for t in range(10):
         theta_old = theta
@@ -200,46 +165,57 @@ def cccp_outer_loop():
         vt = mrf.phi_helper(instance.unary_observed, instance.pairwise,
                             instance.y, latent_inferred, instance.clique_indexes, options)
 
-        theta, history = cutting_plane_ssvm(theta, vt, instance, options)
+        theta, inner_history = cutting_plane_ssvm(theta, vt, instance, options)
 
-        if __plot__:
-            latent_plot = mrf.inf_latent_helper(instance.y, instance.clique_indexes, theta, options)
-            for i in range(len(history)):
-                x_y_samples = gen_plot_samples(history[i]['theta'], latent_plot, options)
-                plt.plot(x_y_samples[:, 0], x_y_samples[:, 1], '-*')
-                # print order text
-                plt.text(x_y_samples[np.argmax(x_y_samples[:, 1]), 0],
-                         np.max(x_y_samples[:, 1]), str(i))
-
-            nonzero_idx = np.where(np.sum(latent_plot, axis=1) != 0)[0]
-            nonzero_idx = nonzero_idx[0] if nonzero_idx.shape[0] else 0
-            latent_str = str(latent_plot[nonzero_idx, :])
-            plt.title('active latent var: ' + latent_str)
-            plt.savefig('iteration_%d.png' % t, format='png', dpi=600)
-            plt.close()
+        total_error = np.sum(np.abs(instance.y - inner_history[-1]['y_hat']))
+        outer_history.append({"inner_history": inner_history,
+                              "latent_inferred": latent_inferred,
+                              "total_error": total_error})
 
         if all(theta == theta_old):
             print(latent_inferred)
             print('stop converge at iter: %d' % t)
-            print('classification error: %d' % np.sum(np.abs(instance.y - history[-1]['y_hat'])))
+            print('classification error: %d' % total_error)
             break
 
-        if np.sum(np.abs(instance.y - history[-1]['y_hat'])) / options.numVariables < options.eps:
+        if np.sum(np.abs(instance.y - inner_history[-1]['y_hat'])) / options.numVariables < options.eps:
             print(latent_inferred)
             print('converge at iter: %d' % t)
-            print('classification error: %d' % np.sum(np.abs(instance.y - history[-1]['y_hat'])))
+            print('classification error: %d' % total_error)
             break
 
-    return latent_inferred, history, options
+    return outer_history
 
 
 if __name__ == "__main__":
-    latent_inferred = 0
-    while np.sum(latent_inferred) == 0:
-        latent_inferred, history, options = cccp_outer_loop()
-
     import pickle
 
-    with open('sym_inactive.pickle', 'wb') as f:
-        # Pickle the 'data' dictionary using the highest protocol available.
-        pickle.dump([latent_inferred, history, options], f, pickle.HIGHEST_PROTOCOL)
+    prefix_str = "sym_concave_"
+    active = False
+    inactive = False
+
+    ina_counter = 0
+    a_counter = 0
+    while not (active and inactive):
+        instance = Instance()
+        options = Options()
+        outer_history = cccp_outer_loop(instance, options)
+        latent_inferred = outer_history[-1]["latent_inferred"]
+
+        if np.sum(latent_inferred) == 0:
+            with open(prefix_str + 'inactive.pickle', 'wb') as f:
+                pickle.dump({"outer_history": outer_history,
+                             "instance": instance,
+                             "options": options}, f, pickle.HIGHEST_PROTOCOL)
+            inactive = True
+            ina_counter += 1
+
+        else:
+            with open(prefix_str + 'active.pickle', 'wb') as f:
+                pickle.dump({"outer_history": outer_history,
+                             "instance": instance,
+                             "options": options}, f, pickle.HIGHEST_PROTOCOL)
+            active = True
+            a_counter += 1
+
+    print("active/total: %f" % (a_counter / (a_counter + ina_counter)))
