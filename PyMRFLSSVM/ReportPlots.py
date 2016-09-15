@@ -120,7 +120,7 @@ def plot_colormap(save_name, outer_history, instance, options):
     plt.close()
 
     # Plot converged color map
-    iter_no = len(outer_history[-1]['inner_history'])
+    iter_no = len(outer_history[-1]['inner_history']) - 1
     y_hat = outer_history[-1]['inner_history'][iter_no]['y_hat']
     plt.imshow(y_hat, cmap='Greys', interpolation='nearest')
     plt.savefig(root_path + save_name + '_grey_map_converged_%diter.png' % iter_no, dpi=100)
@@ -130,7 +130,7 @@ def plot_colormap(save_name, outer_history, instance, options):
 if __name__ == "__main__":
     filepath = sym_concave_active_str
     outer_history, instance, options = load_pickle(filepath)
-    save_name = filepath
+    save_name = sym_concave_active_str
 
     plot_linfunc_by_iters(save_name, outer_history, options)
     plot_linfunc_converged(save_name, outer_history, options)
