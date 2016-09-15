@@ -34,7 +34,10 @@ def Inf_Algo(double[:,:,::1]observed_unary, double [:,::1]pairwise,
     c_options.numCliques = options.numCliques
     c_options.K = options.K
 
-    c_options.n_pairwise_rows = pairwise.shape[0]
+    if options.hasPairwise:
+        c_options.n_pairwise_rows = pairwise.shape[0]
+    else:
+        c_options.n_pairwise_rows = 0
     c_options.learningQP = options.learningQP
 
     return graph_cut_method(&observed_unary[0,0,0], &pairwise[0,0], &clique_indexes[0,0],

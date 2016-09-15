@@ -1167,6 +1167,7 @@ static char __pyx_k_learningQP[] = "learningQP";
 static char __pyx_k_numCliques[] = "numCliques";
 static char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
 static char __pyx_k_MemoryError[] = "MemoryError";
+static char __pyx_k_hasPairwise[] = "hasPairwise";
 static char __pyx_k_WllepGraphCut[] = "WllepGraphCut";
 static char __pyx_k_pyx_getbuffer[] = "__pyx_getbuffer";
 static char __pyx_k_clique_indexes[] = "clique_indexes";
@@ -1243,6 +1244,7 @@ static PyObject *__pyx_n_s_format;
 static PyObject *__pyx_n_s_fortran;
 static PyObject *__pyx_n_u_fortran;
 static PyObject *__pyx_kp_s_got_differing_extents_in_dimensi;
+static PyObject *__pyx_n_s_hasPairwise;
 static PyObject *__pyx_n_s_id;
 static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_inferred_label;
@@ -1461,7 +1463,7 @@ static PyObject *__pyx_pf_13WllepGraphCut_Inf_Algo(CYTHON_UNUSED PyObject *__pyx
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   int __pyx_t_2;
-  Py_ssize_t __pyx_t_3;
+  int __pyx_t_3;
   Py_ssize_t __pyx_t_4;
   Py_ssize_t __pyx_t_5;
   Py_ssize_t __pyx_t_6;
@@ -1473,6 +1475,7 @@ static PyObject *__pyx_pf_13WllepGraphCut_Inf_Algo(CYTHON_UNUSED PyObject *__pyx
   Py_ssize_t __pyx_t_12;
   Py_ssize_t __pyx_t_13;
   Py_ssize_t __pyx_t_14;
+  Py_ssize_t __pyx_t_15;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -1522,7 +1525,7 @@ static PyObject *__pyx_pf_13WllepGraphCut_Inf_Algo(CYTHON_UNUSED PyObject *__pyx
  *     c_options.numCliques = options.numCliques
  *     c_options.K = options.K             # <<<<<<<<<<<<<<
  * 
- *     c_options.n_pairwise_rows = pairwise.shape[0]
+ *     if options.hasPairwise:
  */
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_options, __pyx_n_s_K); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 35; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -1533,136 +1536,171 @@ static PyObject *__pyx_pf_13WllepGraphCut_Inf_Algo(CYTHON_UNUSED PyObject *__pyx
   /* "WllepGraphCut.pyx":37
  *     c_options.K = options.K
  * 
- *     c_options.n_pairwise_rows = pairwise.shape[0]             # <<<<<<<<<<<<<<
+ *     if options.hasPairwise:             # <<<<<<<<<<<<<<
+ *         c_options.n_pairwise_rows = pairwise.shape[0]
+ *     else:
+ */
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_options, __pyx_n_s_hasPairwise); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 37; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 37; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (__pyx_t_3) {
+
+    /* "WllepGraphCut.pyx":38
+ * 
+ *     if options.hasPairwise:
+ *         c_options.n_pairwise_rows = pairwise.shape[0]             # <<<<<<<<<<<<<<
+ *     else:
+ *         c_options.n_pairwise_rows = 0
+ */
+    __pyx_v_c_options.n_pairwise_rows = (__pyx_v_pairwise.shape[0]);
+
+    /* "WllepGraphCut.pyx":37
+ *     c_options.K = options.K
+ * 
+ *     if options.hasPairwise:             # <<<<<<<<<<<<<<
+ *         c_options.n_pairwise_rows = pairwise.shape[0]
+ *     else:
+ */
+    goto __pyx_L3;
+  }
+
+  /* "WllepGraphCut.pyx":40
+ *         c_options.n_pairwise_rows = pairwise.shape[0]
+ *     else:
+ *         c_options.n_pairwise_rows = 0             # <<<<<<<<<<<<<<
  *     c_options.learningQP = options.learningQP
  * 
  */
-  __pyx_v_c_options.n_pairwise_rows = (__pyx_v_pairwise.shape[0]);
+  /*else*/ {
+    __pyx_v_c_options.n_pairwise_rows = 0;
+  }
+  __pyx_L3:;
 
-  /* "WllepGraphCut.pyx":38
- * 
- *     c_options.n_pairwise_rows = pairwise.shape[0]
+  /* "WllepGraphCut.pyx":41
+ *     else:
+ *         c_options.n_pairwise_rows = 0
  *     c_options.learningQP = options.learningQP             # <<<<<<<<<<<<<<
  * 
  *     return graph_cut_method(&observed_unary[0,0,0], &pairwise[0,0], &clique_indexes[0,0],
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_options, __pyx_n_s_learningQP); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 38; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_options, __pyx_n_s_learningQP); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 38; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_c_options.learningQP = __pyx_t_2;
 
-  /* "WllepGraphCut.pyx":40
+  /* "WllepGraphCut.pyx":43
  *     c_options.learningQP = options.learningQP
  * 
  *     return graph_cut_method(&observed_unary[0,0,0], &pairwise[0,0], &clique_indexes[0,0],             # <<<<<<<<<<<<<<
  *                             &inferred_label[0,0], &inferred_z[0,0], &theta[0], c_options)
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_3 = 0;
   __pyx_t_4 = 0;
   __pyx_t_5 = 0;
-  __pyx_t_2 = -1;
-  if (__pyx_t_3 < 0) {
-    __pyx_t_3 += __pyx_v_observed_unary.shape[0];
-    if (unlikely(__pyx_t_3 < 0)) __pyx_t_2 = 0;
-  } else if (unlikely(__pyx_t_3 >= __pyx_v_observed_unary.shape[0])) __pyx_t_2 = 0;
-  if (__pyx_t_4 < 0) {
-    __pyx_t_4 += __pyx_v_observed_unary.shape[1];
-    if (unlikely(__pyx_t_4 < 0)) __pyx_t_2 = 1;
-  } else if (unlikely(__pyx_t_4 >= __pyx_v_observed_unary.shape[1])) __pyx_t_2 = 1;
-  if (__pyx_t_5 < 0) {
-    __pyx_t_5 += __pyx_v_observed_unary.shape[2];
-    if (unlikely(__pyx_t_5 < 0)) __pyx_t_2 = 2;
-  } else if (unlikely(__pyx_t_5 >= __pyx_v_observed_unary.shape[2])) __pyx_t_2 = 2;
-  if (unlikely(__pyx_t_2 != -1)) {
-    __Pyx_RaiseBufferIndexError(__pyx_t_2);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  }
   __pyx_t_6 = 0;
-  __pyx_t_7 = 0;
   __pyx_t_2 = -1;
+  if (__pyx_t_4 < 0) {
+    __pyx_t_4 += __pyx_v_observed_unary.shape[0];
+    if (unlikely(__pyx_t_4 < 0)) __pyx_t_2 = 0;
+  } else if (unlikely(__pyx_t_4 >= __pyx_v_observed_unary.shape[0])) __pyx_t_2 = 0;
+  if (__pyx_t_5 < 0) {
+    __pyx_t_5 += __pyx_v_observed_unary.shape[1];
+    if (unlikely(__pyx_t_5 < 0)) __pyx_t_2 = 1;
+  } else if (unlikely(__pyx_t_5 >= __pyx_v_observed_unary.shape[1])) __pyx_t_2 = 1;
   if (__pyx_t_6 < 0) {
-    __pyx_t_6 += __pyx_v_pairwise.shape[0];
-    if (unlikely(__pyx_t_6 < 0)) __pyx_t_2 = 0;
-  } else if (unlikely(__pyx_t_6 >= __pyx_v_pairwise.shape[0])) __pyx_t_2 = 0;
-  if (__pyx_t_7 < 0) {
-    __pyx_t_7 += __pyx_v_pairwise.shape[1];
-    if (unlikely(__pyx_t_7 < 0)) __pyx_t_2 = 1;
-  } else if (unlikely(__pyx_t_7 >= __pyx_v_pairwise.shape[1])) __pyx_t_2 = 1;
+    __pyx_t_6 += __pyx_v_observed_unary.shape[2];
+    if (unlikely(__pyx_t_6 < 0)) __pyx_t_2 = 2;
+  } else if (unlikely(__pyx_t_6 >= __pyx_v_observed_unary.shape[2])) __pyx_t_2 = 2;
   if (unlikely(__pyx_t_2 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_2);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 43; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
+  __pyx_t_7 = 0;
   __pyx_t_8 = 0;
-  __pyx_t_9 = 0;
   __pyx_t_2 = -1;
+  if (__pyx_t_7 < 0) {
+    __pyx_t_7 += __pyx_v_pairwise.shape[0];
+    if (unlikely(__pyx_t_7 < 0)) __pyx_t_2 = 0;
+  } else if (unlikely(__pyx_t_7 >= __pyx_v_pairwise.shape[0])) __pyx_t_2 = 0;
   if (__pyx_t_8 < 0) {
-    __pyx_t_8 += __pyx_v_clique_indexes.shape[0];
-    if (unlikely(__pyx_t_8 < 0)) __pyx_t_2 = 0;
-  } else if (unlikely(__pyx_t_8 >= __pyx_v_clique_indexes.shape[0])) __pyx_t_2 = 0;
-  if (__pyx_t_9 < 0) {
-    __pyx_t_9 += __pyx_v_clique_indexes.shape[1];
-    if (unlikely(__pyx_t_9 < 0)) __pyx_t_2 = 1;
-  } else if (unlikely(__pyx_t_9 >= __pyx_v_clique_indexes.shape[1])) __pyx_t_2 = 1;
+    __pyx_t_8 += __pyx_v_pairwise.shape[1];
+    if (unlikely(__pyx_t_8 < 0)) __pyx_t_2 = 1;
+  } else if (unlikely(__pyx_t_8 >= __pyx_v_pairwise.shape[1])) __pyx_t_2 = 1;
   if (unlikely(__pyx_t_2 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_2);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 43; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+  __pyx_t_9 = 0;
+  __pyx_t_10 = 0;
+  __pyx_t_2 = -1;
+  if (__pyx_t_9 < 0) {
+    __pyx_t_9 += __pyx_v_clique_indexes.shape[0];
+    if (unlikely(__pyx_t_9 < 0)) __pyx_t_2 = 0;
+  } else if (unlikely(__pyx_t_9 >= __pyx_v_clique_indexes.shape[0])) __pyx_t_2 = 0;
+  if (__pyx_t_10 < 0) {
+    __pyx_t_10 += __pyx_v_clique_indexes.shape[1];
+    if (unlikely(__pyx_t_10 < 0)) __pyx_t_2 = 1;
+  } else if (unlikely(__pyx_t_10 >= __pyx_v_clique_indexes.shape[1])) __pyx_t_2 = 1;
+  if (unlikely(__pyx_t_2 != -1)) {
+    __Pyx_RaiseBufferIndexError(__pyx_t_2);
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 43; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "WllepGraphCut.pyx":41
+  /* "WllepGraphCut.pyx":44
  * 
  *     return graph_cut_method(&observed_unary[0,0,0], &pairwise[0,0], &clique_indexes[0,0],
  *                             &inferred_label[0,0], &inferred_z[0,0], &theta[0], c_options)             # <<<<<<<<<<<<<<
  */
-  __pyx_t_10 = 0;
   __pyx_t_11 = 0;
-  __pyx_t_2 = -1;
-  if (__pyx_t_10 < 0) {
-    __pyx_t_10 += __pyx_v_inferred_label.shape[0];
-    if (unlikely(__pyx_t_10 < 0)) __pyx_t_2 = 0;
-  } else if (unlikely(__pyx_t_10 >= __pyx_v_inferred_label.shape[0])) __pyx_t_2 = 0;
-  if (__pyx_t_11 < 0) {
-    __pyx_t_11 += __pyx_v_inferred_label.shape[1];
-    if (unlikely(__pyx_t_11 < 0)) __pyx_t_2 = 1;
-  } else if (unlikely(__pyx_t_11 >= __pyx_v_inferred_label.shape[1])) __pyx_t_2 = 1;
-  if (unlikely(__pyx_t_2 != -1)) {
-    __Pyx_RaiseBufferIndexError(__pyx_t_2);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  }
   __pyx_t_12 = 0;
-  __pyx_t_13 = 0;
   __pyx_t_2 = -1;
+  if (__pyx_t_11 < 0) {
+    __pyx_t_11 += __pyx_v_inferred_label.shape[0];
+    if (unlikely(__pyx_t_11 < 0)) __pyx_t_2 = 0;
+  } else if (unlikely(__pyx_t_11 >= __pyx_v_inferred_label.shape[0])) __pyx_t_2 = 0;
   if (__pyx_t_12 < 0) {
-    __pyx_t_12 += __pyx_v_inferred_z.shape[0];
-    if (unlikely(__pyx_t_12 < 0)) __pyx_t_2 = 0;
-  } else if (unlikely(__pyx_t_12 >= __pyx_v_inferred_z.shape[0])) __pyx_t_2 = 0;
-  if (__pyx_t_13 < 0) {
-    __pyx_t_13 += __pyx_v_inferred_z.shape[1];
-    if (unlikely(__pyx_t_13 < 0)) __pyx_t_2 = 1;
-  } else if (unlikely(__pyx_t_13 >= __pyx_v_inferred_z.shape[1])) __pyx_t_2 = 1;
+    __pyx_t_12 += __pyx_v_inferred_label.shape[1];
+    if (unlikely(__pyx_t_12 < 0)) __pyx_t_2 = 1;
+  } else if (unlikely(__pyx_t_12 >= __pyx_v_inferred_label.shape[1])) __pyx_t_2 = 1;
   if (unlikely(__pyx_t_2 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_2);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 44; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
+  __pyx_t_13 = 0;
   __pyx_t_14 = 0;
   __pyx_t_2 = -1;
+  if (__pyx_t_13 < 0) {
+    __pyx_t_13 += __pyx_v_inferred_z.shape[0];
+    if (unlikely(__pyx_t_13 < 0)) __pyx_t_2 = 0;
+  } else if (unlikely(__pyx_t_13 >= __pyx_v_inferred_z.shape[0])) __pyx_t_2 = 0;
   if (__pyx_t_14 < 0) {
-    __pyx_t_14 += __pyx_v_theta.shape[0];
-    if (unlikely(__pyx_t_14 < 0)) __pyx_t_2 = 0;
-  } else if (unlikely(__pyx_t_14 >= __pyx_v_theta.shape[0])) __pyx_t_2 = 0;
+    __pyx_t_14 += __pyx_v_inferred_z.shape[1];
+    if (unlikely(__pyx_t_14 < 0)) __pyx_t_2 = 1;
+  } else if (unlikely(__pyx_t_14 >= __pyx_v_inferred_z.shape[1])) __pyx_t_2 = 1;
   if (unlikely(__pyx_t_2 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_2);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 44; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+  __pyx_t_15 = 0;
+  __pyx_t_2 = -1;
+  if (__pyx_t_15 < 0) {
+    __pyx_t_15 += __pyx_v_theta.shape[0];
+    if (unlikely(__pyx_t_15 < 0)) __pyx_t_2 = 0;
+  } else if (unlikely(__pyx_t_15 >= __pyx_v_theta.shape[0])) __pyx_t_2 = 0;
+  if (unlikely(__pyx_t_2 != -1)) {
+    __Pyx_RaiseBufferIndexError(__pyx_t_2);
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 44; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "WllepGraphCut.pyx":40
+  /* "WllepGraphCut.pyx":43
  *     c_options.learningQP = options.learningQP
  * 
  *     return graph_cut_method(&observed_unary[0,0,0], &pairwise[0,0], &clique_indexes[0,0],             # <<<<<<<<<<<<<<
  *                             &inferred_label[0,0], &inferred_z[0,0], &theta[0], c_options)
  */
-  __pyx_t_1 = PyFloat_FromDouble(graph_cut_method((&(*((double *) ( /* dim=2 */ ((char *) (((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_observed_unary.data + __pyx_t_3 * __pyx_v_observed_unary.strides[0]) ) + __pyx_t_4 * __pyx_v_observed_unary.strides[1]) )) + __pyx_t_5)) )))), (&(*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_pairwise.data + __pyx_t_6 * __pyx_v_pairwise.strides[0]) )) + __pyx_t_7)) )))), (&(*((int *) ( /* dim=1 */ ((char *) (((int *) ( /* dim=0 */ (__pyx_v_clique_indexes.data + __pyx_t_8 * __pyx_v_clique_indexes.strides[0]) )) + __pyx_t_9)) )))), (&(*((int *) ( /* dim=1 */ ((char *) (((int *) ( /* dim=0 */ (__pyx_v_inferred_label.data + __pyx_t_10 * __pyx_v_inferred_label.strides[0]) )) + __pyx_t_11)) )))), (&(*((int *) ( /* dim=1 */ ((char *) (((int *) ( /* dim=0 */ (__pyx_v_inferred_z.data + __pyx_t_12 * __pyx_v_inferred_z.strides[0]) )) + __pyx_t_13)) )))), (&(*((double *) ( /* dim=0 */ (__pyx_v_theta.data + __pyx_t_14 * __pyx_v_theta.strides[0]) )))), __pyx_v_c_options)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(graph_cut_method((&(*((double *) ( /* dim=2 */ ((char *) (((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_observed_unary.data + __pyx_t_4 * __pyx_v_observed_unary.strides[0]) ) + __pyx_t_5 * __pyx_v_observed_unary.strides[1]) )) + __pyx_t_6)) )))), (&(*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_pairwise.data + __pyx_t_7 * __pyx_v_pairwise.strides[0]) )) + __pyx_t_8)) )))), (&(*((int *) ( /* dim=1 */ ((char *) (((int *) ( /* dim=0 */ (__pyx_v_clique_indexes.data + __pyx_t_9 * __pyx_v_clique_indexes.strides[0]) )) + __pyx_t_10)) )))), (&(*((int *) ( /* dim=1 */ ((char *) (((int *) ( /* dim=0 */ (__pyx_v_inferred_label.data + __pyx_t_11 * __pyx_v_inferred_label.strides[0]) )) + __pyx_t_12)) )))), (&(*((int *) ( /* dim=1 */ ((char *) (((int *) ( /* dim=0 */ (__pyx_v_inferred_z.data + __pyx_t_13 * __pyx_v_inferred_z.strides[0]) )) + __pyx_t_14)) )))), (&(*((double *) ( /* dim=0 */ (__pyx_v_theta.data + __pyx_t_15 * __pyx_v_theta.strides[0]) )))), __pyx_v_c_options)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 43; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -13938,6 +13976,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_fortran, __pyx_k_fortran, sizeof(__pyx_k_fortran), 0, 0, 1, 1},
   {&__pyx_n_u_fortran, __pyx_k_fortran, sizeof(__pyx_k_fortran), 0, 1, 0, 1},
   {&__pyx_kp_s_got_differing_extents_in_dimensi, __pyx_k_got_differing_extents_in_dimensi, sizeof(__pyx_k_got_differing_extents_in_dimensi), 0, 0, 1, 0},
+  {&__pyx_n_s_hasPairwise, __pyx_k_hasPairwise, sizeof(__pyx_k_hasPairwise), 0, 0, 1, 1},
   {&__pyx_n_s_id, __pyx_k_id, sizeof(__pyx_k_id), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_inferred_label, __pyx_k_inferred_label, sizeof(__pyx_k_inferred_label), 0, 0, 1, 1},
