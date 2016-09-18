@@ -133,7 +133,7 @@ def init_theta_concave(instance, options):
     if options.K < unique_value_array.shape[0]:
         print("Warning: Current K: %d < potentially best %d, please increase K then run again"
               % (options.K, unique_value_array[0]))
-        exit()
+        raise ValueError("see warning info")
 
     # Mid points between unique values.
     mid_points_array = np.zeros([unique_value_array.shape[0] - 1])
