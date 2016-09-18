@@ -197,7 +197,7 @@ if __name__ == "__main__":
     ina_counter = 0
     a_counter = 0
     while not (active and inactive):
-        instance = Instance()
+        instance = Instance('gaussian_portions', portion_miu=(0.1, 0.9))
         options = Options()
         outer_history = cccp_outer_loop(instance, options)
         latent_inferred = outer_history[-1]["latent_inferred"]

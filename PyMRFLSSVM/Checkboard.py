@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 from numpy.matlib import repmat
-import sys
 
 # from pprint import pprint as pp
 # from Utils.ReadMat import loadCheckboard
@@ -40,20 +39,23 @@ class Options:
 
 
 class Instance:
-    def __init__(self, checkboard_type='black_white', _eta=(0.1, 0.1)):
+    def __init__(self, checkboard_type='black_white', _eta=(0.1, 0.1), **kwargs):
 
         self._eta = _eta
         self.functions_dict = {'black_white': self.checkboardHelper_bw,
                                'triang': self.checkboardHelper_triad,
-                               'shuffle': self.checkboardHelper_shuffle}
+                               'shuffle': self.checkboardHelper_shuffle,
+                               'gaussian_portions': self.checkboardHelper_gaussian_portions}
         check_func = self.functions_dict.get(checkboard_type, False)
 
-        if not check_func:
-            self.help(checkboard_type)
-            return
-        else:
-            # clique index starts from 1
-            self.clique_indexes, self.y = check_func()
+        try:
+            if check_func == self.checkboardHelper_gaussian_portions:
+                self.clique_indexes, self.y = check_func(**kwargs)
+            else:
+                self.clique_indexes, self.y = check_func()
+        except:
+            self.help()
+            raise
 
         self.unary_observed = self.init_unary_feature()
         self.pairwise = self.init_pairwise_feature()
@@ -61,11 +63,13 @@ class Instance:
 
         # self.unary = loadCheckboard().astype(np.double)
 
-    def help(self, checkboard_type):
-        print("Type %s doesn't exists." % checkboard_type)
+    def help(self):
+        print("Help: Type  doesn't exists or parameters error!")
         print("Available checkboard types:")
         for i in self.functions_dict.keys():
             print(i)
+        print("Note: `gaussian_portions()` has key word parameters "
+              "`portion_miu` and `sigma`")
 
     # Generate checkboard data
     def checkboardHelper_bw(self):
@@ -148,10 +152,54 @@ class Instance:
 
             y[i * Options.gridStep:(i + 1) * Options.gridStep, :] = full_list[np.newaxis, :]
 
-        # for i in range(Options.H):
-        #     for j in range(Options.W):
-        #         print(y[i, j], end=' ')
-        #     print()
+        return clique_indexes, y
+
+    # Generate checkboard data
+    def checkboardHelper_gaussian_portions(self, portion_miu=(0.3, 0.9), sigma=0.05):
+        H = Options.H
+        W = Options.W
+
+        portions_num = len(portion_miu)
+        avg_portion_cliques_n = Options.numCliques // portions_num
+        last_portion_cliques_n = avg_portion_cliques_n + \
+                                 Options.numCliques % portions_num
+
+        # black labels portions of each clique
+        clique_portions = np.zeros([Options.numCliques])
+        for i in range(portions_num - 1):
+            clique_portions[i * avg_portion_cliques_n:
+            (i + 1) * avg_portion_cliques_n] = np.random.normal(portion_miu[i], sigma,
+                                                                avg_portion_cliques_n)
+        clique_portions[-last_portion_cliques_n:] = \
+            np.random.normal(portion_miu[-1], sigma, last_portion_cliques_n)
+
+        # black labels' quantity in each clique
+        clique_black_num_array = np.zeros([Options.numCliques], dtype=np.int)
+        for i in range(Options.numCliques):
+            if clique_portions[i] < 0:
+                clique_portions[i] = 0
+            elif clique_portions[i] > 1:
+                clique_portions[i] = 1
+            clique_black_num_array[i] = np.floor(Options.gridStep ** 2
+                                                 * clique_portions[i])
+
+        # create checkboard data (clique and ground_truth y)
+        clique_indexes = np.zeros([H, W], dtype=np.int32, order='C')  # mapping of variables to clique_indexes
+        _cliqueID = 1.0  # clique index starts from 1
+        y = np.zeros([H, W], dtype=np.int32, order='C')  # ground-truth labels
+        for _rowIndx in range(0, H, Options.gridStep):
+            for _colIndx in range(0, W, Options.gridStep):
+                black_labels_num = clique_black_num_array[int(_cliqueID) - 1]
+                labels = np.array([0] * black_labels_num + \
+                                  [1] * (Options.gridStep ** 2 - black_labels_num))
+                np.random.shuffle(labels)
+                y[_rowIndx:_rowIndx + Options.gridStep,
+                _colIndx:_colIndx + Options.gridStep] = \
+                    np.reshape(labels, [Options.gridStep, Options.gridStep])
+
+                clique_indexes[_rowIndx:_rowIndx + Options.gridStep,
+                _colIndx:_colIndx + Options.gridStep] = _cliqueID
+                _cliqueID += 1.0
 
         return clique_indexes, y
 
@@ -187,5 +235,9 @@ class Instance:
 
 
 if __name__ == '__main__':
-    instance = Instance('shuffle')
+    instance = Instance('gaussian_portions', portion_miu=(0.1, 0.9))
     options = Options()
+    for i in range(Options.H):
+        for j in range(Options.W):
+            print(instance.y[i, j], end=' ')
+        print()
