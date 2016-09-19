@@ -69,8 +69,8 @@ while not (active and inactive):
             dump_pickle(prefix_str + 'inactive.pickle', outer_history, instance, options)
             inactive = True
             ina_counter += 1
-            plot_colormap(prefix_str + 'inactive.pickle', outer_history, instance, options)
-            plot_linfunc_converged(prefix_str + 'inactive.pickle', outer_history, options)
+            plot_colormap(prefix_str + 'inactive', outer_history, instance, options)
+            plot_linfunc_converged(prefix_str + 'inactive', outer_history, options)
     else:
         if active:
             continue
@@ -78,8 +78,8 @@ while not (active and inactive):
             dump_pickle(prefix_str + 'active.pickle', outer_history, instance, options)
             active = True
             a_counter += 1
-            plot_colormap(prefix_str + 'active.pickle', outer_history, instance, options)
-            plot_linfunc_converged(prefix_str + 'active.pickle', outer_history, options)
+            plot_colormap(prefix_str + 'active', outer_history, instance, options)
+            plot_linfunc_converged(prefix_str + 'active', outer_history, options)
 
 print("active/total: %f" % (a_counter / (a_counter + ina_counter)))
 
@@ -88,24 +88,24 @@ print("active/total: %f" % (a_counter / (a_counter + ina_counter)))
 root = './expData/unbalaced_portions/'
 
 # more black (1s)
-prefix_str = "more_black_13"
+prefix_str = "more_black_3339"
 prefix_str = root + prefix_str
-instance = Instance('gaussian_portions', portion_miu=(0.3, 0.3, 0.3, 0.8), is_gaussian=False)
+instance = Instance('gaussian_portions', portion_miu=(0.3, 0.3, 0.3, 0.9), is_gaussian=False)
 options = Options()
 outer_history = cccp_outer_loop(instance, options, init_method='clique_by_clique')
-dump_pickle(prefix_str + '.pickle', outer_history, instance, options)
-plot_colormap(prefix_str + '.pickle', outer_history, instance, options)
-plot_linfunc_converged(prefix_str + '.pickle', outer_history, options)
+dump_pickle(prefix_str, outer_history, instance, options)
+plot_colormap(prefix_str, outer_history, instance, options)
+plot_linfunc_converged(prefix_str, outer_history, options)
 
 # more white (0s)
-prefix_str = "more_white_79"
+prefix_str = "more_white_1777"
 prefix_str = root + prefix_str
-instance = Instance('gaussian_portions', portion_miu=(0.2, 0.7, 0.7, 0.7), is_gaussian=False)
+instance = Instance('gaussian_portions', portion_miu=(0.1, 0.7, 0.7, 0.7), is_gaussian=False)
 options = Options()
 outer_history = cccp_outer_loop(instance, options, init_method='clique_by_clique')
-dump_pickle(prefix_str + '.pickle', outer_history, instance, options)
-plot_colormap(prefix_str + '.pickle', outer_history, instance, options)
-plot_linfunc_converged(prefix_str + '.pickle', outer_history, options)
+dump_pickle(prefix_str, outer_history, instance, options)
+plot_colormap(prefix_str, outer_history, instance, options)
+plot_linfunc_converged(prefix_str, outer_history, options)
 
 prefix_str = "balanced_portions_124678"
 prefix_str = root + prefix_str
@@ -114,6 +114,6 @@ instance = Instance('gaussian_portions',
                                  0.6, 0.7, 0.8), is_gaussian=False)
 options = Options()
 outer_history = cccp_outer_loop(instance, options, init_method='clique_by_clique')
-dump_pickle(prefix_str + '.pickle', outer_history, instance, options)
-plot_colormap(prefix_str + '.pickle', outer_history, instance, options)
-plot_linfunc_converged(prefix_str + '.pickle', outer_history, options)
+dump_pickle(prefix_str, outer_history, instance, options)
+plot_colormap(prefix_str, outer_history, instance, options)
+plot_linfunc_converged(prefix_str, outer_history, options)
