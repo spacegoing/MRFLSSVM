@@ -174,13 +174,13 @@ class Instance:
             np.random.normal(portion_miu[-1], sigma, last_portion_cliques_n)
 
         # black labels' quantity in each clique
-        clique_black_num_array = np.zeros([Options.numCliques], dtype=np.int)
+        clique_white_num_array = np.zeros([Options.numCliques], dtype=np.int)
         for i in range(Options.numCliques):
             if clique_portions[i] < 0:
                 clique_portions[i] = 0
             elif clique_portions[i] > 1:
                 clique_portions[i] = 1
-            clique_black_num_array[i] = np.floor(Options.gridStep ** 2
+            clique_white_num_array[i] = np.floor(Options.gridStep ** 2
                                                  * clique_portions[i])
 
         # create checkboard data (clique and ground_truth y)
@@ -189,9 +189,9 @@ class Instance:
         y = np.zeros([H, W], dtype=np.int32, order='C')  # ground-truth labels
         for _rowIndx in range(0, H, Options.gridStep):
             for _colIndx in range(0, W, Options.gridStep):
-                black_labels_num = clique_black_num_array[int(_cliqueID) - 1]
-                labels = np.array([0] * black_labels_num + \
-                                  [1] * (Options.gridStep ** 2 - black_labels_num))
+                white_labels_num = clique_white_num_array[int(_cliqueID) - 1]
+                labels = np.array([0] * white_labels_num + \
+                                  [1] * (Options.gridStep ** 2 - white_labels_num))
                 np.random.shuffle(labels)
                 y[_rowIndx:_rowIndx + Options.gridStep,
                 _colIndx:_colIndx + Options.gridStep] = \
