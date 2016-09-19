@@ -102,12 +102,12 @@ def plot_colormap(save_name, outer_history, instance, options):
     plt.savefig(root_path + save_name + '_unary.png', dpi=100)
     plt.close()
 
-    # Plot color map at 10th iteration
-    iter_no = 2
-    y_hat = outer_history[-1]['inner_history'][iter_no]['y_hat']
-    plt.imshow(y_hat, cmap='Greys', interpolation='nearest')
-    plt.savefig(root_path + save_name + '_grey_map_%diter.png' % (iter_no + 1), dpi=100)
-    plt.close()
+    # # Plot color map at 2cd iteration
+    # iter_no = 2
+    # y_hat = outer_history[-1]['inner_history'][iter_no]['y_hat']
+    # plt.imshow(y_hat, cmap='Greys', interpolation='nearest')
+    # plt.savefig(root_path + save_name + '_grey_map_%diter.png' % (iter_no + 1), dpi=100)
+    # plt.close()
 
     # Plot converged color map
     iter_no = len(outer_history[-1]['inner_history']) - 1
