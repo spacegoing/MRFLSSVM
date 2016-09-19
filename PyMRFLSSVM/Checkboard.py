@@ -69,7 +69,7 @@ class Instance:
         for i in self.functions_dict.keys():
             print(i)
         print("Note: `gaussian_portions()` has key word parameters "
-              "`portion_miu` and `sigma`")
+              "`portion_miu`, `is_gaussian` and `sigma`")
 
     # Generate checkboard data
     def checkboardHelper_bw(self):
@@ -155,7 +155,7 @@ class Instance:
         return clique_indexes, y
 
     # Generate checkboard data
-    def checkboardHelper_gaussian_portions(self, portion_miu=(0.3, 0.9), sigma=0.05):
+    def checkboardHelper_gaussian_portions(self, portion_miu=(0.3, 0.9), sigma=0.05, is_gaussian=True):
         H = Options.H
         W = Options.W
 
@@ -167,9 +167,13 @@ class Instance:
         # white labels portions of each clique
         clique_portions = np.zeros([Options.numCliques])
         for i in range(portions_num - 1):
-            clique_portions[i * avg_portion_cliques_n:
-            (i + 1) * avg_portion_cliques_n] = np.random.normal(portion_miu[i], sigma,
-                                                                avg_portion_cliques_n)
+            if is_gaussian:
+                clique_portions[i * avg_portion_cliques_n:
+                (i + 1) * avg_portion_cliques_n] = np.random.normal(portion_miu[i], sigma,
+                                                                    avg_portion_cliques_n)
+            else:
+                clique_portions[i * avg_portion_cliques_n:
+                (i + 1) * avg_portion_cliques_n] = portion_miu[i]
         clique_portions[-last_portion_cliques_n:] = \
             np.random.normal(portion_miu[-1], sigma, last_portion_cliques_n)
 
