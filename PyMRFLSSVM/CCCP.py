@@ -4,8 +4,7 @@ import matlab.engine
 import MRF_Helpers as mrf
 from Checkboard import Instance, Options
 from Utils.ReadMat import loadTestInf, loadMatPairwise
-import matplotlib.pyplot as plt
-
+from Utils.IOhelpers import dump_pickle
 __author__ = 'spacegoing'
 
 eng = matlab.engine.start_matlab()
@@ -133,7 +132,7 @@ def cutting_plane_ssvm(theta, vt, instance, options):
     return theta, history
 
 
-def cccp_outer_loop(instance, options):
+def cccp_outer_loop(instance, options, init_method='clique_by_clique', inf_latent_method='slack'):
     outer_history = list()
 
     if __DEBUG__ == 'matlab':
@@ -141,18 +140,33 @@ def cccp_outer_loop(instance, options):
         instance.unary_observed = unary_observed
         instance.pairwise = pairwise
 
-    # theta = np.zeros(options.sizePhi + 1, dtype=np.double, order='C')
-    # theta[options.sizeHighPhi] = 1  # set unary weight to 1
-    # theta = np.asarray([np.random.uniform(-1, 1, 1)[0]] + list(-1 * np.random.rand(1, options.K - 1)[0, :]) + \
-    #                    list(np.random.rand(1, options.K - 1)[0, :]) + \
-    #                    [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :]),
-    #                    dtype=np.double, order='C')
-    theta = mrf.init_theta_concave(instance, options)
+    if init_method == 'clique_by_clique':
+        theta = mrf.init_theta_concave(instance, options)
+    elif init_method == 'zeros':
+        theta = np.zeros(options.sizePhi + 1, dtype=np.double, order='C')
+        theta[options.sizeHighPhi] = 1  # set unary weight to 1
+    elif init_method == 'ones':
+        theta = np.ones(options.sizePhi + 1, dtype=np.double, order='C')
+        theta[options.sizeHighPhi] = 1  # set unary weight to 1
+    else:
+        theta = np.asarray([np.random.uniform(-1, 1, 1)[0]] +
+                           # a_0
+                           list(-1 * np.random.rand(1, options.K - 1)[0, :]) + \
+                           # a_2 -> a_K
+                           list(np.random.rand(1, options.K - 1)[0, :]) + \
+                           # b_2 -> b_K
+                           [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :]),
+                           # unary + [pairwise slack]
+                           dtype=np.double, order='C')
 
     for t in range(10):
         theta_old = theta
 
-        latent_inferred = mrf.inf_latent_helper(instance.y, instance.clique_indexes, theta, options)
+        if inf_latent_method == 'slack':
+            # todo: slack inf
+            pass
+        else:
+            latent_inferred = mrf.inf_latent_helper(instance.y, instance.clique_indexes, theta, options)
 
         if __DEBUG__ == 'matlab':
             black = True
@@ -206,18 +220,12 @@ if __name__ == "__main__":
         latent_inferred = outer_history[-1]["latent_inferred"]
 
         if np.sum(latent_inferred) == 0:
-            with open(prefix_str + 'inactive.pickle', 'wb') as f:
-                pickle.dump({"outer_history": outer_history,
-                             "instance": instance,
-                             "options": options}, f, pickle.HIGHEST_PROTOCOL)
+            dump_pickle(prefix_str + 'inactive.pickle', outer_history, instance, options)
             inactive = True
             ina_counter += 1
 
         else:
-            with open(prefix_str + 'active.pickle', 'wb') as f:
-                pickle.dump({"outer_history": outer_history,
-                             "instance": instance,
-                             "options": options}, f, pickle.HIGHEST_PROTOCOL)
+            dump_pickle(prefix_str + 'active.pickle', outer_history, instance, options)
             active = True
             a_counter += 1
 
