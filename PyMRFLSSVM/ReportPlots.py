@@ -2,7 +2,7 @@
 __author__ = 'spacegoing'
 import matplotlib.pyplot as plt
 import numpy as np
-import pickle
+from Utils.IOhelpers import load_pickle
 
 root_path = "./"
 
@@ -15,16 +15,6 @@ sym_random_active_str = "sym_random_active"
 sym_random_inactive_str = "sym_random_inactive"
 asym_random_active_str = "asym_random_active"
 asym_random_inactive_str = "asym_random_inactive"
-
-
-def load_pickle(filepath):
-    with open(filepath + ".pickle", 'rb') as f:
-        data = pickle.load(f)
-        instance = data['instance']
-        options = data['options']
-        outer_history = data['outer_history']
-
-    return outer_history, instance, options
 
 
 def gen_plot_samples(theta, latent_plot, options):
