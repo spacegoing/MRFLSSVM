@@ -5,6 +5,7 @@ import MRF_Helpers as mrf
 from Checkboard import Instance, Options
 from Utils.ReadMat import loadTestInf, loadMatPairwise
 from Utils.IOhelpers import dump_pickle
+
 __author__ = 'spacegoing'
 
 eng = matlab.engine.start_matlab()
@@ -132,7 +133,7 @@ def cutting_plane_ssvm(theta, vt, instance, options):
     return theta, history
 
 
-def cccp_outer_loop(instance, options, init_method='clique_by_clique', inf_latent_method='slack'):
+def cccp_outer_loop(instance, options, init_method='random', inf_latent_method='slack'):
     outer_history = list()
 
     if __DEBUG__ == 'matlab':
