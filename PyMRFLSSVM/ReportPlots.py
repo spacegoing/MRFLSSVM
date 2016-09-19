@@ -123,7 +123,7 @@ def plot_colormap(save_name, outer_history, instance, options):
     iter_no = len(outer_history[-1]['inner_history']) - 1
     y_hat = outer_history[-1]['inner_history'][iter_no]['y_hat']
     plt.imshow(y_hat, cmap='Greys', interpolation='nearest')
-    plt.savefig(root_path + save_name + '_grey_map_converged_%diter.png' % iter_no, dpi=100)
+    plt.savefig(root_path + save_name + '_grey_map_converged_%diter.png' % (iter_no + 1), dpi=100)
     plt.close()
 
 
