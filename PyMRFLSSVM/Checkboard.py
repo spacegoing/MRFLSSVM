@@ -164,7 +164,7 @@ class Instance:
         last_portion_cliques_n = avg_portion_cliques_n + \
                                  Options.numCliques % portions_num
 
-        # black labels portions of each clique
+        # white labels portions of each clique
         clique_portions = np.zeros([Options.numCliques])
         for i in range(portions_num - 1):
             clique_portions[i * avg_portion_cliques_n:
@@ -173,7 +173,7 @@ class Instance:
         clique_portions[-last_portion_cliques_n:] = \
             np.random.normal(portion_miu[-1], sigma, last_portion_cliques_n)
 
-        # black labels' quantity in each clique
+        # white labels' quantity in each clique
         clique_white_num_array = np.zeros([Options.numCliques], dtype=np.int)
         for i in range(Options.numCliques):
             if clique_portions[i] < 0:
