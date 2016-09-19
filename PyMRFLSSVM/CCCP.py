@@ -133,7 +133,7 @@ def cutting_plane_ssvm(theta, vt, instance, options):
     return theta, history
 
 
-def cccp_outer_loop(instance, options, init_method='random', inf_latent_method='slack'):
+def cccp_outer_loop(instance, options, init_method='', inf_latent_method=''):
     outer_history = list()
 
     if __DEBUG__ == 'matlab':
