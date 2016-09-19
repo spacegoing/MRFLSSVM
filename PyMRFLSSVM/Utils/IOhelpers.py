@@ -5,7 +5,7 @@ from Checkboard import Instance, Options
 __author__ = 'spacegoing'
 
 def dump_pickle(prefix_str, outer_history, instance, options):
-    with open(prefix_str + 'active.pickle', 'wb') as f:
+    with open(prefix_str + '.pickle', 'wb') as f:
         pickle.dump({"outer_history": outer_history,
                      "instance": instance,
                      "options": options}, f, pickle.HIGHEST_PROTOCOL)
