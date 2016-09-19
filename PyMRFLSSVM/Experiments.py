@@ -117,3 +117,17 @@ outer_history = cccp_outer_loop(instance, options, init_method='clique_by_clique
 dump_pickle(prefix_str, outer_history, instance, options)
 plot_colormap(prefix_str, outer_history, instance, options)
 plot_linfunc_converged(prefix_str, outer_history, options)
+
+
+################################## Triangle Checkboard:##########################
+root = './expData/triang/'
+
+# more black (1s)
+prefix_str = "triang"
+prefix_str = root + prefix_str
+instance = Instance('triang')
+options = Options()
+outer_history = cccp_outer_loop(instance, options, init_method='clique_by_clique')
+dump_pickle(prefix_str, outer_history, instance, options)
+plot_colormap(prefix_str, outer_history, instance, options)
+plot_linfunc_converged(prefix_str, outer_history, options)
