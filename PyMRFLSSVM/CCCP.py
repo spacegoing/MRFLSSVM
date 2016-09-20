@@ -163,9 +163,9 @@ def cccp_outer_loop(instance, options, init_method='', inf_latent_method=''):
     for t in range(10):
         theta_old = theta
 
-        if inf_latent_method == 'slack':
-            # todo: slack inf
-            pass
+        if inf_latent_method == 'remove_redund':
+            theta = mrf.remove_redundancy_theta(theta, options)
+            latent_inferred = mrf.inf_latent_helper(instance.y, instance.clique_indexes, theta, options)
         else:
             latent_inferred = mrf.inf_latent_helper(instance.y, instance.clique_indexes, theta, options)
 
