@@ -191,6 +191,50 @@ def init_theta_concave(instance, options):
     return theta
 
 
+def remove_redundancy_theta(theta, options, eps=1e-14):
+    '''
+
+    :param theta:
+    :param options:
+    :param eps:
+    :return:
+    '''
+    # decode theta
+    a_b_array = np.zeros([options.K, 2])
+    a_b_array[0, 0] = theta[0]
+    for i in range(1, options.K):
+        a_b_array[i, 0] = theta[i] + a_b_array[i - 1, 0]
+        a_b_array[i, 1] = theta[i + options.K - 1] + a_b_array[i - 1, 1]
+
+    # generate intersection points
+    inter_points = np.zeros([options.K, 2])
+    for i in range(1, options.K):
+        a_2 = a_b_array[i, 0]
+        b_2 = a_b_array[i, 1]
+        a_1 = a_b_array[i - 1, 0]
+        b_1 = a_b_array[i - 1, 1]
+        inter_points[i, 0] = (b_2 - b_1) / (a_1 - a_2)
+        inter_points[i, 1] = (a_1 * b_2 - a_2 * b_1) / (a_1 - a_2)
+
+    for i in reversed(range(1, options.K)):
+        if (abs(inter_points[i, 0] - inter_points[i - 1, 0]) < eps) \
+                or (abs(inter_points[i, 1] -
+                            inter_points[i - 1, 1]) < eps):
+            a_b_array[i - 1, :] = a_b_array[i, :]
+
+    # Remove redundancies
+    arr, indices = np.unique(a_b_array[:,0],return_index=True)
+    indices = np.sort(indices)
+    a_b_array[:indices.shape[0],:] = a_b_array[indices,:]
+    a_b_array[indices.shape[0]:,:] = a_b_array[-1,:]
+
+    for i in range(1, options.K):
+        theta[i] = a_b_array[i, 0] - a_b_array[i - 1, 0]
+        theta[i + options.K - 1] = a_b_array[i, 1] - a_b_array[i - 1, 1]
+
+    return theta
+
+
 if __name__ == '__main__':
     from Checkboard import Instance, Options
 
@@ -209,3 +253,20 @@ if __name__ == '__main__':
     inferred_label, inferred_z, e_i = \
         inf_label_latent_helper(unary_observed, pairwise, clique_indexes, theta_full, options)
     inferred_latent = inf_latent_helper(labels, clique_indexes, theta_full, options)
+
+    # Dev slack inf
+    from Utils.IOhelpers import load_pickle
+
+    outer_history, instance, options = \
+        load_pickle("/Users/spacegoing/macCodeLab-MBP2015/"
+                    "Python/MRFLSVM/PyMRFLSSVM/expData/"
+                    "unbalaced_portions/more_black_3339active")
+    theta = outer_history[-1]['inner_history'][-1]['theta']
+    latent_inferred = inf_latent_helper(instance.y, instance.clique_indexes, theta, options)
+    for i in latent_inferred:
+        print(i)
+    print('\n############Remove#############\n')
+    theta = remove_redundancy_theta(theta, options)
+    latent_inferred = inf_latent_helper(instance.y, instance.clique_indexes, theta, options)
+    for i in latent_inferred:
+        print(i)
