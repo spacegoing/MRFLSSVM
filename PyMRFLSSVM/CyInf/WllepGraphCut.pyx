@@ -2,7 +2,7 @@ from cython.operator cimport dereference as deref, preincrement as inc
 # cython: boundscheck=False
 # cython: wraparound=False
 
-cdef extern from "/Users/spacegoing/macCodeLab-MBP2015/Python/MRFLSVM/PyMRFLSSVM/CyInf/GraphCut.h":
+cdef extern from "/home/spacegoing/ubuntuCodeLab/MRFLSSVM/PyMRFLSSVM/CyInf/GraphCut.h":
     ctypedef struct OPTIONS:
         # Image Configs
         int cols;  # image width (checkboard cols)

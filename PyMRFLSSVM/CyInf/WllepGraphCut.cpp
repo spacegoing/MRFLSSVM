@@ -4,7 +4,7 @@
 {
     "distutils": {
         "depends": [
-            "/Users/spacegoing/macCodeLab-MBP2015/Python/MRFLSVM/PyMRFLSSVM/CyInf/GraphCut.h"
+            "/home/spacegoing/ubuntuCodeLab/MRFLSSVM/PyMRFLSSVM/CyInf/GraphCut.h"
         ],
         "language": "c++"
     }
@@ -256,7 +256,7 @@ static CYTHON_INLINE float __PYX_NAN() {
 
 #define __PYX_HAVE__WllepGraphCut
 #define __PYX_HAVE_API__WllepGraphCut
-#include "/Users/spacegoing/macCodeLab-MBP2015/Python/MRFLSVM/PyMRFLSSVM/CyInf/GraphCut.h"
+#include "/home/spacegoing/ubuntuCodeLab/MRFLSSVM/PyMRFLSSVM/CyInf/GraphCut.h"
 #include "pythread.h"
 #include "string.h"
 #include "stdlib.h"
@@ -1190,7 +1190,7 @@ static char __pyx_k_Step_may_not_be_zero_axis_d[] = "Step may not be zero (axis 
 static char __pyx_k_itemsize_0_for_cython_array[] = "itemsize <= 0 for cython.array";
 static char __pyx_k_unable_to_allocate_array_data[] = "unable to allocate array data.";
 static char __pyx_k_strided_and_direct_or_indirect[] = "<strided and direct or indirect>";
-static char __pyx_k_Users_spacegoing_macCodeLab_MBP[] = "/Users/spacegoing/macCodeLab-MBP2015/Python/MRFLSVM/PyMRFLSSVM/CyInf/WllepGraphCut.pyx";
+static char __pyx_k_home_spacegoing_ubuntuCodeLab_M[] = "/home/spacegoing/ubuntuCodeLab/MRFLSSVM/PyMRFLSSVM/CyInf/WllepGraphCut.pyx";
 static char __pyx_k_All_dimensions_preceding_dimensi[] = "All dimensions preceding dimension %d must be indexed and not sliced";
 static char __pyx_k_Buffer_view_does_not_expose_stri[] = "Buffer view does not expose strides";
 static char __pyx_k_Can_only_create_a_buffer_that_is[] = "Can only create a buffer that is contiguous in memory.";
@@ -1222,7 +1222,6 @@ static PyObject *__pyx_n_b_O;
 static PyObject *__pyx_kp_s_Out_of_bounds_on_buffer_access_a;
 static PyObject *__pyx_n_s_TypeError;
 static PyObject *__pyx_kp_s_Unable_to_convert_item_to_object;
-static PyObject *__pyx_kp_s_Users_spacegoing_macCodeLab_MBP;
 static PyObject *__pyx_n_s_ValueError;
 static PyObject *__pyx_n_s_W;
 static PyObject *__pyx_n_s_WllepGraphCut;
@@ -1245,6 +1244,7 @@ static PyObject *__pyx_n_s_fortran;
 static PyObject *__pyx_n_u_fortran;
 static PyObject *__pyx_kp_s_got_differing_extents_in_dimensi;
 static PyObject *__pyx_n_s_hasPairwise;
+static PyObject *__pyx_kp_s_home_spacegoing_ubuntuCodeLab_M;
 static PyObject *__pyx_n_s_id;
 static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_inferred_label;
@@ -13954,7 +13954,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_Out_of_bounds_on_buffer_access_a, __pyx_k_Out_of_bounds_on_buffer_access_a, sizeof(__pyx_k_Out_of_bounds_on_buffer_access_a), 0, 0, 1, 0},
   {&__pyx_n_s_TypeError, __pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 0, 1, 1},
   {&__pyx_kp_s_Unable_to_convert_item_to_object, __pyx_k_Unable_to_convert_item_to_object, sizeof(__pyx_k_Unable_to_convert_item_to_object), 0, 0, 1, 0},
-  {&__pyx_kp_s_Users_spacegoing_macCodeLab_MBP, __pyx_k_Users_spacegoing_macCodeLab_MBP, sizeof(__pyx_k_Users_spacegoing_macCodeLab_MBP), 0, 0, 1, 0},
   {&__pyx_n_s_ValueError, __pyx_k_ValueError, sizeof(__pyx_k_ValueError), 0, 0, 1, 1},
   {&__pyx_n_s_W, __pyx_k_W, sizeof(__pyx_k_W), 0, 0, 1, 1},
   {&__pyx_n_s_WllepGraphCut, __pyx_k_WllepGraphCut, sizeof(__pyx_k_WllepGraphCut), 0, 0, 1, 1},
@@ -13977,6 +13976,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_u_fortran, __pyx_k_fortran, sizeof(__pyx_k_fortran), 0, 1, 0, 1},
   {&__pyx_kp_s_got_differing_extents_in_dimensi, __pyx_k_got_differing_extents_in_dimensi, sizeof(__pyx_k_got_differing_extents_in_dimensi), 0, 0, 1, 0},
   {&__pyx_n_s_hasPairwise, __pyx_k_hasPairwise, sizeof(__pyx_k_hasPairwise), 0, 0, 1, 1},
+  {&__pyx_kp_s_home_spacegoing_ubuntuCodeLab_M, __pyx_k_home_spacegoing_ubuntuCodeLab_M, sizeof(__pyx_k_home_spacegoing_ubuntuCodeLab_M), 0, 0, 1, 0},
   {&__pyx_n_s_id, __pyx_k_id, sizeof(__pyx_k_id), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_inferred_label, __pyx_k_inferred_label, sizeof(__pyx_k_inferred_label), 0, 0, 1, 1},
@@ -14189,7 +14189,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__14 = PyTuple_Pack(8, __pyx_n_s_observed_unary, __pyx_n_s_pairwise, __pyx_n_s_clique_indexes, __pyx_n_s_inferred_label, __pyx_n_s_inferred_z, __pyx_n_s_theta, __pyx_n_s_options, __pyx_n_s_c_options); if (unlikely(!__pyx_tuple__14)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__14);
   __Pyx_GIVEREF(__pyx_tuple__14);
-  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(7, 0, 8, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_spacegoing_macCodeLab_MBP, __pyx_n_s_Inf_Algo, 24, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(7, 0, 8, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_spacegoing_ubuntuCodeLab_M, __pyx_n_s_Inf_Algo, 24, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
   /* "View.MemoryView":278
  *         return self.name
