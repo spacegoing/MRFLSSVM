@@ -1,0 +1,10 @@
+* data downloaded from:
+
+http://research.microsoft.com/en-us/um/cambridge/projects/visionimagevideoediting/segmentation/grabcut.htm
+image 124080 from BSDS300 is actually 124084
+
+* trimap (mask) colours:
+0 background
+64 background (used for background colour model learning)
+128 inferred (used for foreground colour model learning)
+255 foreground
