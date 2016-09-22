@@ -216,13 +216,16 @@ def remove_redundancy_theta(theta, options, eps=1e-14):
         inter_points[i, 0] = (b_2 - b_1) / (a_1 - a_2)
         inter_points[i, 1] = (a_1 * b_2 - a_2 * b_1) / (a_1 - a_2)
 
+    # if diff < eps between inter_points, let its (a_i,b_i) equal
+    # (a_{i+1},b_{i+1})
     for i in reversed(range(1, options.K)):
         if (abs(inter_points[i, 0] - inter_points[i - 1, 0]) < eps) \
                 or (abs(inter_points[i, 1] -
                             inter_points[i - 1, 1]) < eps):
             a_b_array[i - 1, :] = a_b_array[i, :]
 
-    # Remove redundancies
+    # Remove redundancies (Otherwise there will be 0s between 1s in
+    # latent_inferred like: [1 0 1 0 0 0 0...])
     arr, indices = np.unique(a_b_array[:,0],return_index=True)
     indices = np.sort(indices)
     a_b_array[:indices.shape[0],:] = a_b_array[indices,:]
