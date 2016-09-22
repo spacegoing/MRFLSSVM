@@ -54,7 +54,7 @@ class GMM:
                                      cov[1] * (cov[3] * cov[8] - cov[5] * cov[6]) + \
                                      cov[2] * (cov[3] * cov[7] - cov[4] * cov[6])
                 dtrm = self.covDeterms[i]
-                if dtrm != 0:
+                if dtrm != 0.0:
                     self.inverseCovs[i][0][0] = (cov[4] * cov[8] - cov[5] * cov[7]) / dtrm
                     self.inverseCovs[i][1][0] = -(cov[3] * cov[8] - cov[5] * cov[6]) / dtrm
                     self.inverseCovs[i][2][0] = (cov[3] * cov[7] - cov[4] * cov[6]) / dtrm
@@ -65,22 +65,63 @@ class GMM:
                     self.inverseCovs[i][1][2] = -(cov[0] * cov[5] - cov[2] * cov[3]) / dtrm
                     self.inverseCovs[i][2][2] = (cov[0] * cov[4] - cov[1] * cov[3]) / dtrm
 
+    def calculate_pixel_unary(self, color):
+        '''
+
+        :param color: np.ndarray(3,)
+        :return:
+        '''
+        res = 0.0
+        for i in range(self.componentsCount):
+            res_i = 0.0
+            if self.coefs[i] > 0:
+                if self.covDeterms[i] > -1e-16:
+                    m = self.means[i, :]
+                    diff = color - m
+                    mult = diff[0] * (diff[0] * self.inverseCovs[i][0][0] +
+                                      diff[1] * self.inverseCovs[i][1][0] +
+                                      diff[2] * self.inverseCovs[i][2][0]) + \
+                           diff[1] * (diff[0] * self.inverseCovs[i][0][1] +
+                                      diff[1] * self.inverseCovs[i][1][1] +
+                                      diff[2] * self.inverseCovs[i][2][1]) + \
+                           diff[2] * (diff[0] * self.inverseCovs[i][0][2] +
+                                      diff[1] * self.inverseCovs[i][1][2] +
+                                      diff[2] * self.inverseCovs[i][2][2])
+                    res_i = 1.0 / np.sqrt(self.covDeterms[i]) * np.exp(-0.5 * mult)
+            res += self.coefs[i] * res_i
+
+        return res
+
+    def get_img_unary(self, img):
+        unary = np.zeros(img.shape, dtype=np.double)
+
+        for i in range(img.shape[0]):
+            for j in range(img.shape[1]):
+                unary[i, j, :] = self.calculate_pixel_unary(img[i, j, :])
+
+        return unary
+
 
 componentsCount = 5
 modelSize = 1 + 3 + 9  # component weight + mean + covariance
 bgdModel = np.zeros((1, modelSize * componentsCount), np.float64)
 fgdModel = np.zeros((1, modelSize * componentsCount), np.float64)
 
-fgdGMM = GMM(fgdModel)
-np.sum(fgdGMM.inverseCovs == inverseCovs)
-
 #################################
 img = cv2.imread(image_path + filename + image_suffix)
 mask = np.zeros(img.shape[:2], np.uint8)
 rect = (50, 50, 450, 290)
 cv2.grabCut(img, mask, rect, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_RECT)
-mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
-img = img * mask2[:, :, np.newaxis]
+# mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
+# img = img * mask2[:, :, np.newaxis]
+###################################
+
+fgdGMM = GMM(fgdModel)
+color = np.array([200, 156, 222])
+fgdGMM.calculate_pixel_unary(color)
+unary = fgdGMM.get_img_unary(img)
+
+###############################
 
 plt.imshow(img), plt.colorbar(), plt.show()
 
