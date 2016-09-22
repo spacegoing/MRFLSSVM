@@ -21,6 +21,11 @@ class GMM:
     '''
 
     def __init__(self, Model, Gaussian_Num=5):
+        '''
+
+        :param Model: cv2.grabcut()->fgdModel/bgdModel
+        :param Gaussian_Num:
+        '''
         # Those are found in opencv/modules/imgproc/src/grabcut.cpp
         # source code. Component means one guassian distribution
         self.componentsCount = Gaussian_Num
@@ -45,7 +50,6 @@ class GMM:
         self.inverseCovs = np.zeros([self.componentsCount, 3, 3])
         self.calcInverseCovAndDeterm()
 
-    ########################## Decode Model into GMM #########################
     def calcInverseCovAndDeterm(self):
         for i in range(self.componentsCount):
             if self.coefs[i] > 0:
@@ -93,6 +97,11 @@ class GMM:
         return res
 
     def get_img_unary(self, img):
+        '''
+
+        :param img: cv2.imread()->img
+        :return:
+        '''
         unary = np.zeros(img.shape, dtype=np.double)
 
         for i in range(img.shape[0]):
@@ -101,40 +110,35 @@ class GMM:
 
         return unary
 
+if __name__ =='__main__':
 
-componentsCount = 5
-modelSize = 1 + 3 + 9  # component weight + mean + covariance
-bgdModel = np.zeros((1, modelSize * componentsCount), np.float64)
-fgdModel = np.zeros((1, modelSize * componentsCount), np.float64)
+    mask_type = ''
+    componentsCount = 5
+    modelSize = 1 + 3 + 9  # component weight + mean + covariance
+    bgdModel = np.zeros((1, modelSize * componentsCount), np.float64)
+    fgdModel = np.zeros((1, modelSize * componentsCount), np.float64)
 
-#################################
-img = cv2.imread(image_path + filename + image_suffix)
-mask = np.zeros(img.shape[:2], np.uint8)
-rect = (50, 50, 450, 290)
-cv2.grabCut(img, mask, rect, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_RECT)
-# mask2 = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
-# img = img * mask2[:, :, np.newaxis]
-###################################
+    img = cv2.imread(image_path + filename + image_suffix)
 
-fgdGMM = GMM(fgdModel)
-color = np.array([200, 156, 222])
-fgdGMM.calculate_pixel_unary(color)
-unary = fgdGMM.get_img_unary(img)
+    # newmask is the mask image I manually labelled
+    newmask = cv2.imread(mask_path + filename + mask_type + mask_suffix, 0)
+    # todo: 0 1 2 3 newmask
+    # whereever it is marked white (sure foreground), change mask=1
+    # whereever it is marked black (sure background), change mask=0
+    mask = np.zeros(img.shape[:2], np.uint8)
+    mask[newmask == 0] = 0
+    mask[newmask == 255] = 1
 
-###############################
+    # train grabCut models
+    mask, bgdModel, fgdModel = cv2.grabCut(img, mask, None, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_MASK)
+    # mask = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
+    # img = img * mask[:, :, np.newaxis]
+    # plt.imshow(img), plt.colorbar(), plt.show()
 
-plt.imshow(img), plt.colorbar(), plt.show()
+    # Compute Unary fgd/bgd
+    fgdGMM = GMM(fgdModel)
+    fgd_unary = fgdGMM.get_img_unary(img)
+    bgdGMM = GMM(bgdModel)
+    bgd_unary = bgdGMM.get_img_unary(img)
 
-# newmask is the mask image I manually labelled
-mask_type = ''
-newmask = cv2.imread(mask_path + filename + mask_type + mask_suffix, 0)
-np.unique(newmask)
-plt.imshow(newmask)
-# whereever it is marked white (sure foreground), change mask=1
-# whereever it is marked black (sure background), change mask=0
-mask[newmask == 0] = 0
-mask[newmask == 255] = 1
-mask, bgdModel, fgdModel = cv2.grabCut(img, mask, None, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_MASK)
-mask = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
-img = img * mask[:, :, np.newaxis]
-plt.imshow(img), plt.colorbar(), plt.show()
+
