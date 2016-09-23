@@ -105,38 +105,81 @@ class GMM:
         return unary
 
 
-if __name__ == '__main__':
-    image_path = './GrabCut/Data/grabCut/images/'
-    mask_path = './GrabCut/Data/grabCut/labels/'
-    filename = '106024'
-    image_suffix = '.jpg'
-    mask_suffix = '.bmp'
-
-    img = cv2.imread(image_path + filename + image_suffix)
-
+class GrabCut:
     componentsCount = 5
     modelSize = 1 + 3 + 9  # component weight + mean + covariance
     bgdModel = np.zeros((1, modelSize * componentsCount), np.float64)
     fgdModel = np.zeros((1, modelSize * componentsCount), np.float64)
 
-    mask_type = ''
-    # newmask is the mask image I manually labelled
-    newmask = cv2.imread(mask_path + filename + mask_type + mask_suffix, 0)
-    # todo: 0 1 2 3 newmask
-    # whereever it is marked white (sure foreground), change mask=1
-    # whereever it is marked black (sure background), change mask=0
-    mask = np.zeros(img.shape[:2], np.uint8)
-    mask[newmask == 0] = 0
-    mask[newmask == 255] = 1
+    def __init__(self, image_path, mask_path):
+        self.img = cv2.imread(image_path)
 
-    # train grabCut models
-    mask, bgdModel, fgdModel = cv2.grabCut(img, mask, None, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_MASK)
-    # mask = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
-    # img = img * mask[:, :, np.newaxis]
-    # plt.imshow(img), plt.colorbar(), plt.show()
+        self.raw_mask = cv2.imread(mask_path, 0)  # 0 stands for greyscale image
+        self.input_mask = np.zeros(self.img.shape[:2], np.uint8)
+        # todo: check all have 0 64 128 255
+        # cv2.GC_BGD, cv2.GC_FGD, cv2.GC_PR_BGD, cv2.GC_PR_FGD
+        # 0 1 2 3
+        # wherever it is marked sure background (0), change input_mask=0
+        # wherever it is marked sure foreground (1), change input_mask=1
+        self.input_mask[self.raw_mask == 0] = 0
+        self.input_mask[self.raw_mask == 255] = 1
+        self.input_mask[self.raw_mask == 64] = 2
+        self.input_mask[self.raw_mask == 128] = 3
 
-    # Compute Unary fgd/bgd
-    fgdGMM = GMM(fgdModel)
-    fgd_unary = fgdGMM.get_img_unary(img)
-    bgdGMM = GMM(bgdModel)
-    bgd_unary = bgdGMM.get_img_unary(img)
+        self._train()
+
+    def _train(self):
+        # _train grabCut models
+        self.output_mask, self.bgdModel, self.fgdModel = \
+            cv2.grabCut(self.img, self.input_mask, None,
+                        self.bgdModel, self.fgdModel, 5,
+                        cv2.GC_INIT_WITH_MASK)
+
+        self.output_mask = np.where((self.output_mask == 2) |
+                                    (self.output_mask == 0), 0, 1).astype('uint8')
+
+    def get_unary_observed(self):
+        # Compute Unary fgd/bgd
+        self.bgdGMM = GMM(self.bgdModel)
+        bgd_unary = self.bgdGMM.get_img_unary(self.img)
+        self.fgdGMM = GMM(self.fgdModel)
+        fgd_unary = self.fgdGMM.get_img_unary(self.img)
+
+        self.unary_observed = np.zeros([fgd_unary.shape[0], fgd_unary.shape[1], 2], dtype=np.double)
+        self.unary_observed[:, :, 0] = bgd_unary
+        self.unary_observed[:, :, 1] = fgd_unary
+
+        return self.unary_observed
+
+    def plot_images(self):
+        f, ax = plt.subplots(2)
+        ax[0].set_title('Original Image')
+        ax[0].imshow(self.img)
+        ax[0].axis('off')
+
+        ax[1].set_title('Predicted Image')
+        img = self.img * self.output_mask[:, :, np.newaxis]
+        ax[1].imshow(img)
+        ax[1].axis('off')
+
+    def plot_raw_mask(self):
+        plt.figure()
+        plt.imshow(self.raw_mask)
+        plt.show()
+
+
+if __name__ == '__main__':
+    image_dir = './GrabCut/Data/grabCut/images/'
+    mask_dir = './GrabCut/Data/grabCut/labels/'
+    filename = '106024'
+    image_suffix = '.jpg'
+    mask_suffix = '.bmp'
+
+    image_path = image_dir + filename + image_suffix
+
+    mask_type = '_rect'
+    mask_path = mask_dir + filename + mask_type + mask_suffix
+
+    img_grabcut = GrabCut(image_path, mask_path)
+    img_grabcut.plot_images()
+    img_grabcut.plot_raw_mask()
