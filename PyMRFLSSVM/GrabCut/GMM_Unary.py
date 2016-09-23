@@ -4,12 +4,6 @@ import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 
-image_path = './GrabCut/Data/grabCut/images/'
-mask_path = './GrabCut/Data/grabCut/labels/'
-filename = '106024'
-image_suffix = '.jpg'
-mask_suffix = '.bmp'
-
 
 class GMM:
     '''
@@ -110,16 +104,22 @@ class GMM:
 
         return unary
 
-if __name__ =='__main__':
 
-    mask_type = ''
+if __name__ == '__main__':
+    image_path = './GrabCut/Data/grabCut/images/'
+    mask_path = './GrabCut/Data/grabCut/labels/'
+    filename = '106024'
+    image_suffix = '.jpg'
+    mask_suffix = '.bmp'
+
+    img = cv2.imread(image_path + filename + image_suffix)
+
     componentsCount = 5
     modelSize = 1 + 3 + 9  # component weight + mean + covariance
     bgdModel = np.zeros((1, modelSize * componentsCount), np.float64)
     fgdModel = np.zeros((1, modelSize * componentsCount), np.float64)
 
-    img = cv2.imread(image_path + filename + image_suffix)
-
+    mask_type = ''
     # newmask is the mask image I manually labelled
     newmask = cv2.imread(mask_path + filename + mask_type + mask_suffix, 0)
     # todo: 0 1 2 3 newmask
@@ -140,5 +140,3 @@ if __name__ =='__main__':
     fgd_unary = fgdGMM.get_img_unary(img)
     bgdGMM = GMM(bgdModel)
     bgd_unary = bgdGMM.get_img_unary(img)
-
-
