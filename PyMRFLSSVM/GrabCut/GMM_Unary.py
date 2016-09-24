@@ -96,11 +96,11 @@ class GMM:
         :param img: cv2.imread()->img
         :return:
         '''
-        unary = np.zeros(img.shape, dtype=np.double)
+        unary = np.zeros([img.shape[0], img.shape[1]], dtype=np.double)
 
         for i in range(img.shape[0]):
             for j in range(img.shape[1]):
-                unary[i, j, :] = self.calculate_pixel_unary(img[i, j, :])
+                unary[i, j] = self.calculate_pixel_unary(img[i, j, :])
 
         return unary
 
