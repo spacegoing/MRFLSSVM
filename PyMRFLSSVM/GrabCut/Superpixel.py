@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import numpy as np
 from skimage.segmentation import quickshift, slic, felzenszwalb
 from skimage.segmentation import mark_boundaries
 from skimage.util import img_as_float
@@ -43,3 +44,4 @@ if __name__ == '__main__':
     numSegments = 200
 
     segments = superpixel(image_path, if_plot=True)
+    np.unique(segments)
