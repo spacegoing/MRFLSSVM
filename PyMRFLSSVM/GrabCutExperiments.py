@@ -4,7 +4,6 @@ __author__ = 'spacegoing'
 import numpy as np
 import pickle
 from Utils.IOhelpers import dump_pickle
-
 from Checkboard import Instance, Options
 from CCCP import cccp_outer_loop
 from ReportPlots import plot_linfunc_converged, plot_colormap
@@ -31,11 +30,18 @@ grabInstance = GrabCutInstance(image_path, mask_path, true_mask_path,
 instance = Instance()
 options = Options()
 
-# Image Configs
-options.gridStep = np.inf  # grid size for defining clique_indexes
 options.H = grabInstance.true_mask.shape[0]  # rows image height
 options.W = grabInstance.true_mask.shape[1]  # cols image width
 options.numCliques = len(np.unique(grabInstance.cliques))  # number of clique_indexes
+options.rowsPairwise = grabInstance.pairwise.shape[0]
+
+instance.clique_indexes = grabInstance.cliques.astype(np.int32)
+instance.pairwise = grabInstance.pairwise
+instance.unary_observed = grabInstance.unary_observed
+instance.y = grabInstance.true_mask
+
+# Image Configs
+options.gridStep = np.inf  # grid size for defining clique_indexes
 options.numVariables = options.H * options.W
 options.N = options.H * options.W  # number of variables
 
@@ -53,14 +59,8 @@ options.eps = 1.0e-16  # constraint violation threshold
 options.learningQP = 1  # encoding for learning QP (1, 2, or 3)
 options.figWnd = 0  # figure for showing results
 options.hasPairwise = True  # dimPairwise = 0 when it's false
-options.rowsPairwise = grabInstance.pairwise.shape[0]
 options.log_history = True
 
-instance.clique_indexes = grabInstance.cliques
-instance.clique_indexes.dtype = np.int32
-instance.pairwise = grabInstance.pairwise
-instance.unary_observed = grabInstance.unary_observed
-instance.y = grabInstance.true_mask
 instance.latent_var = np.zeros([Options.numCliques, Options.K - 1])
 
 outer_history = cccp_outer_loop(instance, options)
