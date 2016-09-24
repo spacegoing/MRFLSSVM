@@ -88,7 +88,7 @@ class GMM:
                     res_i = 1.0 / np.sqrt(self.covDeterms[i]) * np.exp(-0.5 * mult)
             res += self.coefs[i] * res_i
 
-        return res
+        return res if res > 1e-16 else 0.0
 
     def get_img_unary(self, img):
         '''
@@ -113,20 +113,23 @@ class GrabCut:
 
     def __init__(self, image_path, mask_path):
         self.img = cv2.imread(image_path)
+        self.input_mask = self.read_mask_img(mask_path)
+        self._train()
 
-        self.raw_mask = cv2.imread(mask_path, 0)  # 0 stands for greyscale image
-        self.input_mask = np.zeros(self.img.shape[:2], np.uint8)
+    def read_mask_img(self, mask_path):
+        mask_img = cv2.imread(mask_path, 0)  # 0 stands for greyscale image
+        input_mask = np.zeros(self.img.shape[:2], np.uint8)
         # todo: check all have 0 64 128 255
         # cv2.GC_BGD, cv2.GC_FGD, cv2.GC_PR_BGD, cv2.GC_PR_FGD
         # 0 1 2 3
         # wherever it is marked sure background (0), change input_mask=0
         # wherever it is marked sure foreground (1), change input_mask=1
-        self.input_mask[self.raw_mask == 0] = 0
-        self.input_mask[self.raw_mask == 255] = 1
-        self.input_mask[self.raw_mask == 64] = 2
-        self.input_mask[self.raw_mask == 128] = 3
+        input_mask[mask_img == 0] = 0
+        input_mask[mask_img == 255] = 1
+        input_mask[mask_img == 64] = 2
+        input_mask[mask_img == 128] = 3
 
-        self._train()
+        return input_mask
 
     def _train(self):
         # _train grabCut models
