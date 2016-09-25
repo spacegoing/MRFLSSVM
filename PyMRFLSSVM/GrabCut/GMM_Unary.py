@@ -112,13 +112,13 @@ class GrabCut:
     fgdModel = np.zeros((1, modelSize * componentsCount), np.float64)
 
     def __init__(self, image_path, mask_path):
-        self.img = cv2.imread(image_path)
+        self.img = cv2.imread(image_path).astype(np.int32)
         self.input_mask = self.read_mask_img(mask_path)
         self._train()
 
     def read_mask_img(self, mask_path):
-        mask_img = cv2.imread(mask_path, 0)  # 0 stands for greyscale image
-        input_mask = np.zeros(self.img.shape[:2], np.uint8)
+        mask_img = cv2.imread(mask_path, 0).astype(np.int32)  # 0 stands for greyscale image
+        input_mask = np.zeros(self.img.shape[:2], np.int32)
         # todo: check all have 0 64 128 255
         # cv2.GC_BGD, cv2.GC_FGD, cv2.GC_PR_BGD, cv2.GC_PR_FGD
         # 0 1 2 3
@@ -134,12 +134,12 @@ class GrabCut:
     def _train(self):
         # _train grabCut models
         self.output_mask, self.bgdModel, self.fgdModel = \
-            cv2.grabCut(self.img, self.input_mask, None,
+            cv2.grabCut(self.img.astype('uint8'), self.input_mask.astype('uint8'), None,
                         self.bgdModel, self.fgdModel, 5,
                         cv2.GC_INIT_WITH_MASK)
 
         self.output_mask = np.where((self.output_mask == 2) |
-                                    (self.output_mask == 0), 0, 1).astype('uint8')
+                                    (self.output_mask == 0), 0, 1).astype(np.int32)
 
     def get_unary_observed(self):
         # Compute Unary fgd/bgd
