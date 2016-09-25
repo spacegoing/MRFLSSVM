@@ -88,7 +88,7 @@ class GMM:
                     res_i = 1.0 / np.sqrt(self.covDeterms[i]) * np.exp(-0.5 * mult)
             res += self.coefs[i] * res_i
 
-        return res if res > 1e-16 else 0.0
+        return -np.log(res)
 
     def get_img_unary(self, img):
         '''
