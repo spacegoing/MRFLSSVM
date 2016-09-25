@@ -63,4 +63,8 @@ options.log_history = True
 
 instance.latent_var = np.zeros([Options.numCliques, Options.K - 1])
 
+prefix_str = "./expData/grabCutRes/"+image_name
 outer_history = cccp_outer_loop(instance, options)
+dump_pickle(prefix_str, outer_history, instance, options)
+plot_colormap(prefix_str, outer_history, instance, options)
+plot_linfunc_converged(prefix_str, outer_history, options)
