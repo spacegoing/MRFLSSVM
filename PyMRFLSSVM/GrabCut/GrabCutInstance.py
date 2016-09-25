@@ -179,7 +179,7 @@ if __name__ == '__main__':
     name_image_mask_truemask = get_name_path_arr(image_dir, mask_dir,
                                                  mask_ground_truth_type, mask_input_type)
 
-    i = 20
+    i = 0
     image_name = name_image_mask_truemask[i, 0]
     image_path = name_image_mask_truemask[i, 1]
     mask_path = name_image_mask_truemask[i, 2]
