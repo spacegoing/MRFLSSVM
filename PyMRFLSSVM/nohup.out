@@ -1,3 +1,106 @@
 emacs: standard input is not a tty
 emacs: standard input is not a tty
 emacs: standard input is not a tty
+OpenCV Error: Assertion failed (!bgdSamples.empty() && !fgdSamples.empty()) in initGMMs, file /home/travis/miniconda/conda-bld/work/opencv-3.1.0/modules/imgproc/src/grabcut.cpp, line 379
+start 153077 _new
+start memorial _new
+start 209070 _new
+start 124080 _new
+start fullmoon _new
+start 189080 _new
+start banana2 _new
+start banana3 _new
+start person8 _new
+start 376043 _new
+start 69020 _new
+start book _new
+start 24077 _new
+start bool _new
+start elefant _new
+start 37073 _new
+start person3 _new
+start stone2 _new
+start doll _new
+start 86016 _new
+start 106024 _new
+start person5 _new
+start ceramic _new
+start 181079 _new
+start 21077 _new
+start 388016 _new
+start sheep _new
+start 153093 _new
+start person2 _new
+start 227092 _new
+start 326038 _new
+start tennis _new
+start person4 _new
+start 271008 _new
+start music _new
+start person7 _new
+start cross _new
+start person1 _new
+start grave _new
+start 304074 _new
+start scissors _new
+start banana1 _new
+start teddy _new
+start flower _new
+start stone1 _new
+start person6 _new
+start llama _new
+start 208001 _new
+start bush _new
+start 65019 _new
+start 153077 _rect
+start memorial _rect
+start 209070 _rect
+start 124080 _rect
+start fullmoon _rect
+start 189080 _rect
+start banana2 _rect
+start banana3 _rect
+start person8 _rect
+start 376043 _rect
+start 69020 _rect
+start book _rect
+start 24077 _rect
+start bool _rect
+start elefant _rect
+start 37073 _rect
+start person3 _rect
+start stone2 _rect
+start doll _rect
+start 86016 _rect
+start 106024 _rect
+start person5 _rect
+start ceramic _rect
+start 181079 _rect
+start 21077 _rect
+start 388016 _rect
+start sheep _rect
+start 153093 _rect
+start person2 _rect
+start 227092 _rect
+start 326038 _rect
+start tennis _rect
+start person4 _rect
+start 271008 _rect
+start music _rect
+start person7 _rect
+start cross _rect
+Traceback (most recent call last):
+  File "GrabCutExperiments.py", line 11, in <module>
+    _dump_grabcut_unary_pairwise_cliques()
+  File "/home/spacegoing/ecoServerCodeLab/Python/MRFLSSVM/PyMRFLSSVM/Utils/IOhelpers.py", line 70, in _dump_grabcut_unary_pairwise_cliques
+    inner_loop(m)
+  File "/home/spacegoing/ecoServerCodeLab/Python/MRFLSSVM/PyMRFLSSVM/Utils/IOhelpers.py", line 56, in inner_loop
+    method='slic', numSegments=300)
+  File "/home/spacegoing/ecoServerCodeLab/Python/MRFLSSVM/PyMRFLSSVM/GrabCut/GrabCutInstance.py", line 37, in __init__
+    self.img_grabcut = GrabCut(image_path, mask_path)
+  File "/home/spacegoing/ecoServerCodeLab/Python/MRFLSSVM/PyMRFLSSVM/GrabCut/GMM_Unary.py", line 120, in __init__
+    self._train()
+  File "/home/spacegoing/ecoServerCodeLab/Python/MRFLSSVM/PyMRFLSSVM/GrabCut/GMM_Unary.py", line 142, in _train
+    cv2.GC_INIT_WITH_MASK)
+cv2.error: /home/travis/miniconda/conda-bld/work/opencv-3.1.0/modules/imgproc/src/grabcut.cpp:379: error: (-215) !bgdSamples.empty() && !fgdSamples.empty() in function initGMMs
+
