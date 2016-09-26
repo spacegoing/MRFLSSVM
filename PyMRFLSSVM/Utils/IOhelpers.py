@@ -27,7 +27,7 @@ def load_pickle(filepath):
 
 def __dump_grabcut_exps(dump_dir: str, mask_type: str, filename: str, grabInstance: GrabCutInstance):
     with open(dump_dir + mask_type + '/' +
-                      grabInstance.superpixel_method + '/' + filename+'.pickle','wb') as f:
+              grabInstance.superpixel_method + '/' + filename+'.pickle','wb') as f:
         pickle.dump(grabInstance, f, pickle.HIGHEST_PROTOCOL)
 
 
@@ -49,6 +49,7 @@ def _dump_grabcut_unary_pairwise_cliques():
             image_path = name_image_mask_truemask[i, 1]
             mask_path = name_image_mask_truemask[i, 2]
             true_mask_path = name_image_mask_truemask[i, 3]
+            print("start "+image_name+' '+mask_input_type)
 
             # slic
             grabInstance = GrabCutInstance(image_path, mask_path, true_mask_path,
