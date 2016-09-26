@@ -2,15 +2,13 @@
 __author__ = 'spacegoing'
 
 import numpy as np
-import pickle
-from Utils.IOhelpers import dump_pickle
+from Utils.IOhelpers import dump_pickle, _load_grabcut_unary_pairwise_cliques
 from Checkboard import Instance, Options
 from CCCP import cccp_outer_loop
 from ReportPlots import plot_linfunc_converged, plot_colormap
 from GrabCut.GrabCutInstance import GrabCutInstance, get_name_path_arr
 
 image_dir = './GrabCut/Data/grabCut/images/'
-
 mask_dir = './GrabCut/Data/grabCut/labels/'
 mask_ground_truth_type = ''
 mask_input_type = '_new'
@@ -18,7 +16,7 @@ mask_input_type = '_new'
 name_image_mask_truemask = get_name_path_arr(image_dir, mask_dir,
                                              mask_ground_truth_type, mask_input_type)
 
-i = 20
+i = 25
 image_name = name_image_mask_truemask[i, 0]
 image_path = name_image_mask_truemask[i, 1]
 mask_path = name_image_mask_truemask[i, 2]
@@ -35,7 +33,7 @@ options.W = grabInstance.true_mask.shape[1]  # cols image width
 options.numCliques = len(np.unique(grabInstance.cliques))  # number of clique_indexes
 options.rowsPairwise = grabInstance.pairwise.shape[0]
 
-instance.clique_indexes = grabInstance.cliques.astype(np.int32)
+instance.clique_indexes = grabInstance.cliques
 instance.pairwise = grabInstance.pairwise
 instance.unary_observed = grabInstance.unary_observed
 instance.y = grabInstance.true_mask
@@ -63,4 +61,8 @@ options.log_history = True
 
 instance.latent_var = np.zeros([Options.numCliques, Options.K - 1])
 
+prefix_str = "./expData/grabCutRes/" + image_name
 outer_history = cccp_outer_loop(instance, options)
+dump_pickle(prefix_str, outer_history, instance, options)
+plot_colormap(prefix_str, outer_history, instance, options)
+plot_linfunc_converged(prefix_str, outer_history, options)

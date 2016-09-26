@@ -33,7 +33,7 @@ def superpixel(image_path, method='quickshift', if_plot=False, numSegments=200):
         # show the plots
         plt.show()
 
-    return segments
+    return segments.astype(np.int32)
 
 
 if __name__ == '__main__':

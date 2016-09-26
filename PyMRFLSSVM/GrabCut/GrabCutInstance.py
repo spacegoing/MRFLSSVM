@@ -44,6 +44,7 @@ class GrabCutInstance:
         self.unary_observed = self.get_unary_observed()
         self.pairwise = self.get_pairwise(self.img)
         self.cliques = self.get_cliques(image_path, method, numSegments)
+        self.superpixel_method = method
 
     def get_unary_observed(self):
         return self.img_grabcut.get_unary_observed()
@@ -193,3 +194,4 @@ if __name__ == '__main__':
     print(np.unique(grabInstance.cliques))
     print(np.max(grabInstance.pairwise))
     print(grabInstance.pairwise.shape)
+
