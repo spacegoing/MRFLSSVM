@@ -17,7 +17,18 @@ asym_random_active_str = "asym_random_active"
 asym_random_inactive_str = "asym_random_inactive"
 
 
-def gen_plot_samples(theta, latent_plot, options):
+def gen_plot_samples(theta, latent_inferred, options):
+    def intersect(a_1, b_1, a_2, b_2, func_idx, i):
+        if a_1 - a_2 == 0:
+            raise ValueError('Intersection Equals 0!\ntheta: %d and %d' % (func_idx, i))
+        x = (b_2 - b_1) / (a_1 - a_2)
+        y = (a_1 * b_2 - a_2 * b_1) / (a_1 - a_2)
+        # Can't exceed 1
+        if x > 1:
+            x = 1
+            y = a_1 + b_1
+        return x, y
+
     # decode theta
     a_b_array = np.zeros([options.K, 2])
     a_b_array[0, 0] = theta[0]
@@ -26,30 +37,43 @@ def gen_plot_samples(theta, latent_plot, options):
         a_b_array[i, 1] = theta[i + options.K - 1] + a_b_array[i - 1, 1]
 
     # generate intersection points
-    inter_points = np.zeros([options.K + 1, 2])
-    for i in range(1, options.K):
-        a_2 = a_b_array[i, 0]
-        b_2 = a_b_array[i, 1]
-        a_1 = a_b_array[i - 1, 0]
-        b_1 = a_b_array[i - 1, 1]
-        inter_points[i, 0] = (b_2 - b_1) / (a_1 - a_2)
-        inter_points[i, 1] = (a_1 * b_2 - a_2 * b_1) / (a_1 - a_2)
+    active_inter_points_list = [[0, 0]]
+    active_func_idx_list = [0]
 
-    max_latent = np.max(np.sum(latent_plot, axis=1))
+    func_idx = 0
+    while func_idx < options.K - 1:
+        inter_points = list()
+        a_1 = a_b_array[func_idx, 0]
+        b_1 = a_b_array[func_idx, 1]
+        for i in range(func_idx + 1, options.K):
+            a_2 = a_b_array[i, 0]
+            b_2 = a_b_array[i, 1]
+            inter_points.append(intersect(a_1, b_1, a_2, b_2, func_idx, i))
+        inter_points = np.asarray(inter_points)
 
-    unique_inter_points = list()
-    for i in inter_points:
-        if i[0] >= 1:
-            i[0] = 1
-            i[1] = a_b_array[max_latent, 0] + a_b_array[max_latent, 1]
-        if tuple(i) not in unique_inter_points:
-            unique_inter_points += [tuple(i)]
-    unique_inter_points = np.asarray(unique_inter_points)
-    if unique_inter_points[-1][0] < 1:
-        np.r_['0,2', unique_inter_points, [1, a_b_array[max_latent, 0]
-                                           + a_b_array[max_latent, 1]]]
+        # Which functions is lower (inter point nearest to original point)
+        active_inter_point_idx = np.argmin(inter_points[:, 0])
+        active_point = inter_points[active_inter_point_idx, :]
+        active_inter_points_list.append(active_point)
+        if active_point[0] == 1:
+            active_func_idx = active_inter_point_idx + func_idx
+            active_func_idx_list.append(active_func_idx)
+            break
+        else:
+            active_func_idx = active_inter_point_idx + func_idx + 1
+            active_func_idx_list.append(active_func_idx)
+            func_idx = active_func_idx
 
-    return unique_inter_points
+    if 1.0 not in np.asarray(active_inter_points_list)[:, 0]:
+        x = 1
+        max_latent = np.max(np.sum(latent_inferred, axis=1))
+        y = a_b_array[max_latent + 1, 0] + a_b_array[max_latent + 1, 1]
+        active_inter_points_list.append([x,y])
+
+    active_inter_points = np.asarray(active_inter_points_list)
+    active_func_idxs = np.unique(active_func_idx_list)
+
+    return active_inter_points
 
 
 def plot_linfunc_by_iters(save_name, outer_history, options):
