@@ -76,7 +76,7 @@ def gen_plot_samples(theta, latent_inferred, options):
     if 1.0 not in np.asarray(active_inter_points_list)[:, 0]:
         x = 1
         max_latent = np.max(np.sum(latent_inferred, axis=1))
-        y = a_b_array[max_latent + 1, 0] + a_b_array[max_latent + 1, 1]
+        y = a_b_array[max_latent, 0] + a_b_array[max_latent, 1]
         active_inter_points_list.append([x, y])
 
     active_inter_points = np.asarray(active_inter_points_list)
