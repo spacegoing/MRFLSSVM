@@ -191,7 +191,7 @@ def init_theta_concave(instance, options):
     return theta
 
 
-def remove_redundancy_theta(theta, options, eps=1e-14):
+def remove_redundancy_theta(theta, options, eps=1e-5):
     '''
 
     :param theta:
@@ -202,6 +202,7 @@ def remove_redundancy_theta(theta, options, eps=1e-14):
 
     def intersect(a_1, b_1, a_2, b_2, func_idx, i):
         if a_1 - a_2 == 0:
+            print(theta)
             raise ValueError('Intersection Equals 0!\ntheta: %d and %d' % (func_idx, i))
         x = (b_2 - b_1) / (a_1 - a_2)
         y = (a_1 * b_2 - a_2 * b_1) / (a_1 - a_2)
@@ -247,7 +248,19 @@ def remove_redundancy_theta(theta, options, eps=1e-14):
             func_idx = active_func_idx
 
     # np.unique return values from smallest to largest
+    active_inter_points_arr = np.asarray(active_inter_points_list)
     active_func_idxs = np.unique(active_func_idx_list)
+
+    # if diff < eps between inter_points, let its (a_i,b_i) equal
+    # (a_{i+1},b_{i+1})
+    for i in reversed(range(1, len(active_inter_points_list))):
+        a_2, b_2 = active_inter_points_arr[i, :]
+        a_1, b_1 = active_inter_points_arr[i - 1, :]
+        if (abs(a_2 - a_1) < eps) \
+                and (abs(b_2 - b_1) < eps):
+            active_func_idxs[i - 1] = active_func_idxs[i]
+
+    active_func_idxs = np.unique(active_func_idxs)
     active_func_no = active_func_idxs.shape[0]
 
     # Remove redundancies (Otherwise there will be 0s between 1s in

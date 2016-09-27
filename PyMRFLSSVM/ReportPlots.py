@@ -20,7 +20,8 @@ asym_random_inactive_str = "asym_random_inactive"
 def gen_plot_samples(theta, latent_inferred, options):
     def intersect(a_1, b_1, a_2, b_2, func_idx, i):
         if a_1 - a_2 == 0:
-            raise ValueError('Intersection Equals 0!\ntheta: %d and %d' % (func_idx, i))
+            print('Intersection Equals 0!\ntheta: %d and %d' % (func_idx, i))
+            return
         x = (b_2 - b_1) / (a_1 - a_2)
         y = (a_1 * b_2 - a_2 * b_1) / (a_1 - a_2)
         # Can't exceed 1
@@ -48,27 +49,35 @@ def gen_plot_samples(theta, latent_inferred, options):
         for i in range(func_idx + 1, options.K):
             a_2 = a_b_array[i, 0]
             b_2 = a_b_array[i, 1]
-            inter_points.append(intersect(a_1, b_1, a_2, b_2, func_idx, i))
-        inter_points = np.asarray(inter_points)
+            point = intersect(a_1, b_1, a_2, b_2, func_idx, i)
+            if point:
+                inter_points.append(point)
+            else:
+                continue
 
-        # Which functions is lower (inter point nearest to original point)
-        active_inter_point_idx = np.argmin(inter_points[:, 0])
-        active_point = inter_points[active_inter_point_idx, :]
-        active_inter_points_list.append(active_point)
-        if active_point[0] == 1:
-            active_func_idx = active_inter_point_idx + func_idx
-            active_func_idx_list.append(active_func_idx)
-            break
+        if inter_points:
+            inter_points = np.asarray(inter_points)
+
+            # Which functions is lower (inter point nearest to original point)
+            active_inter_point_idx = np.argmin(inter_points[:, 0])
+            active_point = inter_points[active_inter_point_idx, :]
+            active_inter_points_list.append(active_point)
+            if active_point[0] == 1:
+                active_func_idx = active_inter_point_idx + func_idx
+                active_func_idx_list.append(active_func_idx)
+                break
+            else:
+                active_func_idx = active_inter_point_idx + func_idx + 1
+                active_func_idx_list.append(active_func_idx)
+                func_idx = active_func_idx
         else:
-            active_func_idx = active_inter_point_idx + func_idx + 1
-            active_func_idx_list.append(active_func_idx)
-            func_idx = active_func_idx
+            break
 
     if 1.0 not in np.asarray(active_inter_points_list)[:, 0]:
         x = 1
         max_latent = np.max(np.sum(latent_inferred, axis=1))
         y = a_b_array[max_latent + 1, 0] + a_b_array[max_latent + 1, 1]
-        active_inter_points_list.append([x,y])
+        active_inter_points_list.append([x, y])
 
     active_inter_points = np.asarray(active_inter_points_list)
     active_func_idxs = np.unique(active_func_idx_list)
