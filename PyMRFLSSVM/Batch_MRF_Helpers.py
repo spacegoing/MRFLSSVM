@@ -30,8 +30,12 @@ def phi_helper(ex, label_inferred, latent_inferred, options):
     # pairwise phi
     pairwise_phi = 0
     if ex.hasPairwise:
-        pairwise_phi = sum(label_inferred.flatten()[ex.pairwise[:, 0].astype(np.int)] !=
-                           label_inferred.flatten()[ex.pairwise[:, 1].astype(np.int)])
+        label = label_inferred.flatten()
+        for i1, i2, value in ex.pairwise:
+            if label[int(i1)] != label[int(i2)]:
+                pairwise_phi += value
+        # pairwise_phi = sum(label_inferred.flatten()[ex.pairwise[:, 0].astype(np.int)] !=
+        #                    label_inferred.flatten()[ex.pairwise[:, 1].astype(np.int)])
 
     # higher order phi
     higher_order_phi = np.zeros(2 * options.K - 1, dtype=np.double, order='C')
@@ -118,6 +122,7 @@ class Old_Option:
         self.K = K
         self.hasPairwise = hasPairwise
         self.learningQP = learningQP
+
 
 def inf_label_latent_helper(unary_observed, pairwise, clique_indexes, theta_full, options, hasPairwise=False):
     '''

@@ -235,6 +235,8 @@ class Instance:
                 pairwise[i + u.shape[0] * u.shape[1], 0] = v_i
                 pairwise[i + u.shape[0] * u.shape[1], 1] = v_i + H
 
+        pairwise[:, 2] = 1
+
         return pairwise
 
 

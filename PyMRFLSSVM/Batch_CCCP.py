@@ -93,9 +93,10 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options):
         for vt, ex, lossUnary, m in zip(vt_list, examples_list,
                                         lossUnary_list, range(examples_num)):
             print(m)
-            # todo: Errors: Pairwise features
+            # todo: Errors: Unary features
             if ex.hasPairwise:
-                ex.pairwise[:, 2] = pairwiseWeight
+                pairwise = np.copy(ex.pairwise)
+                pairwise[:, 2] = pairwiseWeight * ex.pairwise[:, 2]
 
             # infer most violated constraint
             y_loss, z_loss, e_loss = \
@@ -235,6 +236,12 @@ if __name__ == '__main__':
 
     outer_history = cccp_outer_loop([examples_list[0]], options, inf_latent_method, init_method)
 
+    from ReportPlots import plot_colormap, plot_linfunc_converged
+
+    prefix_str = './batch_1_n'
+    dump_pickle(prefix_str, outer_history, examples_list[0], options)
+    plot_colormap(prefix_str, outer_history, examples_list[0], options)
+    plot_linfunc_converged(prefix_str, outer_history, options)
     # outer_history = list()  # type: list[dict]
     #
     # examples_num = len(examples_list)
