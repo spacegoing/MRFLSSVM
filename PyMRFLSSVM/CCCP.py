@@ -73,8 +73,9 @@ def cutting_plane_ssvm(theta, vt, instance, options):
         # Decode parameters
         unaryWeight = theta[options.sizeHighPhi]
         pairwiseWeight = max(0, theta[options.sizeHighPhi + 1])
+        pairwise = np.copy(instance.pairwise)
         if options.hasPairwise:
-            instance.pairwise[:, 2] = pairwiseWeight
+            pairwise[:, 2] = pairwiseWeight * instance.pairwise[:, 2]
 
         if options.log_history:
             y_hat, z_hat, e_hat = \
@@ -112,7 +113,7 @@ def cutting_plane_ssvm(theta, vt, instance, options):
                         print(str(i) + str(j))
 
         y_loss, z_loss, e_loss = \
-            mrf.inf_label_latent_helper(unaryWeight * instance.unary_observed - lossUnary, instance.pairwise,
+            mrf.inf_label_latent_helper(unaryWeight * instance.unary_observed - lossUnary, pairwise,
                                         instance.clique_indexes, theta, options)
 
         # add constraint

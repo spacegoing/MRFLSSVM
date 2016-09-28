@@ -94,14 +94,14 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options):
                                         lossUnary_list, range(examples_num)):
             print(m)
             # todo: Errors: Unary features
+            pairwise = np.copy(ex.pairwise)
             if ex.hasPairwise:
-                pairwise = np.copy(ex.pairwise)
                 pairwise[:, 2] = pairwiseWeight * ex.pairwise[:, 2]
 
             # infer most violated constraint
             y_loss, z_loss, e_loss = \
                 mrf.inf_label_latent_helper(unaryWeight * ex.unary_observed - lossUnary,
-                                            ex.pairwise, ex.clique_indexes,
+                                            pairwise, ex.clique_indexes,
                                             theta, options, ex.hasPairwise)
 
             # add constraint
