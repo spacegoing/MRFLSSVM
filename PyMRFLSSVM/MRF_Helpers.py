@@ -188,7 +188,7 @@ def init_theta_concave(instance, options):
     # unary, pairwise and slack
     theta += [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :])
 
-    return theta
+    return np.asarray(theta, dtype=np.double, order='C')
 
 
 def remove_redundancy_theta(theta, options, eps=1e-5):
