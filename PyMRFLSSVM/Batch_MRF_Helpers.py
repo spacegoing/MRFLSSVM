@@ -140,6 +140,13 @@ def inf_label_latent_helper(unary_observed, pairwise, clique_indexes, theta_full
     :return:
     :rtype:
     '''
+
+    # unary_observed = u
+    # pairwise = p
+    # clique_indexes = c
+    # theta_full = t
+    # hasPairwise = True
+
     rows = unary_observed.shape[0]
     cols = unary_observed.shape[1]
     numCliques = len(np.unique(clique_indexes))
@@ -154,6 +161,13 @@ def inf_label_latent_helper(unary_observed, pairwise, clique_indexes, theta_full
 
     old_option = Old_Option(rows, cols, numCliques,
                             options.K, hasPairwise, 1)
+
+    # print("%d %d %d %d %d %d" % (old_option.H,
+    #                              old_option.W,
+    #                              old_option.numCliques,
+    #                              old_option.K,
+    #                              old_option.hasPairwise,
+    #                              old_option.learningQP))
 
     e_i = Inf_Algo(unary_observed, pairwise, clique_indexes,
                    inferred_label, inferred_z, theta, old_option)

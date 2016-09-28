@@ -74,7 +74,7 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options):
 
     ################## iterate until convergence ####################
     for t in range(0, options.maxIters):
-
+        theta_old = theta
         # Decode parameters
         unaryWeight = theta[options.sizeHighPhi]
         pairwiseWeight = max(0, theta[options.sizeHighPhi + 1])
@@ -121,6 +121,10 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options):
         b = np.r_[b, loss]
 
         theta = quadprog_matlab(P, q, -A, -b)
+
+        if all(theta_old == theta):
+            print("break at %d" % t)
+            break
 
     return theta, history
 
@@ -223,6 +227,16 @@ if __name__ == '__main__':
     __DEBUG__ = 0
     __plot__ = 1
 
+
+    def quadprog_matlab(P, q, A, b):
+        P, q, A, b = [matlab.double(i.tolist())
+                      for i in [P, q, A, b]]
+        null = matlab.double([])
+        theta = eng.quadprog(P, q, A, b, null, null, null, null)
+
+        return np.array(theta, dtype=np.double, order='C').reshape(len(theta))
+
+
     from Utils.IOhelpers import _load_grabcut_unary_pairwise_cliques
     from MrfTypes import BatchExamplesParser
 
@@ -234,7 +248,11 @@ if __name__ == '__main__':
     inf_latent_method = 'remove_redund'
     init_method = 'clique_by_clique'
 
+    examples_list = [examples_list[0]]
+
     outer_history = cccp_outer_loop([examples_list[0]], options, inf_latent_method, init_method)
+    prefix_str = './batch_0'
+    from ReportPlots import plot_linfunc_converged, plot_colormap
 
     from ReportPlots import plot_colormap, plot_linfunc_converged
 
