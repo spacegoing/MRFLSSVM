@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy as np
+import Checkboard
 
 # from pprint import pprint as pp
 # from Utils.ReadMat import loadCheckboard
@@ -89,4 +90,21 @@ class BatchExamplesParser:
 
             examples_list.append(ex)
 
+        return examples_list
+
+    def parse_checkboard(self, instance):
+        '''
+
+        :param instance:
+        :type instance: Checkboard.Instance
+        :param options:
+        :type options: Checkboard.Options
+        :return:
+        :rtype: list[Example]
+        '''
+
+        ex = Example(instance.y, instance.unary_observed,
+                     instance.clique_indexes,
+                     True, instance.pairwise, name='checkboard')
+        examples_list = [ex]
         return examples_list
