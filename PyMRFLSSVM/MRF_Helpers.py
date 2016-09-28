@@ -20,8 +20,10 @@ def phi_helper(unary_observed, pairwise, labels, latent_var, clique_indexes, opt
     # pairwise phi
     pairwise_phi = 0
     if options.hasPairwise:
-        pairwise_phi = sum(labels.flatten()[pairwise[:, 0].astype(np.int)] !=
-                           labels.flatten()[pairwise[:, 1].astype(np.int)])
+        label = labels.flatten()
+        for i1, i2, value in instance.pairwise:
+            if label[int(i1)] != label[int(i2)]:
+                pairwise_phi += value
 
     # higher order phi
     higher_order_phi = np.zeros(2 * options.K - 1, dtype=np.double, order='C')
