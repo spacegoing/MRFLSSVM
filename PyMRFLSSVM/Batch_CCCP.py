@@ -22,13 +22,28 @@ def quadprog_matlab(P, q, A, b):
     return np.array(theta, dtype=np.double, order='C').reshape(len(theta))
 
 
-def cutting_plane_ssvm(theta, vt, instance, options):
+def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options):
+    '''
+
+    :param theta:
+    :type theta:
+    :param vt_list:
+    :type vt_list: list[np.ndarray]
+    :param examples_list:
+    :type examples_list: list[Example]
+    :type lossUnary_list: list[np.ndarray]
+    :param options:
+    :type options: Options
+    :return:
+    :rtype:
+    '''
     # theta: first 2K - 1 are higher order params, then unary, pairwise and slack
     # vt = Inferred Cutting Plane = truePhi
     # instance = Instance()
     # options = Options()
 
     history = list()
+    examples_num = len(examples_list)
 
     ## construct QP objective
     P = np.eye(options.sizePhi + 1, options.sizePhi + 1)
@@ -56,16 +71,6 @@ def cutting_plane_ssvm(theta, vt, instance, options):
     A[options.sizeHighPhi - 1, options.sizePhi - 1] = 1
     # 1 positive constraints for slack
     A[options.sizeHighPhi, options.sizePhi] = 1
-    if __DEBUG__ == 'constraint':
-        for i in range(A.shape[0]):
-            for j in range(A.shape[1]):
-                print(A[i][j], end=' ')
-            print('')
-
-    # Loss augmented inference
-    lossUnary = np.zeros([options.H, options.W, 2])
-    lossUnary[instance.y == 1, 0] = 1.0 / options.numVariables
-    lossUnary[instance.y == 0, 1] = 1.0 / options.numVariables
 
     ################## iterate until convergence ####################
     for t in range(0, options.maxIters):
@@ -73,59 +78,45 @@ def cutting_plane_ssvm(theta, vt, instance, options):
         # Decode parameters
         unaryWeight = theta[options.sizeHighPhi]
         pairwiseWeight = max(0, theta[options.sizeHighPhi + 1])
-        if options.hasPairwise:
-            instance.pairwise[:, 2] = pairwiseWeight
 
-        if options.log_history:
-            y_hat, z_hat, e_hat = \
-                mrf.inf_label_latent_helper(unaryWeight * instance.unary_observed, instance.pairwise,
-                                            instance.clique_indexes, theta, options)
-            history.append({'theta': theta, 'y_hat': y_hat, 'z_hat': z_hat, 'e_hat': e_hat})
+        # todo: log data
+        y_hat, z_hat, e_hat = \
+            mrf.inf_label_latent_helper(unaryWeight * examples_list[0].unary_observed,
+                                        examples_list[0].pairwise,
+                                        examples_list[0].clique_indexes,
+                                        theta, options, examples_list[0].hasPairwise)
+        history.append({'theta': theta, 'y_hat': y_hat})
 
-        if __DEBUG__ == 'hat':
-            for i in range(options.H):
-                for j in range(options.W):
-                    print(y_hat[i][j], end='')
-                print('\n')
-            for i in range(options.numCliques):
-                for j in range(options.K - 1):
-                    print(z_hat[i][j], end='')
-                print('\n')
-            if np.sum(z_hat) > 0 and np.sum(z_hat) < 1:
-                print(z_hat)
-                break
+        loss_arr = np.zeros(examples_num)
+        phi_loss_sum = np.zeros(options.sizePhi, dtype=np.double, order='C')
+        violation_sum = 0.0
+        for vt, ex, lossUnary, m in zip(vt_list, examples_list,
+                                        lossUnary_list, range(examples_num)):
+            print(m)
+            # todo: Errors: Pairwise features
+            if ex.hasPairwise:
+                ex.pairwise[:, 2] = pairwiseWeight
 
-        # infer most violated constraint
-        if __DEBUG__ == 'inference':
-            # load matlab .mat data
-            unary_observed, pairwise, theta, y_inferred, z_inferred, e = loadTestInf()
+            # infer most violated constraint
             y_loss, z_loss, e_loss = \
-                mrf.inf_label_latent_helper(unary_observed, pairwise,
-                                            instance.clique_indexes, theta, options)
-            for i in range(128):
-                for j in range(128):
-                    if y_loss[i][j] != y_inferred[i][j]:
-                        print(str(i) + ' ' + str(j))
-            for i in range(64):
-                for j in range(9):
-                    if z_loss[i][j] != z_inferred.T[i][j]:
-                        print(str(i) + str(j))
+                mrf.inf_label_latent_helper(unaryWeight * ex.unary_observed - lossUnary,
+                                            ex.pairwise, ex.clique_indexes,
+                                            theta, options, ex.hasPairwise)
 
-        y_loss, z_loss, e_loss = \
-            mrf.inf_label_latent_helper(unaryWeight * instance.unary_observed - lossUnary, instance.pairwise,
-                                        instance.clique_indexes, theta, options)
+            # add constraint
+            phi = mrf.phi_helper(ex, y_loss, z_loss, options)
+            phi_loss_sum += phi - vt
 
-        # add constraint
-        phi = mrf.phi_helper(instance.unary_observed, instance.pairwise, y_loss,
-                             z_loss, instance.clique_indexes, options)
-        loss = np.sum(y_loss != instance.y) / options.numVariables
-        slack = loss - np.dot((phi - vt), theta[:-1])
-        violation = slack - theta[-1]
+            loss_arr[m] = np.sum(y_loss != ex.y) / ex.numVariables
+            slack = loss_arr[m] - np.dot((phi - vt), theta[:-1])
+            violation_sum += slack - theta[-1]
 
-        if violation < options.eps:
+        if violation_sum / examples_num < options.eps:
             break
 
-        A = np.r_[A, [np.r_[phi - vt, 1]]]
+        loss = np.sum(loss_arr) / examples_num
+        phi_loss = phi_loss_sum / examples_num
+        A = np.r_[A, [np.r_[phi_loss, 1]]]
         b = np.r_[b, loss]
 
         theta = quadprog_matlab(P, q, -A, -b)
@@ -135,6 +126,10 @@ def cutting_plane_ssvm(theta, vt, instance, options):
 
 def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''):
     '''
+
+
+    # inf_latent_method = 'remove_redund'
+    # init_method = 'clique_by_clique'
 
     :param examples_list:
     :type examples_list: list[Example]
@@ -150,14 +145,15 @@ def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''
 
     outer_history = list()  # type: list[dict]
 
+    examples_num = len(examples_list)
+
     if init_method == 'clique_by_clique':
         theta = mrf.init_theta_concave(examples_list[0], options)
     elif init_method == 'zeros':
-        theta = np.zeros(options.sizerPhi + 1, dtype=np.double, order='C')
+        theta = np.zeros(options.sizePhi + 1, dtype=np.double, order='C')
         theta[options.sizeHighPhi] = 1  # set unary weight to 1
     elif init_method == 'ones':
         theta = np.ones(options.sizePhi + 1, dtype=np.double, order='C')
-        theta[options.sizeHighPhi] = 1  # set unary weight to 1
     else:
         theta = np.asarray([np.random.uniform(-1, 1, 1)[0]] +
                            # a_0
@@ -169,41 +165,42 @@ def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''
                            # unary + [pairwise slack]
                            dtype=np.double, order='C')
 
+    lossUnary_list = list()
+    for ex in examples_list:
+        lossUnary_list.append(mrf.augmented_loss(ex))
+
     for t in range(10):
         theta_old = theta
 
         if inf_latent_method == 'remove_redund':
             theta = mrf.remove_redundancy_theta(theta, options)
-            latent_inferred = mrf.inf_latent_helper(instance.y, instance.clique_indexes, theta, options)
-        else:
-            latent_inferred = mrf.inf_latent_helper(instance.y, instance.clique_indexes, theta, options)
 
-        if __DEBUG__ == 'matlab':
-            black = True
-            for i in range(64):
-                if i % 8 == 0:
-                    black = not black
-                latent_inferred[i, :] = 1 if black else 0
-                black = not black
+        latent_inferred_list = list()
+        for ex in examples_list:
+            latent_inferred_list.append(
+                mrf.inf_latent_helper(ex, theta, options))
 
-        vt = mrf.phi_helper(instance.unary_observed, instance.pairwise,
-                            instance.y, latent_inferred, instance.clique_indexes, options)
+        vt_list = list()
+        for ex, latent_inferred in zip(examples_list, latent_inferred_list):
+            vt_list.append(mrf.phi_helper(ex, ex.y, latent_inferred, options))
 
-        theta, inner_history = cutting_plane_ssvm(theta, vt, instance, options)
+        theta, inner_history = cutting_plane_ssvm(theta, vt_list, examples_list,
+                                                  lossUnary_list, options)
 
-        total_error = np.sum(np.abs(instance.y - inner_history[-1]['y_hat']))
+        total_error = np.sum(np.abs(examples_list[0].y - inner_history[-1]['y_hat']))
         outer_history.append({"inner_history": inner_history,
-                              "latent_inferred": latent_inferred,
+                              "latent_inferred": latent_inferred_list[0],
                               "total_error": total_error})
 
         if all(theta == theta_old):
-            print(latent_inferred)
+            print(latent_inferred_list[0])
             print('stop converge at iter: %d' % t)
             print('classification error: %d' % total_error)
             break
 
-        if np.sum(np.abs(instance.y - inner_history[-1]['y_hat'])) / options.numVariables < options.eps:
-            print(latent_inferred)
+        if np.sum(np.abs(examples_list[0].y - inner_history[-1]['y_hat'])) / examples_list[0].numVariables < \
+                options.eps:
+            print(latent_inferred_list[0])
             print('converge at iter: %d' % t)
             print('classification error: %d' % total_error)
             break
@@ -212,9 +209,155 @@ def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''
 
 
 if __name__ == '__main__':
+    import numpy as np
+    import matlab.engine
+    import Batch_MRF_Helpers as mrf
+    from MrfTypes import Example, Options
+    from Utils.ReadMat import loadTestInf, loadMatPairwise
+    from Utils.IOhelpers import dump_pickle
+
+    __author__ = 'spacegoing'
+
+    eng = matlab.engine.start_matlab()
+    __DEBUG__ = 0
+    __plot__ = 1
+
     from Utils.IOhelpers import _load_grabcut_unary_pairwise_cliques
     from MrfTypes import BatchExamplesParser
 
     raw_example_list = _load_grabcut_unary_pairwise_cliques()
     parser = BatchExamplesParser()
     examples_list = parser.parse_grabcut_pickle(raw_example_list)
+    options = Options
+
+    inf_latent_method = 'remove_redund'
+    init_method = 'clique_by_clique'
+
+    outer_history = cccp_outer_loop([examples_list[0]], options, inf_latent_method, init_method)
+
+    # outer_history = list()  # type: list[dict]
+    #
+    # examples_num = len(examples_list)
+    #
+    # if init_method == 'clique_by_clique':
+    #     theta = mrf.init_theta_concave(examples_list[0], options)
+    # elif init_method == 'zeros':
+    #     theta = np.zeros(options.sizePhi + 1, dtype=np.double, order='C')
+    #     theta[options.sizeHighPhi] = 1  # set unary weight to 1
+    # elif init_method == 'ones':
+    #     theta = np.ones(options.sizePhi + 1, dtype=np.double, order='C')
+    # else:
+    #     theta = np.asarray([np.random.uniform(-1, 1, 1)[0]] +
+    #                        # a_0
+    #                        list(-1 * np.random.rand(1, options.K - 1)[0, :]) + \
+    #                        # a_2 -> a_K
+    #                        list(np.random.rand(1, options.K - 1)[0, :]) + \
+    #                        # b_2 -> b_K
+    #                        [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :]),
+    #                        # unary + [pairwise slack]
+    #                        dtype=np.double, order='C')
+    # lossUnary_list = list()
+    # for ex in examples_list:
+    #     lossUnary_list.append(mrf.augmented_loss(ex))
+    #
+    #
+    # theta_old = theta
+    #
+    # if inf_latent_method == 'remove_redund':
+    #     theta = mrf.remove_redundancy_theta(theta, options)
+    #
+    # print('latent')
+    # latent_inferred_list = list()
+    # for ex in examples_list:
+    #     latent_inferred_list.append(
+    #         mrf.inf_latent_helper(ex, theta, options))
+    # print('vt')
+    # vt_list = list()
+    # for ex, latent_inferred in zip(examples_list, latent_inferred_list):
+    #     vt_list.append(mrf.phi_helper(ex, ex.y, latent_inferred, options))
+    # print('vt done')
+    #
+    # history = list()
+    # examples_num = len(examples_list)
+    #
+    # ## construct QP objective
+    # P = np.eye(options.sizePhi + 1, options.sizePhi + 1)
+    # P[-1, -1] = 0.0  # for slack variable
+    # q = np.zeros(options.sizePhi + 1)
+    # q[-1] = 1.0e3  # for slack variable
+    #
+    # ################## Adding Constraints ##########################
+    # # positivity constraint on pairwise weight
+    # A = np.zeros([2 * options.K, options.sizePhi + 1], dtype=np.double, order='C')
+    # b = np.zeros(2 * options.K, dtype=np.double, order='C')
+    # # options.K-1s' positive constraints for a_k - a_{k+1} ---------
+    # # A[0] = [0 -1 0 0...]
+    # # A[1] = [0 0 -1 0...]
+    # # A[K-2] = [0 0 0 -1...]
+    # for i in range(0, options.K - 1):
+    #     A[i, i + 1] = -1
+    # # options.K-1s' positive constraints for b_{k+1} - b_k ---------
+    # # A[K-1] = [0 0 0 0 ... 1 0 0 0 ...]
+    # # A[K]   = [0 0 0 0 ... 0 1 0 0 ...]
+    # # A[2*K-3] = [0 0 0 0 ... 0 0 0 1 ...]
+    # for i in range(options.K - 1, options.sizeHighPhi - 1):
+    #     A[i, i + 1] = 1
+    # # 1 positive constraints for pairwise
+    # A[options.sizeHighPhi - 1, options.sizePhi - 1] = 1
+    # # 1 positive constraints for slack
+    # A[options.sizeHighPhi, options.sizePhi] = 1
+    #
+    # # Decode parameters
+    # unaryWeight = theta[options.sizeHighPhi]
+    # pairwiseWeight = max(0, theta[options.sizeHighPhi + 1])
+    #
+    # # todo: log data
+    # # if options.log_history:
+    # #     y_hat, z_hat, e_hat = \
+    # #         mrf.inf_label_latent_helper(unaryWeight * instance.unary_observed, instance.pairwise,
+    # #                                     instance.clique_indexes, theta, options)
+    # #     history.append({'theta': theta, 'y_hat': y_hat, 'z_hat': z_hat, 'e_hat': e_hat})
+    #
+    # loss_arr = np.zeros(examples_num)
+    # phi_loss_sum = np.zeros(options.sizePhi, dtype=np.double, order='C')
+    # violation_sum = 0.0
+    # for vt, ex, lossUnary, m in zip(vt_list, examples_list,
+    #                                 lossUnary_list, range(examples_num)):
+    #     print(m)
+    #     # todo: Errors: Pairwise features
+    #     if ex.hasPairwise:
+    #         ex.pairwise[:, 2] = pairwiseWeight
+    #
+    #     # infer most violated constraint
+    #     y_loss, z_loss, e_loss = \
+    #         mrf.inf_label_latent_helper(unaryWeight * ex.unary_observed - lossUnary,
+    #                                     ex.pairwise, ex.clique_indexes,
+    #                                     theta, options, ex.hasPairwise)
+    #
+    #     # add constraint
+    #     phi = mrf.phi_helper(ex, y_loss, z_loss, options)
+    #     phi_loss_sum += phi - vt
+    #
+    #     loss_arr[m] = np.sum(y_loss != ex.y) / ex.numVariables
+    #     slack = loss_arr[m] - np.dot((phi - vt), theta[:-1])
+    #     violation_sum += slack - theta[-1]
+    #
+    # if violation_sum / examples_num < options.eps:
+    #     print("violation_sum / examples_num < options.eps")
+    #
+    # loss = np.sum(loss_arr) / examples_num
+    # phi_loss = phi_loss_sum / examples_num
+    # A = np.r_[A, [np.r_[phi_loss, 1]]]
+    # b = np.r_[b, loss]
+    #
+    # theta = quadprog_matlab(P, q, -A, -b)
+    # print("done theta")
+    #
+    # ex.unary_observed.shape
+    # ex.unary_observed.dtype
+    # ex.pairwise.shape
+    # ex.pairwise.dtype
+    # ex.clique_indexes.shape
+    # ex.clique_indexes.dtype
+    # theta.shape
+    # theta.dtype

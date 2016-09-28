@@ -35,7 +35,6 @@ class Example:
     :type numVariables: int
     :type dimPairwise: int
     :type rowsPairwise: int
-    :type latent_var: np.ndarray
     """
 
     # Image Configs
@@ -59,7 +58,6 @@ class Example:
         self.hasPairwise = hasPairwise  # dimPairwise = 0 when it's false
         self.dimPairwise = 3
         self.rowsPairwise = self.pairwise.shape[0]
-        self.latent_var = np.zeros([self.numCliques, Options.K - 1])
 
         self.name = name
 

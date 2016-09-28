@@ -5,7 +5,7 @@ from MrfTypes import Example, Options
 import numpy as np
 
 
-def phi_helper(ex, latent_inferred, options):
+def phi_helper(ex, label_inferred, latent_inferred, options):
     '''
 
     :param ex:
@@ -24,14 +24,14 @@ def phi_helper(ex, latent_inferred, options):
     # options = Options()
 
     # unary phi
-    unary_phi = sum(ex.unary_observed[:, :, 0].flatten()[ex.y.flatten() == 0]) + \
-                sum(ex.unary_observed[:, :, 1].flatten()[ex.y.flatten() == 1])
+    unary_phi = sum(ex.unary_observed[:, :, 0].flatten()[label_inferred.flatten() == 0]) + \
+                sum(ex.unary_observed[:, :, 1].flatten()[label_inferred.flatten() == 1])
 
     # pairwise phi
     pairwise_phi = 0
     if ex.hasPairwise:
-        pairwise_phi = sum(ex.y.flatten()[ex.pairwise[:, 0].astype(np.int)] !=
-                           ex.y.flatten()[ex.pairwise[:, 1].astype(np.int)])
+        pairwise_phi = sum(label_inferred.flatten()[ex.pairwise[:, 0].astype(np.int)] !=
+                           label_inferred.flatten()[ex.pairwise[:, 1].astype(np.int)])
 
     # higher order phi
     higher_order_phi = np.zeros(2 * options.K - 1, dtype=np.double, order='C')
@@ -39,7 +39,7 @@ def phi_helper(ex, latent_inferred, options):
 
     # clique index starts from 1
     cliques_size = [sum(sum(ex.clique_indexes == i + 1)) for i in range(ex.numCliques)]
-    cliques_value = [sum(ex.y.flatten()[ex.clique_indexes.flatten() == i + 1]) /
+    cliques_value = [sum(label_inferred.flatten()[ex.clique_indexes.flatten() == i + 1]) /
                      cliques_size[i] for i in range(ex.numCliques)]
 
     higher_order_phi[0] = sum(cliques_value)
@@ -65,7 +65,18 @@ def phi_helper(ex, latent_inferred, options):
     return phi
 
 
-def inf_latent_helper(labels, clique_indexes, theta_full, options):
+def inf_latent_helper(ex, theta_full, options):
+    '''
+
+    :param ex:
+    :type ex: Example
+    :param theta_full:
+    :type theta_full:
+    :param options:
+    :type options: Options
+    :return:
+    :rtype:
+    '''
     # np.double[:] theta_full contains unary & pairwise params
     # Inf_Algo only accepts higher-order params
 
@@ -76,9 +87,10 @@ def inf_latent_helper(labels, clique_indexes, theta_full, options):
 
     theta = theta_full[:options.sizeHighPhi]
 
-    cliques_size = [sum(sum(clique_indexes == i + 1)) for i in range(options.numCliques)]  # clique index starts from 1
-    cliques_value = [sum(labels.flatten()[clique_indexes.flatten() == i + 1]) /
-                     cliques_size[i] for i in range(options.numCliques)]
+    cliques_size = [sum(sum(ex.clique_indexes == i + 1)) for i in range(ex.numCliques)]  # clique index starts
+    # from 1
+    cliques_value = [sum(ex.y.flatten()[ex.clique_indexes.flatten() == i + 1]) /
+                     cliques_size[i] for i in range(ex.numCliques)]
 
     # # code for debugging
     # cliques_unary_value = [sum(instance.unary_observed[:, :, 1].
@@ -87,8 +99,8 @@ def inf_latent_helper(labels, clique_indexes, theta_full, options):
     # a = np.reshape(cliques_value, [8, 8])
     # b = np.reshape(cliques_unary_value, [8, 8])
 
-    inferred_latent = np.zeros([options.numCliques, options.K - 1], dtype=np.int32, order='C')
-    for i in range(options.numCliques):
+    inferred_latent = np.zeros([ex.numCliques, options.K - 1], dtype=np.int32, order='C')
+    for i in range(ex.numCliques):
         for j in range(options.K - 1):
             # z_k = 1 only if (a_{k+1}-a_k)W_c(y_c) + b_{k+1}-b_k) < 0
             inferred_latent[i][j] = 1 if (theta[1 + j] * cliques_value[i] +
@@ -97,16 +109,49 @@ def inf_latent_helper(labels, clique_indexes, theta_full, options):
     return inferred_latent
 
 
-def inf_label_latent_helper(unary_observed, pairwise, clique_indexes, theta_full, options):
+class Old_Option:
+    def __init__(self, rows, cols, numCliques,
+                 K, hasPairwise, learningQP):
+        self.H = rows
+        self.W = cols
+        self.numCliques = numCliques
+        self.K = K
+        self.hasPairwise = hasPairwise
+        self.learningQP = learningQP
+
+def inf_label_latent_helper(unary_observed, pairwise, clique_indexes, theta_full, options, hasPairwise=False):
+    '''
+
+    :param unary_observed:
+    :type unary_observed:
+    :param pairwise:
+    :type pairwise:
+    :param clique_indexes:
+    :type clique_indexes:
+    :param theta_full:
+    :type theta_full:
+    :param options:
+    :type options: Options
+    :return:
+    :rtype:
+    '''
+    rows = unary_observed.shape[0]
+    cols = unary_observed.shape[1]
+    numCliques = len(np.unique(clique_indexes))
+
     # np.double[:] theta_full contains unary & pairwise params
     # Inf_Algo only accepts higher-order params
     theta = theta_full[:options.sizeHighPhi]
 
     # inferred_label & inferred_z are assigned inside Inf_Algo()
-    inferred_label = np.zeros([options.H, options.W], dtype=np.int32, order='C')
-    inferred_z = np.zeros([options.numCliques, options.K - 1], dtype=np.int32, order='C')
+    inferred_label = np.zeros([rows, cols], dtype=np.int32, order='C')
+    inferred_z = np.zeros([numCliques, options.K - 1], dtype=np.int32, order='C')
 
-    e_i = Inf_Algo(unary_observed, pairwise, clique_indexes, inferred_label, inferred_z, theta, options)
+    old_option = Old_Option(rows, cols, numCliques,
+                            options.K, hasPairwise, 1)
+
+    e_i = Inf_Algo(unary_observed, pairwise, clique_indexes,
+                   inferred_label, inferred_z, theta, old_option)
 
     return inferred_label, inferred_z, e_i
 
@@ -200,7 +245,7 @@ def init_theta_concave(example, options):
     # unary, pairwise and slack
     theta += [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :])
 
-    return theta
+    return np.asarray(theta, dtype=np.double, order='C')
 
 
 def remove_redundancy_theta(theta, options, eps=1e-5):
@@ -288,3 +333,19 @@ def remove_redundancy_theta(theta, options, eps=1e-5):
         theta[i + options.K - 1] = a_b_array[i, 1] - a_b_array[i - 1, 1]
 
     return theta
+
+
+def augmented_loss(ex):
+    '''
+
+    :param ex:
+    :type ex: Example
+    :return:
+    :rtype:
+    '''
+    # Loss augmented inference
+    lossUnary = np.zeros([ex.rows, ex.cols, 2])
+    lossUnary[ex.y == 1, 0] = 1.0 / ex.numVariables
+    lossUnary[ex.y == 0, 1] = 1.0 / ex.numVariables
+
+    return lossUnary
