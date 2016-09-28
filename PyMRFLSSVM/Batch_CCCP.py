@@ -227,7 +227,6 @@ if __name__ == '__main__':
     __DEBUG__ = 0
     __plot__ = 1
 
-
     # def quadprog_matlab(P, q, A, b):
     #     P, q, A, b = [matlab.double(i.tolist())
     #                   for i in [P, q, A, b]]

@@ -251,15 +251,15 @@ def remove_redundancy_theta(theta, options, eps=1e-5):
 
     # np.unique return values from smallest to largest
     active_inter_points_arr = np.asarray(active_inter_points_list)
-    active_func_idxs = np.unique(active_func_idx_list)
+    active_func_idxs = np.asarray(active_func_idx_list)
 
     # if diff < eps between inter_points, let its (a_i,b_i) equal
     # (a_{i+1},b_{i+1})
     for i in reversed(range(1, len(active_inter_points_list))):
-        a_2, b_2 = active_inter_points_arr[i, :]
-        a_1, b_1 = active_inter_points_arr[i - 1, :]
-        if (abs(a_2 - a_1) < eps) \
-                and (abs(b_2 - b_1) < eps):
+        x_2, y_2 = active_inter_points_arr[i, :]
+        x_1, y_1 = active_inter_points_arr[i - 1, :]
+        if (abs(x_2 - x_1) < eps) \
+                and (abs(y_2 - y_1) < eps):
             active_func_idxs[i - 1] = active_func_idxs[i]
 
     active_func_idxs = np.unique(active_func_idxs)
