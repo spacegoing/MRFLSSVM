@@ -94,7 +94,6 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options):
         violation_sum = 0.0
         for vt, ex, lossUnary, m in zip(vt_list, examples_list,
                                         lossUnary_list, range(examples_num)):
-            print(m)
             # todo: Errors: Unary features
             pairwise = np.copy(ex.pairwise)
             if ex.hasPairwise:
@@ -177,7 +176,7 @@ def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''
     for t in range(10):
         theta_old = theta
 
-        if inf_latent_method == 'remove_redund':
+        if inf_latent_method == 'remove_redundancy':
             theta = mrf.remove_redundancy_theta(theta, options)
 
         latent_inferred_list = list()
@@ -216,8 +215,9 @@ def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''
 if __name__ == '__main__':
     import numpy as np
     import matlab.engine
+    from ReportPlots import plot_linfunc_converged, plot_colormap
     import Batch_MRF_Helpers as mrf
-    from MrfTypes import Example, Options
+    from MrfTypes import Example, Options, BatchExamplesParser
     from Utils.ReadMat import loadTestInf, loadMatPairwise
     from Utils.IOhelpers import dump_pickle
 
@@ -228,38 +228,34 @@ if __name__ == '__main__':
     __plot__ = 1
 
 
-    def quadprog_matlab(P, q, A, b):
-        P, q, A, b = [matlab.double(i.tolist())
-                      for i in [P, q, A, b]]
-        null = matlab.double([])
-        theta = eng.quadprog(P, q, A, b, null, null, null, null)
+    # def quadprog_matlab(P, q, A, b):
+    #     P, q, A, b = [matlab.double(i.tolist())
+    #                   for i in [P, q, A, b]]
+    #     null = matlab.double([])
+    #     theta = eng.quadprog(P, q, A, b, null, null, null, null)
+    #
+    #     return np.array(theta, dtype=np.double, order='C').reshape(len(theta))
 
-        return np.array(theta, dtype=np.double, order='C').reshape(len(theta))
 
+    # from Utils.IOhelpers import _load_grabcut_unary_pairwise_cliques
+    # from MrfTypes import BatchExamplesParser
+    #
+    # raw_example_list = _load_grabcut_unary_pairwise_cliques()
+    # parser = BatchExamplesParser()
+    # examples_list = parser.parse_grabcut_pickle(raw_example_list)
+    # options = Options
 
-    from Utils.IOhelpers import _load_grabcut_unary_pairwise_cliques
-    from MrfTypes import BatchExamplesParser
-
-    raw_example_list = _load_grabcut_unary_pairwise_cliques()
-    parser = BatchExamplesParser()
-    examples_list = parser.parse_grabcut_pickle(raw_example_list)
-    options = Options
-
-    inf_latent_method = 'remove_redund'
+    inf_latent_method = 'remove_redundancy'
     init_method = 'clique_by_clique'
 
-    examples_list = [examples_list[0]]
-
-    outer_history = cccp_outer_loop([examples_list[0]], options, inf_latent_method, init_method)
-    prefix_str = './batch_0'
-    from ReportPlots import plot_linfunc_converged, plot_colormap
-
-    from ReportPlots import plot_colormap, plot_linfunc_converged
-
-    prefix_str = './batch_1_n'
-    dump_pickle(prefix_str, outer_history, examples_list[0], options)
-    plot_colormap(prefix_str, outer_history, examples_list[0], options)
-    plot_linfunc_converged(prefix_str, outer_history, options)
+    # examples_list = [examples_list[0]]
+    #
+    # outer_history = cccp_outer_loop([examples_list[0]], options, inf_latent_method, init_method)
+    #
+    # prefix_str = './batch_1_n'
+    # dump_pickle(prefix_str, outer_history, examples_list[0], options)
+    # plot_colormap(prefix_str, outer_history, examples_list[0], options)
+    # plot_linfunc_converged(prefix_str, outer_history, options)
     # outer_history = list()  # type: list[dict]
     #
     # examples_num = len(examples_list)
@@ -386,3 +382,49 @@ if __name__ == '__main__':
     # ex.clique_indexes.dtype
     # theta.shape
     # theta.dtype
+
+
+    ########################## Checkboard Test ########################
+    from Checkboard import Instance
+
+    parser = BatchExamplesParser()
+    root = './expData/unbalaced_portions/'
+
+    # more black (1s)
+    prefix_str = "more_black_3339"
+    prefix_str = root + prefix_str
+
+    instance = Instance('gaussian_portions', portion_miu=(0.3, 0.3, 0.3, 0.9), is_gaussian=False)
+    examples_list = parser.parse_checkboard(instance)
+
+    options = Options()
+    outer_history = cccp_outer_loop([examples_list[0]], options, init_method, inf_latent_method)
+
+    dump_pickle(prefix_str, outer_history, instance, options)
+    plot_colormap(prefix_str, outer_history, instance, options)
+    plot_linfunc_converged(prefix_str, outer_history, options)
+
+    # more white (0s)
+    prefix_str = "more_white_1777"
+    prefix_str = root + prefix_str
+    instance = Instance('gaussian_portions', portion_miu=(0.1, 0.7, 0.7, 0.7), is_gaussian=False)
+    examples_list = parser.parse_checkboard(instance)
+
+    options = Options()
+    outer_history = cccp_outer_loop([examples_list[0]], options, init_method, inf_latent_method)
+    dump_pickle(prefix_str, outer_history, instance, options)
+    plot_colormap(prefix_str, outer_history, instance, options)
+    plot_linfunc_converged(prefix_str, outer_history, options)
+
+    prefix_str = "balanced_portions_124678"
+    prefix_str = root + prefix_str
+    instance = Instance('gaussian_portions',
+                        portion_miu=(0.1, 0.2, 0.4,
+                                     0.6, 0.7, 0.8), is_gaussian=False)
+    examples_list = parser.parse_checkboard(instance)
+
+    options = Options()
+    outer_history = cccp_outer_loop([examples_list[0]], options, init_method, inf_latent_method)
+    dump_pickle(prefix_str, outer_history, instance, options)
+    plot_colormap(prefix_str, outer_history, instance, options)
+    plot_linfunc_converged(prefix_str, outer_history, options)
