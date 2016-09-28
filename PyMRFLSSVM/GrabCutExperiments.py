@@ -16,14 +16,15 @@ mask_input_type = '_new'
 name_image_mask_truemask = get_name_path_arr(image_dir, mask_dir,
                                              mask_ground_truth_type, mask_input_type)
 
-i = 25
+i = 28
 image_name = name_image_mask_truemask[i, 0]
 image_path = name_image_mask_truemask[i, 1]
 mask_path = name_image_mask_truemask[i, 2]
 true_mask_path = name_image_mask_truemask[i, 3]
 
-grabInstance = GrabCutInstance(image_path, mask_path, true_mask_path,
-                               method='slic', numSegments=300)
+# grabInstance = GrabCutInstance(image_path, mask_path, true_mask_path,
+#                                method='slic', numSegments=300)
+grabInstance = _load_grabcut_unary_pairwise_cliques()[28]['grabInstance']
 
 instance = Instance()
 options = Options()

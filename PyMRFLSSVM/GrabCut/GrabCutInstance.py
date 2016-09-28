@@ -6,7 +6,7 @@ import os
 
 __author__ = 'spacegoing'
 
-
+# todo: move to IOhelpers but need to refract __main__ first
 def get_name_path_arr(image_dir, mask_dir,
                       mask_ground_truth_type, mask_input_type):
     image_files = os.listdir(image_dir)
