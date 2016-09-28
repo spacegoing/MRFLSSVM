@@ -70,6 +70,8 @@ def cutting_plane_ssvm(theta, vt, instance, options):
     ################## iterate until convergence ####################
     for t in range(0, options.maxIters):
         theta_old = theta
+        theta = quadprog_matlab(P, q, -A, -b)
+
         # Decode parameters
         unaryWeight = theta[options.sizeHighPhi]
         pairwiseWeight = max(0, theta[options.sizeHighPhi + 1])
@@ -128,8 +130,6 @@ def cutting_plane_ssvm(theta, vt, instance, options):
 
         A = np.r_[A, [np.r_[phi - vt, 1]]]
         b = np.r_[b, loss]
-
-        theta = quadprog_matlab(P, q, -A, -b)
 
         if all(theta == theta_old):
             print("break at %d" % t)
