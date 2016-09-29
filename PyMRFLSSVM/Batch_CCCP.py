@@ -207,7 +207,6 @@ def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''
 
 
 if __name__ == '__main__':
-    from ReportPlots import plot_linfunc_converged, plot_colormap
     from MrfTypes import BatchExamplesParser
     from Utils.IOhelpers import _load_grabcut_unary_pairwise_cliques
     import time
