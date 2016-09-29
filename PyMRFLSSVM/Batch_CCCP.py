@@ -169,7 +169,7 @@ def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''
         lossUnary_list.append(mrf.augmented_loss(ex))
 
     for t in range(20):
-        print("outer iter %d" % t)
+        print("%s outer iter %d" % (batch_name, t))
         theta_old = theta
 
         if inf_latent_method == 'remove_redundancy':

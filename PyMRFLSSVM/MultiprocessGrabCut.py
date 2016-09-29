@@ -38,7 +38,7 @@ def calcCheckboard(prefix_str, miu):
 
 
 def calcGrabCut(examples_list, leave_out_name, inf_latent_method, init_method, options):
-    outer_history = cccp_outer_loop(examples_list, options, inf_latent_method, init_method)
+    outer_history = cccp_outer_loop(examples_list, options, inf_latent_method, init_method, leave_out_name)
 
     with open('./expData/batchResult/training_result/'
               'leaveout_image_%s_outer_history.pickle' % leave_out_name, 'wb') as f:
