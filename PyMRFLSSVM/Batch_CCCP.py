@@ -124,7 +124,7 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options, e
     return theta, history
 
 
-def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''):
+def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method='', notFake=True):
     '''
 
 
@@ -165,6 +165,10 @@ def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''
                            [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :]),
                            # unary + [pairwise slack]
                            dtype=np.double, order='C')
+    if notFake:
+        lossUnary_list = list()
+        for ex in examples_list:
+            lossUnary_list.append(mrf.augmented_loss(ex))
 
     lossUnary_list = list()
     for ex in examples_list:
@@ -174,20 +178,20 @@ def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''
         print("outer iter %d" % t)
         theta_old = theta
 
-        if inf_latent_method == 'remove_redundancy':
-            theta = mrf.remove_redundancy_theta(theta, options)
+            if inf_latent_method == 'remove_redundancy':
+                theta = mrf.remove_redundancy_theta(theta, options)
 
-        latent_inferred_list = list()
-        for ex in examples_list:
-            latent_inferred_list.append(
-                mrf.inf_latent_helper(ex, theta, options))
+            latent_inferred_list = list()
+            for ex in examples_list:
+                latent_inferred_list.append(
+                    mrf.inf_latent_helper(ex, theta, options))
 
-        vt_list = list()
-        for ex, latent_inferred in zip(examples_list, latent_inferred_list):
-            vt_list.append(mrf.phi_helper(ex, ex.y, latent_inferred, options))
+            vt_list = list()
+            for ex, latent_inferred in zip(examples_list, latent_inferred_list):
+                vt_list.append(mrf.phi_helper(ex, ex.y, latent_inferred, options))
 
-        theta, inner_history = cutting_plane_ssvm(theta, vt_list, examples_list,
-                                                  lossUnary_list, options, eng)
+            theta, inner_history = cutting_plane_ssvm(theta, vt_list, examples_list,
+                                                    lossUnary_list, options, eng)
 
         outer_history.append({"inner_history": inner_history,
                               "latent_inferred_list": latent_inferred_list})
@@ -240,34 +244,43 @@ if __name__ == '__main__':
 
     raw_example_list = _load_grabcut_unary_pairwise_cliques()
     parser = BatchExamplesParser()
-    examples_list_all = parser.parse_grabcut_pickle(raw_example_list)
+    root = './expData/unbalaced_portions/'
+
+    # more black (1s)
+    # prefix_str = "more_black_3339"
+    # prefix_str = root + prefix_str
+
+    instance = Instance('gaussian_portions', portion_miu=(0.3, 0.3, 0.3, 0.9), is_gaussian=False)
+    examples_list = parser.parse_checkboard(instance)
+
     options = Options()
+    outer_history = cccp_outer_loop([examples_list[0]], options, init_method, inf_latent_method,False)
 
-    inf_latent_method = 'remove_redundancy'
-    init_method = 'clique_by_clique'
+    # dump_pickle(prefix_str, outer_history, instance, options)
+    # plot_colormap(prefix_str, outer_history, instance, options)
+    # plot_linfunc_converged(prefix_str, outer_history, options)
 
-    # for i in range(50):
-    #     time_list.append(time.time())
-    #     examples_list = examples_list_all[:i] + examples_list_all[i + 1:]
+    # more white (0s)
+    prefix_str = "more_white_1777"
+    prefix_str = root + prefix_str
+    instance = Instance('gaussian_portions', portion_miu=(0.1, 0.7, 0.7, 0.7), is_gaussian=False)
+    examples_list = parser.parse_checkboard(instance)
 
-    #     outer_history = cccp_outer_loop(examples_list, options, inf_latent_method, init_method)
+    options = Options()
+    outer_history = cccp_outer_loop([examples_list[0]], options, init_method, inf_latent_method)
+    dump_pickle(prefix_str, outer_history, instance, options)
+    plot_colormap(prefix_str, outer_history, instance, options)
+    plot_linfunc_converged(prefix_str, outer_history, options)
 
-    #     with open('./expData/batchResult/training_result/'
-    #               'image%d_outer_history.pickle' % i, 'wb') as f:
-    #         pickle.dump([outer_history, examples_list_all[i].name, time_list], f)
-    # #
-    i = 0
-    outer_history = cccp_outer_loop([examples_list_all[0]], options, inf_latent_method, init_method)
-    with open('./expData/batchResult/training_result/'
-              'image%d_outer_history.pickle' % i, 'wb') as f:
-        pickle.dump([outer_history, examples_list_all[i].name, time_list], f)
+    # prefix_str = "balanced_portions_124678"
+    # prefix_str = root + prefix_str
+    # instance = Instance('gaussian_portions',
+    #                     portion_miu=(0.1, 0.2, 0.4,
+    #                                  0.6, 0.7, 0.8), is_gaussian=False)
+    # examples_list = parser.parse_checkboard(instance)
 
-    ex = examples_list_all[0]
-    theta = outer_history[-1]['inner_history'][-1]['theta']
-    y_hat,z_hat,e_hat = mrf.inf_label_latent_helper(ex.unary_observed,
-                                        ex.pairwise,
-                                        ex.clique_indexes,
-                                        theta,options,ex.hasPairwise)
-    np.sum(y_hat!=ex.y)/ex.numVariables
-    # plot_linfunc_converged('./hahaha',outer_history,options)
-    # plot_colormap('./hehehe',outer_history,examples_list_all[0],options)
+    # options = Options()
+    # outer_history = cccp_outer_loop([examples_list[0]], options, init_method, inf_latent_method)
+    # dump_pickle(prefix_str, outer_history, instance, options)
+    # plot_colormap(prefix_str, outer_history, instance, options)
+    # plot_linfunc_converged(prefix_str, outer_history, options)
