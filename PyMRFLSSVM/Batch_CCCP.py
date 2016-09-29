@@ -10,12 +10,11 @@ from Utils.IOhelpers import dump_pickle
 
 __author__ = 'spacegoing'
 
-eng = matlab.engine.start_matlab()
 __DEBUG__ = 0
 __plot__ = 1
 
 
-def quadprog_matlab(P, q, A, b):
+def quadprog_matlab(P, q, A, b, eng):
     P, q, A, b = [matlab.double(i.tolist())
                   for i in [P, q, A, b]]
     null = matlab.double([])
@@ -24,7 +23,7 @@ def quadprog_matlab(P, q, A, b):
     return np.array(theta, dtype=np.double, order='C').reshape(len(theta))
 
 
-def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options):
+def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options, eng):
     '''
 
     :param theta:
@@ -77,7 +76,7 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options):
     ################## iterate until convergence ####################
     for t in range(0, options.maxIters):
         theta_old = theta
-        theta = quadprog_matlab(P, q, -A, -b)
+        theta = quadprog_matlab(P, q, -A, -b, eng)
 
         # Decode parameters
         unaryWeight = theta[options.sizeHighPhi]
@@ -149,6 +148,7 @@ def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''
     :rtype:
     '''
 
+    eng = matlab.engine.start_matlab()
     outer_history = list()  # type: list[dict]
 
     examples_num = len(examples_list)
@@ -191,7 +191,7 @@ def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''
             vt_list.append(mrf.phi_helper(ex, ex.y, latent_inferred, options))
 
         theta, inner_history = cutting_plane_ssvm(theta, vt_list, examples_list,
-                                                  lossUnary_list, options)
+                                                  lossUnary_list, options, eng)
 
         total_error = np.sum(np.abs(examples_list[0].y - inner_history[-1]['y_hat']))
         outer_history.append({"inner_history": inner_history,
