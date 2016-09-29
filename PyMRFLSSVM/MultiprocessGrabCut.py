@@ -41,9 +41,9 @@ def calcCheckboard(prefix_str, miu):
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-    data_list = [[root + "more_black_3339", (0.3, 0.3, 0.3, 0.9)],
-                 [root + "more_white_1777", (0.1, 0.7, 0.7, 0.7)],
-                 [root + "balanced_portions_124678", (0.1, 0.2, 0.4, 0.6, 0.7, 0.8)]]
+    data_list = [["more_black_3339", (0.3, 0.3, 0.3, 0.9)],
+                 ["more_white_1777", (0.1, 0.7, 0.7, 0.7)],
+                 ["balanced_portions_124678", (0.1, 0.2, 0.4, 0.6, 0.7, 0.8)]]
     Tasks = [(calcCheckboard, miu) for miu in data_list]
     pool = multiprocessing.Pool(3)
     r = pool.map(calcFun, Tasks)
