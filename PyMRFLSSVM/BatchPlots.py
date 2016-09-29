@@ -119,7 +119,7 @@ def plot_colormap(save_name, y, unary_observed, y_hat):
 
     # Plot converged color map
     plt.imshow(y_hat, cmap='Greys', interpolation='nearest')
-    plt.savefig(root_path + save_name + '_grey_map_converged.png', dpi=100)
+    plt.savefig(root_path + save_name + '_inferred_map_converged.png', dpi=100)
     plt.close()
 
 
@@ -134,8 +134,8 @@ class BatchPlotWrapper:
 
         self.max_latent = 0
         for latent_inferred in outer_history[-1]['latent_inferred_list']:
-            self.max_latent = np.max(self.max_latent,
-                                     np.max(np.sum(latent_inferred, axis=1)))
+            self.max_latent = np.max([self.max_latent,
+                                     np.max(np.sum(latent_inferred, axis=1))])
 
         for ex in examples_list:
             self.name_list = ex.name
