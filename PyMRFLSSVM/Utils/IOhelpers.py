@@ -49,6 +49,7 @@ def _dump_grabcut_unary_pairwise_cliques():
             image_path = name_image_mask_truemask[i, 1]
             mask_path = name_image_mask_truemask[i, 2]
             true_mask_path = name_image_mask_truemask[i, 3]
+            print("start "+image_name+' '+mask_input_type)
 
             # slic
             grabInstance = GrabCutInstance(image_path, mask_path, true_mask_path,
