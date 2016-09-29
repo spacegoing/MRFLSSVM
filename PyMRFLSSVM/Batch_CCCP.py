@@ -4,6 +4,7 @@ import matlab.engine
 import Batch_MRF_Helpers as mrf
 from MrfTypes import Example, Options
 import pickle
+import sys
 
 __author__ = 'spacegoing'
 
@@ -70,6 +71,8 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options, e
     ################## iterate until convergence ####################
     for t in range(0, options.maxIters):
         print("inner iter %d" % t)
+        sys.stdout.flush()
+
         theta_old = theta
         theta = quadprog_matlab(P, q, -A, -b, eng)
 
@@ -112,7 +115,7 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options, e
         history.append({'theta': theta, 'loss_aug': loss})
 
         if all(theta_old == theta):
-            print("break at %d" % t)
+            print("inner loop break at %d" % t)
             break
 
     return theta, history
@@ -189,8 +192,11 @@ def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''
         with open('./expData/batchResult/temp/outer_iter%d.pickle' % t, 'wb') as f:
             pickle.dump(outer_history, f)
 
+        sys.stdout.flush()
+
         if all(theta == theta_old):
             print('stop converge at iter: %d' % t)
+            sys.stdout.flush()
             break
 
     eng.exit()
@@ -223,11 +229,11 @@ if __name__ == '__main__':
         with open('./expData/batchResult/training_result/'
                   'image%d_outer_history.pickle' % i, 'wb') as f:
             pickle.dump([outer_history, examples_list_all[i].name, time_list], f)
-    # i = 0
+    # miu = 0
     # outer_history = cccp_outer_loop([examples_list_all[0]], options, inf_latent_method, init_method)
     # with open('./expData/batchResult/training_result/'
-    #           'image%d_outer_history.pickle' % i, 'wb') as f:
-    #     pickle.dump([outer_history, examples_list_all[i].name], f)
+    #           'image%d_outer_history.pickle' % miu, 'wb') as f:
+    #     pickle.dump([outer_history, examples_list_all[miu].name], f)
     # ex = examples_list_all[0]
     # theta = outer_history[-1]['inner_history'][-1]['theta']
     # y_hat,z_hat,e_hat = mrf.inf_label_latent_helper(ex.unary_observed,
