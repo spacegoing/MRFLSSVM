@@ -76,7 +76,7 @@ list */
         sum[i] = 0;
 
     for (f = a; f; f = f->next)
-        add_vector_ns(sum, f, f->factor);
+        add_vector_ns(sum, f/* lhs */, f->factor/* 1/m */);
 
     return (sum);
 }

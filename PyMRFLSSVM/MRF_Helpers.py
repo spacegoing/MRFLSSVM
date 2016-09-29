@@ -20,8 +20,10 @@ def phi_helper(unary_observed, pairwise, labels, latent_var, clique_indexes, opt
     # pairwise phi
     pairwise_phi = 0
     if options.hasPairwise:
-        pairwise_phi = sum(labels.flatten()[pairwise[:, 0].astype(np.int)] !=
-                           labels.flatten()[pairwise[:, 1].astype(np.int)])
+        label = labels.flatten()
+        for i1, i2, value in instance.pairwise:
+            if label[int(i1)] != label[int(i2)]:
+                pairwise_phi += value
 
     # higher order phi
     higher_order_phi = np.zeros(2 * options.K - 1, dtype=np.double, order='C')
@@ -188,10 +190,10 @@ def init_theta_concave(instance, options):
     # unary, pairwise and slack
     theta += [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :])
 
-    return theta
+    return np.asarray(theta, dtype=np.double, order='C')
 
 
-def remove_redundancy_theta(theta, options, eps=1e-14):
+def remove_redundancy_theta(theta, options, eps=1e-5):
     '''
 
     :param theta:
@@ -199,6 +201,19 @@ def remove_redundancy_theta(theta, options, eps=1e-14):
     :param eps:
     :return:
     '''
+
+    def intersect(a_1, b_1, a_2, b_2, func_idx, i):
+        if a_1 - a_2 == 0:
+            print(theta)
+            raise ValueError('Intersection Equals 0!\ntheta: %d and %d' % (func_idx, i))
+        x = (b_2 - b_1) / (a_1 - a_2)
+        y = (a_1 * b_2 - a_2 * b_1) / (a_1 - a_2)
+        # Can't exceed 1
+        if x > 1:
+            x = 1
+            y = a_1 + b_1
+        return x, y
+
     # decode theta
     a_b_array = np.zeros([options.K, 2])
     a_b_array[0, 0] = theta[0]
@@ -206,30 +221,55 @@ def remove_redundancy_theta(theta, options, eps=1e-14):
         a_b_array[i, 0] = theta[i] + a_b_array[i - 1, 0]
         a_b_array[i, 1] = theta[i + options.K - 1] + a_b_array[i - 1, 1]
 
-    # generate intersection points
-    inter_points = np.zeros([options.K, 2])
-    for i in range(1, options.K):
-        a_2 = a_b_array[i, 0]
-        b_2 = a_b_array[i, 1]
-        a_1 = a_b_array[i - 1, 0]
-        b_1 = a_b_array[i - 1, 1]
-        inter_points[i, 0] = (b_2 - b_1) / (a_1 - a_2)
-        inter_points[i, 1] = (a_1 * b_2 - a_2 * b_1) / (a_1 - a_2)
+    active_inter_points_list = [[0, 0]]
+    active_func_idx_list = [0]
+    func_idx = 0  # next index of active function
+    while func_idx < options.K - 1:
+        inter_points = list()
+        a_1 = a_b_array[func_idx, 0]
+        b_1 = a_b_array[func_idx, 1]
+        # generate intersection points between i and all the other
+        for i in range(func_idx + 1, options.K):
+            a_2 = a_b_array[i, 0]
+            b_2 = a_b_array[i, 1]
+            inter_points.append(intersect(a_1, b_1, a_2, b_2, func_idx, i))
+        inter_points = np.asarray(inter_points)
+
+        # Which function is lower (inter point nearest to original point)
+        active_inter_point_idx = np.argmin(inter_points[:, 0])
+        active_point = inter_points[active_inter_point_idx, :]
+        active_inter_points_list.append(active_point)
+        if active_point[0] == 1:  # if x already exceeds 1, others are redund
+            active_func_idx = active_inter_point_idx + func_idx
+            active_func_idx_list.append(active_func_idx)
+            break
+        else:
+            # else the next active function is the following:
+            active_func_idx = active_inter_point_idx + func_idx + 1
+            active_func_idx_list.append(active_func_idx)
+            func_idx = active_func_idx
+
+    # np.unique return values from smallest to largest
+    active_inter_points_arr = np.asarray(active_inter_points_list)
+    active_func_idxs = np.asarray(active_func_idx_list)
 
     # if diff < eps between inter_points, let its (a_i,b_i) equal
     # (a_{i+1},b_{i+1})
-    for i in reversed(range(1, options.K)):
-        if (abs(inter_points[i, 0] - inter_points[i - 1, 0]) < eps) \
-                or (abs(inter_points[i, 1] -
-                            inter_points[i - 1, 1]) < eps):
-            a_b_array[i - 1, :] = a_b_array[i, :]
+    for i in reversed(range(1, len(active_inter_points_list))):
+        x_2, y_2 = active_inter_points_arr[i, :]
+        x_1, y_1 = active_inter_points_arr[i - 1, :]
+        if (abs(x_2 - x_1) < eps) \
+                and (abs(y_2 - y_1) < eps):
+            active_func_idxs[i - 1] = active_func_idxs[i]
+
+    active_func_idxs = np.unique(active_func_idxs)
+    active_func_no = active_func_idxs.shape[0]
 
     # Remove redundancies (Otherwise there will be 0s between 1s in
     # latent_inferred like: [1 0 1 0 0 0 0...])
-    arr, indices = np.unique(a_b_array[:,0],return_index=True)
-    indices = np.sort(indices)
-    a_b_array[:indices.shape[0],:] = a_b_array[indices,:]
-    a_b_array[indices.shape[0]:,:] = a_b_array[-1,:]
+    # todo: direct calc theta to improve performance
+    a_b_array[:active_func_no, :] = a_b_array[active_func_idxs, :]
+    a_b_array[active_func_no:, :] = a_b_array[active_func_idxs[-1], :]
 
     for i in range(1, options.K):
         theta[i] = a_b_array[i, 0] - a_b_array[i - 1, 0]

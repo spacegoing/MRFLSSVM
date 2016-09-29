@@ -2,8 +2,8 @@
 import pickle
 from Checkboard import Instance, Options
 from GrabCut.GrabCutInstance import GrabCutInstance, get_name_path_arr
+from MrfTypes import Example
 import os
-
 
 __author__ = 'spacegoing'
 
@@ -27,7 +27,7 @@ def load_pickle(filepath):
 
 def __dump_grabcut_exps(dump_dir: str, mask_type: str, filename: str, grabInstance: GrabCutInstance):
     with open(dump_dir + mask_type + '/' +
-              grabInstance.superpixel_method + '/' + filename+'.pickle','wb') as f:
+                      grabInstance.superpixel_method + '/' + filename + '.pickle', 'wb') as f:
         pickle.dump(grabInstance, f, pickle.HIGHEST_PROTOCOL)
 
 
@@ -69,18 +69,30 @@ def _dump_grabcut_unary_pairwise_cliques():
     for m in mask_input_type_list:
         inner_loop(m)
 
-def _load_grabcut_unary_pairwise_cliques(mask_type='_new', superpixel_method='slic'):
+
+def _load_grabcut_unary_pairwise_cliques(mask_type='_new',
+                                         superpixel_method='slic'):
+    """
+
+    :param mask_type:
+    :type mask_type: str
+    :param superpixel_method:
+    :type superpixel_method: str
+    :return:
+    :rtype: list[dict]
+    """
     dump_dir = './GrabCut/Data/grabCut/UnaryPairwiseCliques/'
     dump_parsed_dir = dump_dir + mask_type + '/' + superpixel_method + '/'
-    image_files = os.listdir(dump_parsed_dir)
+    pickle_files = os.listdir(dump_parsed_dir)
 
-    instance_name_dict_list = list()
-    for i in range(len(image_files)):
-        filename = image_files[i].split('.')[0]
-        with open(dump_parsed_dir + filename + '.pickle', 'rb') as f:
+    grabInstance_name_dict_list = list()
+    for i in range(len(pickle_files)):
+        filename = pickle_files[i]
+        with open(dump_parsed_dir + filename, 'rb') as f:
             grabInstance = pickle.load(f)
 
-        instance_name_dict_list.append({'grabInstance': grabInstance,
-                                        'filename': filename})
+        grabInstance_name_dict_list.append({'grabInstance': grabInstance,
+                                            'filename': filename,
+                                            'hasPairwise': True})
 
-    return instance_name_dict_list
+    return grabInstance_name_dict_list

@@ -69,14 +69,15 @@ def cutting_plane_ssvm(theta, vt, instance, options):
 
     ################## iterate until convergence ####################
     for t in range(0, options.maxIters):
-
+        theta_old = theta
         theta = quadprog_matlab(P, q, -A, -b)
 
         # Decode parameters
         unaryWeight = theta[options.sizeHighPhi]
         pairwiseWeight = max(0, theta[options.sizeHighPhi + 1])
+        pairwise = np.copy(instance.pairwise)
         if options.hasPairwise:
-            instance.pairwise[:, 2] = pairwiseWeight
+            pairwise[:, 2] = pairwiseWeight * instance.pairwise[:, 2]
 
         if options.log_history:
             y_hat, z_hat, e_hat = \
@@ -114,7 +115,7 @@ def cutting_plane_ssvm(theta, vt, instance, options):
                         print(str(i) + str(j))
 
         y_loss, z_loss, e_loss = \
-            mrf.inf_label_latent_helper(unaryWeight * instance.unary_observed - lossUnary, instance.pairwise,
+            mrf.inf_label_latent_helper(unaryWeight * instance.unary_observed - lossUnary, pairwise,
                                         instance.clique_indexes, theta, options)
 
         # add constraint
@@ -129,6 +130,10 @@ def cutting_plane_ssvm(theta, vt, instance, options):
 
         A = np.r_[A, [np.r_[phi - vt, 1]]]
         b = np.r_[b, loss]
+
+        if all(theta == theta_old):
+            print("break at %d" % t)
+            break
 
     return theta, history
 
@@ -163,7 +168,7 @@ def cccp_outer_loop(instance, options, init_method='', inf_latent_method=''):
     for t in range(10):
         theta_old = theta
 
-        if inf_latent_method == 'remove_redund':
+        if inf_latent_method == 'remove_redundancy':
             theta = mrf.remove_redundancy_theta(theta, options)
             latent_inferred = mrf.inf_latent_helper(instance.y, instance.clique_indexes, theta, options)
         else:
@@ -203,31 +208,41 @@ def cccp_outer_loop(instance, options, init_method='', inf_latent_method=''):
 
 
 if __name__ == "__main__":
-    import pickle
+    init_method = 'clique_by_clique'
+    inf_latent_method = 'remove_redund'
+    options = Options()
+    instance = Instance()
+    from Utils.IOhelpers import _load_grabcut_unary_pairwise_cliques
+    from MrfTypes import Example, BatchExamplesParser
 
-    prefix_str = "sym_concave_"
-    active = False
-    inactive = False
+    parser = BatchExamplesParser()
+    examples_list = parser.parse_grabcut_pickle(
+        _load_grabcut_unary_pairwise_cliques())
+    example = examples_list[0]  # type: Example
 
-    ina_counter = 0
-    a_counter = 0
-    while not (active and inactive):
-        # instance = Instance('gaussian_portions',
-        #                     portion_miu=(0.1, 0.2, 0.3, 0.4, 0.5,
-        #                                  0.6, 0.7, 0.8, 0.9))
-        instance = Instance()
-        options = Options()
-        outer_history = cccp_outer_loop(instance, options)
-        latent_inferred = outer_history[-1]["latent_inferred"]
+    options.H = example.rows  # rows image height
+    options.W = example.cols  # cols image width
+    options.numCliques = example.numCliques  # number of clique_indexes
+    options.rowsPairwise = example.rowsPairwise
+    instance.clique_indexes = example.clique_indexes
+    instance.pairwise = example.pairwise
+    instance.unary_observed = example.unary_observed
+    instance.y = example.y
+    # Image Configs
+    options.gridStep = np.inf  # grid size for defining clique_indexes
+    options.numVariables = example.numVariables
+    options.dimUnary = 2
+    options.dimPairwise = 3
+    # Other Configs
+    options.learningQP = 1  # encoding for learning QP (1, 2, or 3)
+    options.figWnd = 0  # figure for showing results
+    options.hasPairwise = True  # dimPairwise = 0 when it's false
+    options.log_history = True
 
-        if np.sum(latent_inferred) == 0:
-            dump_pickle(prefix_str + 'inactive.pickle', outer_history, instance, options)
-            inactive = True
-            ina_counter += 1
+    outer_history = cccp_outer_loop(instance, options, init_method, inf_latent_method)
+    prefix_str = './single_0'
+    from ReportPlots import plot_linfunc_converged, plot_colormap
 
-        else:
-            dump_pickle(prefix_str + 'active.pickle', outer_history, instance, options)
-            active = True
-            a_counter += 1
-
-    print("active/total: %f" % (a_counter / (a_counter + ina_counter)))
+    dump_pickle(prefix_str, outer_history, instance, options)
+    plot_colormap(prefix_str, outer_history, instance, options)
+    plot_linfunc_converged(prefix_str, outer_history, options)
