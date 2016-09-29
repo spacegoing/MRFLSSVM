@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import matplotlib
+matplotlib.use('Agg')
 import numpy as np
 import matlab.engine
 import Batch_MRF_Helpers as mrf
