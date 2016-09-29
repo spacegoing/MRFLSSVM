@@ -9,6 +9,7 @@ from MrfTypes import Options, BatchExamplesParser
 from Utils.IOhelpers import dump_pickle
 import multiprocessing
 import sys
+import pickle
 
 
 inf_latent_method = ''
@@ -29,11 +30,13 @@ def calcCheckboard(prefix_str, miu):
     examples_list = parser.parse_checkboard(instance)
 
     options = Options()
-    cccp_outer_loop([examples_list[0]], options, init_method, inf_latent_method)
+    outer_history = cccp_outer_loop([examples_list[0]], options, init_method,
+                                    inf_latent_method, prefix_str)
 
-    # dump_pickle(prefix_str, outer_history, instance, options)
-    # plot_colormap(prefix_str, outer_history, instance, options)
-    # plot_linfunc_converged(prefix_str, outer_history, options)
+    with open('./expData/batchResult/training_result/'
+              'image_%s_outer_history.pickle' % prefix_str, 'wb') as f:
+        pickle.dump([outer_history, prefix_str], f)
+
     sys.stdout.flush()
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ import sys
 
 __author__ = 'spacegoing'
 
+
 def quadprog_matlab(P, q, A, b, eng):
     P, q, A, b = [matlab.double(i.tolist())
                   for i in [P, q, A, b]]
@@ -121,7 +122,7 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options, e
     return theta, history
 
 
-def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''):
+def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method='', batch_name=''):
     '''
 
 
@@ -189,7 +190,8 @@ def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''
         outer_history.append({"inner_history": inner_history,
                               "latent_inferred_list": latent_inferred_list})
 
-        with open('./expData/batchResult/temp/outer_iter%d.pickle' % t, 'wb') as f:
+        with open('./expData/batchResult/temp/%s_outer_iter%d.pickle'
+                          % (batch_name, t), 'wb') as f:
             pickle.dump(outer_history, f)
 
         sys.stdout.flush()
@@ -229,17 +231,17 @@ if __name__ == '__main__':
         with open('./expData/batchResult/training_result/'
                   'image%d_outer_history.pickle' % i, 'wb') as f:
             pickle.dump([outer_history, examples_list_all[i].name, time_list], f)
-    # miu = 0
-    # outer_history = cccp_outer_loop([examples_list_all[0]], options, inf_latent_method, init_method)
-    # with open('./expData/batchResult/training_result/'
-    #           'image%d_outer_history.pickle' % miu, 'wb') as f:
-    #     pickle.dump([outer_history, examples_list_all[miu].name], f)
-    # ex = examples_list_all[0]
-    # theta = outer_history[-1]['inner_history'][-1]['theta']
-    # y_hat,z_hat,e_hat = mrf.inf_label_latent_helper(ex.unary_observed,
-    #                                     ex.pairwise,
-    #                                     ex.clique_indexes,
-    #                                     theta,options,ex.hasPairwise)
-    # np.sum(y_hat!=ex.y)/ex.numVariables
-    # plot_linfunc_converged('./hahaha',outer_history,options)
-    # plot_colormap('./hehehe',outer_history,examples_list_all[0],options)
+            # miu = 0
+            # outer_history = cccp_outer_loop([examples_list_all[0]], options, inf_latent_method, init_method)
+            # with open('./expData/batchResult/training_result/'
+            #           'image%d_outer_history.pickle' % miu, 'wb') as f:
+            #     pickle.dump([outer_history, examples_list_all[miu].name], f)
+            # ex = examples_list_all[0]
+            # theta = outer_history[-1]['inner_history'][-1]['theta']
+            # y_hat,z_hat,e_hat = mrf.inf_label_latent_helper(ex.unary_observed,
+            #                                     ex.pairwise,
+            #                                     ex.clique_indexes,
+            #                                     theta,options,ex.hasPairwise)
+            # np.sum(y_hat!=ex.y)/ex.numVariables
+            # plot_linfunc_converged('./hahaha',outer_history,options)
+            # plot_colormap('./hehehe',outer_history,examples_list_all[0],options)
