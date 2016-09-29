@@ -246,7 +246,7 @@ if __name__ == '__main__':
     # examples_list = parser.parse_grabcut_pickle(raw_example_list)
     # options = Options
 
-    inf_latent_method = 'remove_redundancy'
+    inf_latent_method = ''
     init_method = 'clique_by_clique'
 
     # examples_list = [examples_list[0]]
