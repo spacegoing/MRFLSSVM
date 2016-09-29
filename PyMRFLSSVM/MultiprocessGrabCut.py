@@ -29,13 +29,12 @@ def calcCheckboard(prefix_str, miu):
     examples_list = parser.parse_checkboard(instance)
 
     options = Options()
-    outer_history = cccp_outer_loop([examples_list[0]], options, init_method, inf_latent_method)
+    cccp_outer_loop([examples_list[0]], options, init_method, inf_latent_method)
 
-    dump_pickle(prefix_str, outer_history, instance, options)
-    plot_colormap(prefix_str, outer_history, instance, options)
-    plot_linfunc_converged(prefix_str, outer_history, options)
+    # dump_pickle(prefix_str, outer_history, instance, options)
+    # plot_colormap(prefix_str, outer_history, instance, options)
+    # plot_linfunc_converged(prefix_str, outer_history, options)
     sys.stdout.flush()
-
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
