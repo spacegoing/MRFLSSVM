@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
-__author__ = 'spacegoing'
-
-# -*- coding: utf-8 -*-
 from Batch_CCCP import cccp_outer_loop
 from Checkboard import Instance
-from ReportPlots import plot_linfunc_converged, plot_colormap
 from MrfTypes import Options, BatchExamplesParser
-from Utils.IOhelpers import dump_pickle
 import multiprocessing
 import sys
 import pickle
+
+__author__ = 'spacegoing'
 
 
 inf_latent_method = ''
@@ -35,7 +32,7 @@ def calcCheckboard(prefix_str, miu):
 
     with open('./expData/batchResult/training_result/'
               'image_%s_outer_history.pickle' % prefix_str, 'wb') as f:
-        pickle.dump([outer_history, prefix_str], f)
+        pickle.dump([outer_history, examples_list, prefix_str], f)
 
     sys.stdout.flush()
 

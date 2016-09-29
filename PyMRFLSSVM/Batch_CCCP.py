@@ -229,8 +229,8 @@ if __name__ == '__main__':
         outer_history = cccp_outer_loop(examples_list, options, inf_latent_method, init_method)
 
         with open('./expData/batchResult/training_result/'
-                  'image%d_outer_history.pickle' % i, 'wb') as f:
-            pickle.dump([outer_history, examples_list_all[i].name, time_list], f)
+                  'image_%d_%s_outer_history.pickle' % (i, examples_list_all[i].name), 'wb') as f:
+            pickle.dump([examples_list, outer_history, examples_list_all[i].name, time_list], f)
             # miu = 0
             # outer_history = cccp_outer_loop([examples_list_all[0]], options, inf_latent_method, init_method)
             # with open('./expData/batchResult/training_result/'
