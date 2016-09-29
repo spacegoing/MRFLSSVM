@@ -7,10 +7,7 @@ import pickle
 
 __author__ = 'spacegoing'
 
-eng = matlab.engine.start_matlab()
-
-
-def quadprog_matlab(P, q, A, b):
+def quadprog_matlab(P, q, A, b, eng):
     P, q, A, b = [matlab.double(i.tolist())
                   for i in [P, q, A, b]]
     null = matlab.double([])
@@ -19,7 +16,7 @@ def quadprog_matlab(P, q, A, b):
     return np.array(theta, dtype=np.double, order='C').reshape(len(theta))
 
 
-def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options):
+def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options, eng):
     '''
 
     :param theta:
@@ -74,7 +71,7 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options):
     for t in range(0, options.maxIters):
         print("inner iter %d" % t)
         theta_old = theta
-        theta = quadprog_matlab(P, q, -A, -b)
+        theta = quadprog_matlab(P, q, -A, -b, eng)
 
         # Decode parameters
         unaryWeight = theta[options.sizeHighPhi]
@@ -139,6 +136,7 @@ def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''
     :return:
     :rtype:
     '''
+    eng = matlab.engine.start_matlab()
 
     outer_history = list()  # type: list[dict]
 
@@ -166,7 +164,7 @@ def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''
     for ex in examples_list:
         lossUnary_list.append(mrf.augmented_loss(ex))
 
-    for t in range(50):
+    for t in range(20):
         print("outer iter %d" % t)
         theta_old = theta
 
@@ -183,7 +181,7 @@ def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''
             vt_list.append(mrf.phi_helper(ex, ex.y, latent_inferred, options))
 
         theta, inner_history = cutting_plane_ssvm(theta, vt_list, examples_list,
-                                                  lossUnary_list, options)
+                                                  lossUnary_list, options, eng)
 
         outer_history.append({"inner_history": inner_history,
                               "latent_inferred_list": latent_inferred_list})
@@ -192,9 +190,10 @@ def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''
             pickle.dump(outer_history, f)
 
         if all(theta == theta_old):
-            print(latent_inferred_list[0])
             print('stop converge at iter: %d' % t)
             break
+
+    eng.exit()
 
     return outer_history
 
