@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import matplotlib
+matplotlib.use('Agg')
 __author__ = 'spacegoing'
 import pickle
 import numpy as np
@@ -31,3 +33,6 @@ def plot_checkboard():
         plot_wrapper = BatchPlotWrapper(examples_list, outer_history, options)
         plot_wrapper.plot_linfunc_converged(0)
         plot_wrapper.plot_color_map(0)
+
+if __name__=="__main__":
+    plot_checkboard()
