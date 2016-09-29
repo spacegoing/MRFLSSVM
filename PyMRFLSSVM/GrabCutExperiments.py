@@ -34,5 +34,20 @@ def plot_checkboard():
         plot_wrapper.plot_linfunc_converged(0)
         plot_wrapper.plot_color_map(0)
 
+def plot_GrabCut():
+    # todo: remove .pickle
+    image_name_list = ["86016.pickle", "memorial.pickle", "sheep.pickle"]
+
+    for image_name in image_name_list:
+        # image_name = image_name_list[3]
+        batch_converge_pickle_dir = './expData/batchResult/training_result/' \
+                                    'leaveout_image_%s_outer_history.pickle'
+        with open(batch_converge_pickle_dir % image_name, 'rb') as f:
+            examples_list, outer_history, leave_out_name = pickle.load(f)
+
+        plot_wrapper = BatchPlotWrapper(examples_list, outer_history, options)
+        plot_wrapper.plot_linfunc_converged(3)
+        plot_wrapper.plot_color_map(0)
+
 if __name__=="__main__":
     plot_checkboard()
