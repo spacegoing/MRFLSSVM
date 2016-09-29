@@ -57,21 +57,23 @@ def multip_checkboard():
     print('finished')
 
 def multip_grabCut():
+    batches_num = 5
     raw_example_list = _load_grabcut_unary_pairwise_cliques()
     parser = BatchExamplesParser()
-    examples_list_all = parser.parse_grabcut_pickle(raw_example_list)[:10]
+    examples_list_all = parser.parse_grabcut_pickle(raw_example_list)[:batches_num]
     options = Options()
 
     inf_latent_method = ''
     init_method = 'clique_by_clique'
 
     Tasks = list()
-    for i in range(10):
+    for i in range(batches_num):
         examples_list = examples_list_all[:i] + examples_list_all[i + 1:]
         Tasks.append((calcGrabCut, (examples_list, examples_list_all[i].name,
                                     inf_latent_method, init_method, options)))
 
-    pool = multiprocessing.Pool(10)
+    process_num = min(batches_num,28)
+    pool = multiprocessing.Pool(process_num)
     r = pool.map(calcFun, Tasks)
     pool.close()
     pool.join()
