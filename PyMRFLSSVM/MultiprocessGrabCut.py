@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from Batch_CCCP import cccp_outer_loop
 from Checkboard import Instance
-from MrfTypes import Options, BatchExamplesParser
+from MrfTypes import Example, Options, BatchExamplesParser
 import multiprocessing
 import sys
 import pickle
