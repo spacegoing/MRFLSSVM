@@ -61,7 +61,7 @@ def multip_checkboard():
 def multip_grabCut():
     raw_example_list = _load_grabcut_unary_pairwise_cliques()
     parser = BatchExamplesParser()
-    selected_num = 16
+    selected_num = 50
     examples_list_all = parser.parse_grabcut_pickle(raw_example_list)
     options = Options()
 
@@ -76,7 +76,7 @@ def multip_grabCut():
         Tasks.append((calcGrabCut, (examples_list, examples_list_all[i].name,
                                     inf_latent_method, init_method, options)))
 
-    process_num = min(selected_num, 28)
+    process_num = min(selected_num, 20)
     pool = multiprocessing.Pool(process_num)
     r = pool.map(calcFun, Tasks)
     pool.close()
