@@ -21,7 +21,7 @@ class Options:
     sizeHighPhi = 2 * K - 1
     sizePhi = sizeHighPhi + 2
     maxIters = 100  # maximum learning iterations
-    eps = 1.0e-16  # constraint violation threshold
+    eps = 1.0e-7  # constraint violation threshold
     # Other Configs
     # # todo: encoding for learning QP (1, 2, or 3)
     # learningQP = 1

@@ -87,6 +87,7 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options, e
         theta_old = theta
         theta = quadprog_matlab(P, q, -A, -b, eng)
 
+        y_hat_loss = 0
         for ex in examples_list:
             y_hat = mrf.inf_label_latent_helper(
                 ex.unary_observed, ex.pairwise,
@@ -133,7 +134,7 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options, e
         A = np.r_[A, [np.r_[phi_loss, 1]]]
         b = np.r_[b, loss]
 
-        history.append({'theta': theta, 'loss_aug': loss})
+        history.append({'theta': theta, 'loss_aug': loss, 'y_hat_loss_list': y_hat_loss_list})
 
         if all(theta_old == theta):
             print("inner loop break at %d" % t)
