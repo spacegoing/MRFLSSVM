@@ -69,13 +69,33 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options, e
     # 1 positive constraints for slack
     A[options.sizeHighPhi, options.sizePhi] = 1
 
+    y_hat_loss_list = list()
+    y_hat_loss = 0
+    for ex in examples_list:
+        y_hat = mrf.inf_label_latent_helper(
+            ex.unary_observed, ex.pairwise,
+            ex.clique_indexes, theta, options, ex.hasPairwise)[0]
+        y_hat_loss += np.sum(y_hat != ex.y) / (ex.y.shape[0] * ex.y.shape[1])
+    y_hat_loss_list.append(y_hat_loss / examples_num)
+
     ################## iterate until convergence ####################
     for t in range(0, options.maxIters):
         print("inner iter %d" % t)
         sys.stdout.flush()
 
+        y_hat_loss_old = y_hat_loss
         theta_old = theta
         theta = quadprog_matlab(P, q, -A, -b, eng)
+
+        for ex in examples_list:
+            y_hat = mrf.inf_label_latent_helper(
+                ex.unary_observed, ex.pairwise,
+                ex.clique_indexes, theta, options, ex.hasPairwise)[0]
+            y_hat_loss += np.sum(y_hat != ex.y) / (ex.y.shape[0] * ex.y.shape[1])
+        y_hat_loss_list.append(y_hat_loss / examples_num)
+
+        if np.abs(y_hat_loss - y_hat_loss_old) < options.eps:
+            break
 
         # Decode parameters
         unaryWeight = theta[options.sizeHighPhi]
