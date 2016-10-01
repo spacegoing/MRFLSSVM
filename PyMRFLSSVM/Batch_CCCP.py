@@ -130,21 +130,21 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options, e
             slack = loss_arr[m] - np.dot((phi - vt), theta[:-1])
             violation_sum += slack - theta[-1]
 
-        if violation_sum / examples_num < options.eps:
-            history.append({'theta': theta, 'loss_aug': loss, 'y_hat_loss_list': y_hat_loss_list})
-            return theta, history
-
         loss = np.sum(loss_arr) / examples_num
         phi_loss = phi_loss_sum / examples_num
         A = np.r_[A, [np.r_[phi_loss, 1]]]
         b = np.r_[b, loss]
 
-        history.append({'theta': theta, 'loss_aug': loss, 'y_hat_loss_list': y_hat_loss_list})
+        if violation_sum / examples_num < options.eps:
+            history.append({'theta': theta, 'loss_aug': loss, 'y_hat_loss_list': y_hat_loss_list})
+            return theta, history
 
         if all(theta_old == theta):
             print("inner loop break at %d" % t)
             history.append({'theta': theta, 'loss_aug': loss, 'y_hat_loss_list': y_hat_loss_list})
             return theta, history
+
+        history.append({'theta': theta, 'loss_aug': loss, 'y_hat_loss_list': y_hat_loss_list})
 
     return theta, history
 
