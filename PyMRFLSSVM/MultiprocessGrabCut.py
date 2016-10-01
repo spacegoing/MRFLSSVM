@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import matplotlib
+matplotlib.use('Agg')
 from Batch_CCCP import cccp_outer_loop
 from Checkboard import Instance
 from MrfTypes import Example, Options, BatchExamplesParser
