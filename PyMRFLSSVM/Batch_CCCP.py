@@ -78,6 +78,7 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options, e
         y_hat_loss += np.sum(y_hat != ex.y) / (ex.y.shape[0] * ex.y.shape[1])
     y_hat_loss_list.append(y_hat_loss / examples_num)
 
+    counter = 0
     ################## iterate until convergence ####################
     for t in range(0, options.maxIters):
         print("inner iter %d" % t)
@@ -96,7 +97,10 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options, e
         y_hat_loss_list.append(y_hat_loss / examples_num)
 
         if np.abs(y_hat_loss - y_hat_loss_old) < options.eps:
-            break
+            counter += 1
+            if counter == 3:
+                history.append({'theta': theta, 'loss_aug': loss, 'y_hat_loss_list': y_hat_loss_list})
+                return theta, history
 
         # Decode parameters
         unaryWeight = theta[options.sizeHighPhi]
@@ -127,7 +131,8 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options, e
             violation_sum += slack - theta[-1]
 
         if violation_sum / examples_num < options.eps:
-            break
+            history.append({'theta': theta, 'loss_aug': loss, 'y_hat_loss_list': y_hat_loss_list})
+            return theta, history
 
         loss = np.sum(loss_arr) / examples_num
         phi_loss = phi_loss_sum / examples_num
@@ -138,7 +143,8 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options, e
 
         if all(theta_old == theta):
             print("inner loop break at %d" % t)
-            break
+            history.append({'theta': theta, 'loss_aug': loss, 'y_hat_loss_list': y_hat_loss_list})
+            return theta, history
 
     return theta, history
 
@@ -209,7 +215,7 @@ def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''
                                                   lossUnary_list, options, eng)
 
         outer_history.append({"inner_history": inner_history,
-                              "latent_inferred_list": latent_inferred_list})
+                              "theta": theta})
 
         with open('./expData/batchResult/temp/%s_outer_iter%d.pickle'
                           % (batch_name, t), 'wb') as f:
