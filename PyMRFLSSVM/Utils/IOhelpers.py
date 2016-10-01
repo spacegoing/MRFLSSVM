@@ -49,7 +49,7 @@ def _dump_grabcut_unary_pairwise_cliques():
             image_path = name_image_mask_truemask[i, 1]
             mask_path = name_image_mask_truemask[i, 2]
             true_mask_path = name_image_mask_truemask[i, 3]
-            print("start "+image_name+' '+mask_input_type)
+            print("start " + image_name + ' ' + mask_input_type)
 
             # slic
             grabInstance = GrabCutInstance(image_path, mask_path, true_mask_path,
@@ -96,3 +96,23 @@ def _load_grabcut_unary_pairwise_cliques(mask_type='_new',
                                             'hasPairwise': True})
 
     return grabInstance_name_dict_list
+
+
+def _load_grabcut_train_results(train_results_path="/Users/spacegoing/"
+                                                   "macCodeLab-MBP2015/GrabCutResutls/"):
+    pickle_files = os.listdir(train_results_path)
+    name_theta_example_list = list()
+
+    leave_out_train_results_dict = dict()
+    empty_train_results_list = list()
+    for filename in pickle_files:
+        with open(train_results_path + filename, 'rb')as f:
+            examples_list, outer_history, leave_out_name = pickle.load(f)
+            try:
+                theta_converged = outer_history[1]["inner_history"][-1]['theta']
+                leave_out_train_results_dict[leave_out_name] = \
+                    {'theta': theta_converged, 'outer_history': outer_history}
+            except IndexError:
+                empty_train_results_list.append(filename)
+
+    return leave_out_train_results_dict

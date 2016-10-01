@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
-__author__ = 'spacegoing'
-
 import matplotlib.pyplot as plt
 import numpy as np
+
+from MrfTypes import BatchExamplesParser, Options
+
+__author__ = 'spacegoing'
 
 root_path = "./expData/batchPlots/"
 
@@ -124,6 +126,8 @@ def plot_colormap(save_name, y, unary_observed, y_hat):
 
 
 from Batch_MRF_Helpers import inf_label_latent_helper
+
+
 class BatchPlotWrapper:
     def __init__(self, examples_list, outer_history, options):
         self.examples_list = examples_list
@@ -135,7 +139,7 @@ class BatchPlotWrapper:
         self.max_latent = 0
         for latent_inferred in outer_history[-1]['latent_inferred_list']:
             self.max_latent = np.max([self.max_latent,
-                                     np.max(np.sum(latent_inferred, axis=1))])
+                                      np.max(np.sum(latent_inferred, axis=1))])
 
         for ex in examples_list:
             self.name_list = ex.name
@@ -150,3 +154,83 @@ class BatchPlotWrapper:
     def plot_color_map(self, image_no):
         ex = self.examples_list[image_no]
         plot_colormap(ex.name, ex.y, ex.unary_observed, self.y_hat_list[image_no])
+
+    def match_train_test_pairs(self):
+        import os
+        from Utils.IOhelpers import _load_grabcut_unary_pairwise_cliques, \
+            _load_grabcut_train_results
+
+        raw_example_list = _load_grabcut_unary_pairwise_cliques()
+        parser = BatchExamplesParser()
+        examples_list_all = parser.parse_grabcut_pickle(raw_example_list)
+        options = Options()
+
+        train_results_path = "/Users/spacegoing/macCodeLab-MBP2015/GrabCutResutls/"
+        pickle_files = os.listdir(train_results_path)
+        leave_out_train_results_dict = _load_grabcut_train_results()
+
+        name_theta_example_list = list()
+        for i in pickle_files:
+            test_name = i.split('_')[2]
+            for ex in examples_list_all:
+                if ex.name == test_name:
+                    theta_outerhis = leave_out_train_results_dict.get(ex.name, False)
+                    if theta_outerhis:
+                        name_theta_example_list.append([test_name, theta_outerhis['theta'], ex])
+
+        from Batch_MRF_Helpers import inf_label_latent_helper
+        from MrfTypes import Example
+
+        inferred_label_name_loss_list = list()
+        for i in name_theta_example_list:
+            test_name, theta, ex = i
+            inferred_label = \
+                inf_label_latent_helper(ex.unary_observed, ex.pairwise,
+                                        ex.clique_indexes, theta, options, ex.hasPairwise)[0]
+            loss = np.sum(inferred_label != ex.y) / (ex.y.shape[0] * ex.y.shape[1])
+            inferred_label_name_loss_list.append([inferred_label, loss, test_name])
+
+        error = 0
+        for i in inferred_label_name_loss_list:
+            error += i[1]
+
+        print(error / len(inferred_label_name_loss_list))
+
+        inferred_label_name_list = list()
+        for i in inferred_label_name_loss_list:
+            inferred_label, loss, test_name = i
+            if test_name in ['banana1.pickle', '37073.pickle', '24077.pickle']:
+                inferred_label_name_list.append([test_name, inferred_label])
+
+        image_dir = './GrabCut/Data/grabCut/images/'
+
+        name_list = ['banana1.bmp',
+                     '37073.jpg',
+                     '24077.jpg']
+        import cv2
+        img_dict = dict()
+        for name in name_list:
+            img = cv2.imread(image_dir + name)
+            img_dict[name.split('.')[0]] = img
+
+        prd_img_list = list()
+        for i in inferred_label_name_list:
+            test_name, inferred_label = i
+            prd_img = img_dict[test_name.split('.')[0]] * \
+                      inferred_label[:, :, np.newaxis]
+            prd_img_list.append([prd_img, test_name.split('.')[0]])
+
+        import pickle
+        with open('oaijewopi.pickle', 'wb') as f:
+            pickle.dump(prd_img_list, f)
+
+        with open('oaijewopi.pickle', 'rb') as f:
+            prd_img_list = pickle.load(f)
+
+        for i in prd_img_list:
+            img, name = i
+            plt.imshow(img), plt.savefig(name,dpi=100)
+
+        1 - 0.13119733680481344
+        1 - 0.34933593750000003
+        1 - 0.39286662651148635

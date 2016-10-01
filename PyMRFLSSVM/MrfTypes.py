@@ -108,3 +108,6 @@ class BatchExamplesParser:
                      True, instance.pairwise, name='checkboard')
         examples_list = [ex]
         return examples_list
+
+class BatchTrainingResults:
+    pass
