@@ -99,20 +99,19 @@ def _load_grabcut_unary_pairwise_cliques(mask_type='_new',
 
 
 def _load_grabcut_train_results(train_results_path="/Users/spacegoing/"
-                                                   "macCodeLab-MBP2015/GrabCutResutls/"):
+                                                   "macCodeLab-MBP2015/Python/"
+                                                   "GrabCutPickleBatchResults/"):
     pickle_files = os.listdir(train_results_path)
     name_theta_example_list = list()
 
-    leave_out_train_results_dict = dict()
-    empty_train_results_list = list()
+    leaveout_name_theta_outerhist_dict = dict()
     for filename in pickle_files:
         with open(train_results_path + filename, 'rb')as f:
             examples_list, outer_history, leave_out_name = pickle.load(f)
-            try:
-                theta_converged = outer_history[1]["inner_history"][-1]['theta']
-                leave_out_train_results_dict[leave_out_name] = \
-                    {'theta': theta_converged, 'outer_history': outer_history}
-            except IndexError:
-                empty_train_results_list.append(filename)
 
-    return leave_out_train_results_dict
+            image_name = leave_out_name.split('.')[0]
+            theta_converged = outer_history[-1]["theta"]
+            leaveout_name_theta_outerhist_dict[image_name] = \
+                {'theta': theta_converged, 'outer_history': outer_history}
+
+    return leaveout_name_theta_outerhist_dict
