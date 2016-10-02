@@ -141,8 +141,8 @@ def laipi_grabCut():
         ex_test = examples_list_all[i]
         if ex_test.name.split('.')[0] in laipi_name:
             examples_list = examples_list_all[:i] + examples_list_all[i + 1:]
-            Tasks.append((calcGrabCut, (examples_list, examples_list_all[i].name,
-                                        inf_latent_method, init_method, options)))
+            Tasks.append((laipiDog, (examples_list, examples_list_all[i].name,
+                                        inf_latent_method, init_method, options, ex_test)))
     if len(Tasks) != len(laipi_name):
         raise ValueError('Laipi doesn\'t match!')
 
