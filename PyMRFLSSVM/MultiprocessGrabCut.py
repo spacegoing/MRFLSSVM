@@ -106,7 +106,7 @@ def laipiDog(examples_list, leave_out_name, inf_latent_method, init_method, opti
         outer_history = cccp_outer_loop(examples_list, options, inf_latent_method, init_method, leave_out_name)
         theta = outer_history[-1]['theta']
         y_hat = inf_label_latent_helper(ex_test.unary_observed, ex_test.pairwise,
-                                        ex_test.clique_indexes, theta, options, ex_test.hasPairwise)
+                                        ex_test.clique_indexes, theta, options, ex_test.hasPairwise)[0]
         loss = np.sum(y_hat != ex_test.y) / (ex_test.y.shape[0] * ex_test.y.shape[1])
         count += 1
 
@@ -130,7 +130,7 @@ def laipi_grabCut():
 
     batches_num = len(examples_list_all)
 
-    inf_latent_method = ''
+    inf_latent_method = 'remove_redundancy'
     init_method = 'clique_by_clique'
 
     laipi_name = ['tennis', 'person6', 'cross', '65019', 'elefant',
