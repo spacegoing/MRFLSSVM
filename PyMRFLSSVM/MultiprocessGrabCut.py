@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 import matplotlib
-
 matplotlib.use('Agg')
+import numpy as np
+np.random.seed(20150719)
 from Batch_CCCP import cccp_outer_loop
 from Checkboard import Instance
 from MrfTypes import Example, Options, BatchExamplesParser
 from Utils.IOhelpers import _load_grabcut_unary_pairwise_cliques
 from Batch_MRF_Helpers import inf_label_latent_helper
 import multiprocessing
-import numpy as np
 import sys
 import pickle
 
@@ -102,7 +102,7 @@ def laipiDog(examples_list, leave_out_name, inf_latent_method, init_method, opti
     count = 0
     loss = 1.0
     outer_history = list()
-    while loss > 0.5:
+    while loss > 0.05:
         outer_history = cccp_outer_loop(examples_list, options, inf_latent_method, init_method, leave_out_name)
         theta = outer_history[-1]['theta']
         y_hat = inf_label_latent_helper(ex_test.unary_observed, ex_test.pairwise,
