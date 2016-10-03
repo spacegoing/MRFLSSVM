@@ -100,24 +100,25 @@ def laipiDog(examples_list, leave_out_name, inf_latent_method, init_method, opti
     '''
 
     count = 0
-    loss = 1
+    loss = 1.0
     outer_history = list()
     while loss > 0.5:
         outer_history = cccp_outer_loop(examples_list, options, inf_latent_method, init_method, leave_out_name)
-
-        with open('./expData/batchResult/training_result/'
-                  'laipi_leaveout_image_%s_%d_outer_history.pickle' % (leave_out_name, count), 'wb') as f:
-            pickle.dump([examples_list, outer_history, leave_out_name], f)
-
-        theta = outer_history['theta']
+        theta = outer_history[-1]['theta']
         y_hat = inf_label_latent_helper(ex_test.unary_observed, ex_test.pairwise,
                                         ex_test.clique_indexes, theta, options, ex_test.hasPairwise)
         loss = np.sum(y_hat != ex_test.y) / (ex_test.y.shape[0] * ex_test.y.shape[1])
         count += 1
 
+        with open('./expData/batchResult/training_result/'
+                  'laipi_leaveout_image_%s_%d_%f_outer_history.pickle' %
+                          (leave_out_name, count, float(1-loss)), 'wb') as f:
+            pickle.dump([ex_test, outer_history, leave_out_name], f)
+
+
     with open('./expData/batchResult/training_result/'
               'laipichenggong_leaveout_image_%s_%d_outer_history.pickle' % (leave_out_name, count), 'wb') as f:
-        pickle.dump([examples_list, outer_history, leave_out_name], f)
+        pickle.dump([ex_test, outer_history, leave_out_name], f)
 
 
 def laipi_grabCut():
@@ -151,7 +152,7 @@ def laipi_grabCut():
     pool.close()
     pool.join()
     print(r)
-    print('finished')
+    print('laipi_finished')
 
 
 if __name__ == "__main__":
