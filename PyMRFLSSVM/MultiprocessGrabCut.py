@@ -2,7 +2,6 @@
 import matplotlib
 matplotlib.use('Agg')
 import numpy as np
-np.random.seed(20150719)
 from Batch_CCCP import cccp_outer_loop
 from Checkboard import Instance
 from MrfTypes import Example, Options, BatchExamplesParser
@@ -98,7 +97,7 @@ def laipiDog(examples_list, leave_out_name, inf_latent_method, init_method, opti
     :return:
     :rtype:
     '''
-
+    np.random.seed()
     count = 0
     loss = 1.0
     outer_history = list()
@@ -113,12 +112,12 @@ def laipiDog(examples_list, leave_out_name, inf_latent_method, init_method, opti
         with open('./expData/batchResult/training_result/'
                   'laipi_leaveout_image_%s_%d_%f_outer_history.pickle' %
                           (leave_out_name, count, float(1-loss)), 'wb') as f:
-            pickle.dump([ex_test, outer_history, leave_out_name], f)
+            pickle.dump([ex_test, outer_history, leave_out_name, np.random.get_state()], f)
 
 
     with open('./expData/batchResult/training_result/'
               'laipichenggong_leaveout_image_%s_%d_outer_history.pickle' % (leave_out_name, count), 'wb') as f:
-        pickle.dump([ex_test, outer_history, leave_out_name], f)
+        pickle.dump([ex_test, outer_history, leave_out_name, np.random.get_state()], f)
 
 
 def laipi_grabCut():
