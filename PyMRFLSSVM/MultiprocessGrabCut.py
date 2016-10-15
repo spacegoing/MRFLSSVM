@@ -130,7 +130,7 @@ def laipi_grabCut():
     batches_num = len(examples_list_all)
 
     inf_latent_method = 'remove_redundancy'
-    init_method = 'clique_by_clique'
+    init_method = 'exlarge'
 
     laipi_name = ['tennis', 'person6', 'cross', '65019', 'elefant',
                   'bool', '37073', 'banana1', '153077', 'book', '153093', '24077',

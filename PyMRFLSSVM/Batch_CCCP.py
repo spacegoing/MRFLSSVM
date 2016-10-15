@@ -175,6 +175,8 @@ def cccp_outer_loop(examples_list, options, init_method='', inf_latent_method=''
 
     if init_method == 'clique_by_clique':
         theta = mrf.init_theta_concave(examples_list[0], options)
+    elif init_method == 'exlarge':
+        theta = mrf.init_theta_exlarge(options)
     elif init_method == 'zeros':
         theta = np.zeros(options.sizePhi + 1, dtype=np.double, order='C')
         theta[options.sizeHighPhi] = 1  # set unary weight to 1

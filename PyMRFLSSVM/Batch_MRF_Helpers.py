@@ -3,6 +3,7 @@ __author__ = 'spacegoing'
 from CyInf.WllepGraphCut import Inf_Algo
 from MrfTypes import Example, Options
 import numpy as np
+import scipy as sp
 
 
 def phi_helper(ex, label_inferred, latent_inferred, options):
@@ -34,8 +35,8 @@ def phi_helper(ex, label_inferred, latent_inferred, options):
         for i1, i2, value in ex.pairwise:
             if label[int(i1)] != label[int(i2)]:
                 pairwise_phi += value
-        # pairwise_phi = sum(label_inferred.flatten()[ex.pairwise[:, 0].astype(np.int)] !=
-        #                    label_inferred.flatten()[ex.pairwise[:, 1].astype(np.int)])
+                # pairwise_phi = sum(label_inferred.flatten()[ex.pairwise[:, 0].astype(np.int)] !=
+                #                    label_inferred.flatten()[ex.pairwise[:, 1].astype(np.int)])
 
     # higher order phi
     higher_order_phi = np.zeros(2 * options.K - 1, dtype=np.double, order='C')
@@ -265,6 +266,34 @@ def init_theta_concave(example, options):
     theta += [np.random.uniform(-1, 1, 1)[0]] + list(np.random.rand(1, 2)[0, :])
 
     return np.asarray(theta, dtype=np.double, order='C')
+
+
+def init_theta_exlarge(options, first_a=1e6, dec=1e2):
+    '''
+
+    :param options:
+    :type options: Options
+    :return:
+    :rtype:
+    '''
+    intervals = sp.linspace(0, 1, options.K + 1)
+    a_b_array = np.zeros([options.K, 2], dtype=np.double)
+    a_b_array[0, 0] = first_a
+    for i in range(1, options.K):
+        a_b_array[i, 0] = a_b_array[i - 1, 0] - dec
+        inter_point_y = a_b_array[i - 1, 0] * intervals[i] \
+                        + a_b_array[i - 1, 1]
+        a_b_array[i, 1] = inter_point_y - a_b_array[i, 0] * intervals[i]
+
+    theta = np.zeros(options.sizePhi + 1, dtype=np.double)
+    theta[0] = a_b_array[0, 0]
+    for i in range(1, options.K):
+        theta[i] = a_b_array[i, 0] - a_b_array[i - 1, 0]
+        theta[i + options.K - 1] = a_b_array[i, 1] - a_b_array[i - 1, 1]
+    theta[-3] = 1e-21
+    theta[-2] = 1
+
+    return theta
 
 
 def remove_redundancy_theta(theta, options, eps=1e-5):
