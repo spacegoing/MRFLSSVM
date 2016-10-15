@@ -62,9 +62,18 @@ if __name__ == '__main__':
     with open(stats_data_dir + '50_results.pickle', 'wb') as f:
         pickle.dump(name_infLabel_loss_y_dict, f)
 
-        # avg_error = 0
-        # for i in name_infLabel_loss_y_dict.values():
-        #     print(i['loss'])
-        #     avg_error += i['loss']
-        #
-        # print(avg_error / len(name_infLabel_loss_y_dict))
+    with open(stats_data_dir + '50_results.pickle', 'rb') as f:
+        name_infLabel_loss_y_dict = pickle.load(f)
+
+    avg_error = 0
+    worst_loss_list = list()
+    worst_name_list = list()
+    for name, i in name_infLabel_loss_y_dict.items():
+        print(i['loss'])
+        if i['loss']>0.05:
+            worst_loss_list.append(i['loss'])
+            worst_name_list.append(str(name))
+        else:
+            avg_error += i['loss']
+
+    print(1-avg_error / len(name_infLabel_loss_y_dict))
