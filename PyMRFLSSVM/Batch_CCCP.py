@@ -72,9 +72,13 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options, e
     y_hat_loss_list = list()
     y_hat_loss = 0
     for ex in examples_list:
+        pairwise = np.copy(ex.pairwise)
+        if ex.hasPairwise:
+            pairwise[:, 2] = theta[-2] * ex.pairwise[:, 2]
         y_hat = mrf.inf_label_latent_helper(
-            ex.unary_observed, ex.pairwise,
-            ex.clique_indexes, theta, options, ex.hasPairwise)[0]
+            theta[-3] * ex.unary_observed, pairwise,
+            ex.clique_indexes, theta,
+            options, ex.hasPairwise)[0]
         y_hat_loss += np.sum(y_hat != ex.y) / (ex.y.shape[0] * ex.y.shape[1])
     y_hat_loss_list.append(y_hat_loss / examples_num)
 
@@ -90,9 +94,13 @@ def cutting_plane_ssvm(theta, vt_list, examples_list, lossUnary_list, options, e
 
         y_hat_loss = 0
         for ex in examples_list:
+            pairwise = np.copy(ex.pairwise)
+            if ex.hasPairwise:
+                pairwise[:, 2] = theta[-2] * ex.pairwise[:, 2]
             y_hat = mrf.inf_label_latent_helper(
-                ex.unary_observed, ex.pairwise,
-                ex.clique_indexes, theta, options, ex.hasPairwise)[0]
+                theta[-3] * ex.unary_observed, pairwise,
+                ex.clique_indexes, theta,
+                options, ex.hasPairwise)[0]
             y_hat_loss += np.sum(y_hat != ex.y) / (ex.y.shape[0] * ex.y.shape[1])
         y_hat_loss_list.append(y_hat_loss / examples_num)
 
