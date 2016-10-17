@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import matplotlib
+
 matplotlib.use('Agg')
 import numpy as np
 from Batch_CCCP import cccp_outer_loop
@@ -104,16 +105,18 @@ def laipiDog(examples_list, leave_out_name, inf_latent_method, init_method, opti
     while loss > 0.05:
         outer_history = cccp_outer_loop(examples_list, options, inf_latent_method, init_method, leave_out_name)
         theta = outer_history[-1]['theta']
-        y_hat = inf_label_latent_helper(ex_test.unary_observed, ex_test.pairwise,
+        pairwise = np.copy(ex_test.pairwise)
+        if ex_test.hasPairwise:
+            pairwise[:, 2] = theta[-2] * ex_test.pairwise[:, 2]
+        y_hat = inf_label_latent_helper(theta[-3] * ex_test.unary_observed, pairwise,
                                         ex_test.clique_indexes, theta, options, ex_test.hasPairwise)[0]
         loss = np.sum(y_hat != ex_test.y) / (ex_test.y.shape[0] * ex_test.y.shape[1])
         count += 1
 
         with open('./expData/batchResult/training_result/'
                   'laipi_leaveout_image_%s_%d_%f_outer_history.pickle' %
-                          (leave_out_name, count, float(1-loss)), 'wb') as f:
+                          (leave_out_name, count, float(1 - loss)), 'wb') as f:
             pickle.dump([ex_test, outer_history, leave_out_name, np.random.get_state()], f)
-
 
     with open('./expData/batchResult/training_result/'
               'laipichenggong_leaveout_image_%s_%d_outer_history.pickle' % (leave_out_name, count), 'wb') as f:
@@ -142,7 +145,7 @@ def laipi_grabCut():
         if ex_test.name.split('.')[0] in laipi_name:
             examples_list = examples_list_all[:i] + examples_list_all[i + 1:]
             Tasks.append((laipiDog, (examples_list, examples_list_all[i].name,
-                                        inf_latent_method, init_method, options, ex_test)))
+                                     inf_latent_method, init_method, options, ex_test)))
     if len(Tasks) != len(laipi_name):
         raise ValueError('Laipi doesn\'t match!')
 

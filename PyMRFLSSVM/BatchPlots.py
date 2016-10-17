@@ -143,9 +143,14 @@ class BatchPlotWrapper:
 
         for ex in examples_list:
             self.name_list = ex.name
-            self.y_hat_list.append(inf_label_latent_helper(
-                ex.unary_observed, ex.pairwise,
-                ex.clique_indexes, self.theta, options, ex.hasPairwise)[0])
+            pairwise = np.copy(ex.pairwise)
+            if ex.hasPairwise:
+                pairwise[:, 2] = self.theta[-2] * ex.pairwise[:, 2]
+            y_hat = inf_label_latent_helper(
+                self.theta[-3] * ex.unary_observed, pairwise,
+                ex.clique_indexes, self.theta,
+                options, ex.hasPairwise)[0]
+            self.y_hat_list.append(y_hat)
 
     def plot_linfunc_converged(self, image_no):
         plot_linfunc_converged(self.examples_list[image_no].name,
@@ -184,9 +189,13 @@ class BatchPlotWrapper:
         inferred_label_name_loss_list = list()
         for i in name_theta_example_list:
             test_name, theta, ex = i
-            inferred_label = \
-                inf_label_latent_helper(ex.unary_observed, ex.pairwise,
-                                        ex.clique_indexes, theta, options, ex.hasPairwise)[0]
+            pairwise = np.copy(ex.pairwise)
+            if ex.hasPairwise:
+                pairwise[:, 2] = theta[-2] * ex.pairwise[:, 2]
+            inferred_label = inf_label_latent_helper(
+                theta[-3] * ex.unary_observed, pairwise,
+                ex.clique_indexes, theta,
+                options, ex.hasPairwise)[0]
             loss = np.sum(inferred_label != ex.y) / (ex.y.shape[0] * ex.y.shape[1])
             inferred_label_name_loss_list.append([inferred_label, loss, test_name])
 
@@ -229,7 +238,7 @@ class BatchPlotWrapper:
 
         for i in prd_img_list:
             img, name = i
-            plt.imshow(img), plt.savefig(name,dpi=100)
+            plt.imshow(img), plt.savefig(name, dpi=100)
 
         1 - 0.13119733680481344
         1 - 0.34933593750000003

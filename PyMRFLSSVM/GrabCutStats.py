@@ -45,9 +45,13 @@ def test_results(name_theta_example_dict):
     for name, theta_ex_dict in name_theta_example_dict.items():
         theta = theta_ex_dict['theta']
         ex = theta_ex_dict['ex']
-        inferred_label = \
-            inf_label_latent_helper(ex.unary_observed, ex.pairwise,
-                                    ex.clique_indexes, theta, options, ex.hasPairwise)[0]
+        pairwise = np.copy(ex.pairwise)
+        if ex.hasPairwise:
+            pairwise[:, 2] = theta[-2] * ex.pairwise[:, 2]
+        inferred_label = inf_label_latent_helper(
+            theta[-3] * ex.unary_observed, pairwise,
+            ex.clique_indexes, theta,
+            options, ex.hasPairwise)[0]
         loss = np.sum(inferred_label != ex.y) / (ex.y.shape[0] * ex.y.shape[1])
         name_infLabel_loss_y_dict[name] = {'inferred_label': inferred_label,
                                            'loss': loss,
