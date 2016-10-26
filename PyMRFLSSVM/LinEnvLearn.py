@@ -266,12 +266,24 @@ if __name__ == "__main__":
 
     # Generate instance
     parser = BatchExamplesParser()
-    instance = Instance()
-    unary_observed, pairwise = loadMatPairwise()
-    instance.unary_observed = unary_observed
-    # Original is 0.0
-    pairwise[:, 2] = 1.0
-    instance.pairwise = pairwise
+
+    # # Matlab Data
+    # instance = Instance()
+    # unary_observed, pairwise = loadMatPairwise()
+    # instance.unary_observed = unary_observed
+    # # Original is 0.0
+    # pairwise[:, 2] = 1.0
+    # instance.pairwise = pairwise
+
+    # Unbalanced Data
+    data_list = [["more_black_3339", (0.3, 0.3, 0.3, 0.9)],
+                 ["more_white_1777", (0.1, 0.7, 0.7, 0.7)],
+                 ["balanced_portions_124678", (0.1, 0.2, 0.4, 0.6, 0.7, 0.8)]]
+    miu = data_list[1][1]
+    instance = Instance('gaussian_portions', portion_miu=miu, is_gaussian=False)
+    instance.pairwise[:, 2] = 1.0
+
+
     examples_list = parser.parse_checkboard(instance)
     ex = examples_list[0]
 
@@ -283,5 +295,7 @@ if __name__ == "__main__":
 
     eng = matlab.engine.start_matlab()
 
-    theta, history = pami_cutting_plane_ssvm(examples_list, options, eng)
-    print(decode_theta(theta, options))
+    theta1, history = pami_cutting_plane_ssvm(examples_list, options, eng)
+    print(decode_theta(theta1, options))
+    theta = encode_latent_theta(theta1, options)
+    print()
